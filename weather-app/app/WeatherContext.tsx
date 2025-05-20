@@ -5,6 +5,7 @@ import {
   fetchCurrentWeather, 
   fetchForecast,
   fetchHourlyForecast,
+  fetchMonthlyForecast,
   searchLocation as apiSearchLocation
 } from './api';
 import { SearchHistoryService } from './SearchHistoryService';
@@ -72,10 +73,27 @@ export interface HourlyForecastItem {
   pop: number; // probability of precipitation
 }
 
+export interface MonthlyForecastItem {
+  dt: number;
+  temp: {
+    average: number;
+    min: number;
+    max: number;
+  };
+  humidity: number;
+  precipitation: number;
+  weather?: {
+    id?: number;
+    description?: string;
+    icon?: string;
+  }[];
+}
+
 interface WeatherContextType {
   weatherData: WeatherData | null;
   dailyForecastData: ForecastItem[];
   hourlyForecastData: HourlyForecastItem[];
+  monthlyForecastData: MonthlyForecastItem[];
   isLoading: boolean;
   errorMsg: string | null;
   searchQuery: string;
@@ -96,6 +114,7 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [dailyForecastData, setDailyForecastData] = useState<ForecastItem[]>([]);
   const [hourlyForecastData, setHourlyForecastData] = useState<HourlyForecastItem[]>([]);
+  const [monthlyForecastData, setMonthlyForecastData] = useState<MonthlyForecastItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -167,6 +186,20 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // to display 24 hours (up to 40 entries in the API response covering 5 days)
       const hourlyForecasts = generateHourlyData(forecastResponse.list);
       setHourlyForecastData(hourlyForecasts);
+
+      // Fetch monthly climate forecast (30 days)
+      try {
+        const monthlyResponse = await fetchMonthlyForecast(latitude, longitude);
+        if (monthlyResponse && monthlyResponse.list) {
+          const processedMonthlyData = processMonthlyData(monthlyResponse.list);
+          setMonthlyForecastData(processedMonthlyData);
+        }
+      } catch (monthlyError) {
+        console.error('Error fetching monthly forecast:', monthlyError);
+        // Don't fail the entire operation for monthly forecast error
+        // Just set empty monthly data
+        setMonthlyForecastData([]);
+      }
       
       setErrorMsg(null);
       setLastUpdated(new Date());
@@ -372,12 +405,37 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+    const processMonthlyData = (monthlyList: any[]): MonthlyForecastItem[] => {
+    if (!monthlyList || !Array.isArray(monthlyList)) {
+      return [];
+    }
+    
+    // Process monthly data to match our interface
+    return monthlyList.map(item => ({
+      dt: item.dt,
+      temp: {
+        average: item.temp.average || item.temp.day,
+        min: item.temp.min,
+        max: item.temp.max
+      },
+      humidity: item.humidity || 0,
+      precipitation: item.precipitation || 0,
+      // Some monthly APIs might not include detailed weather conditions
+      weather: item.weather ? [{
+        id: item.weather[0]?.id,
+        description: item.weather[0]?.description || '',
+        icon: item.weather[0]?.icon || ''
+      }] : undefined
+    })).slice(0, 30); // Ensure we only return 30 days
+  };
+
   return (
     <WeatherContext.Provider
       value={{
         weatherData,
         dailyForecastData,
         hourlyForecastData,
+        monthlyForecastData,
         isLoading,
         errorMsg,
         searchQuery,
