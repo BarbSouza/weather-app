@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Text,
   View,
@@ -6,7 +6,6 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
-  TouchableOpacity,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { styles } from './styles';
@@ -15,12 +14,6 @@ import { WeatherIcon, formatHour, formatPrecipitation } from './components/Weath
 
 export default function Hourly() {
   const { hourlyForecastData, isLoading, errorMsg } = useWeather();
-  const [showAllHours, setShowAllHours] = useState(false);
-
-  // Show only 8 hours initially, can be expanded to all 24
-  const displayData = showAllHours 
-    ? hourlyForecastData 
-    : hourlyForecastData.slice(0, 8);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -41,9 +34,9 @@ export default function Hourly() {
           contentContainerStyle={styles.scrollViewContent}
         >
           <View style={styles.forecastContainer}>
-            <Text style={styles.forecastTitle}>Detailed Hourly Forecast</Text>
+            <Text style={styles.forecastTitle}>Hourly Forecast</Text>
             
-            {displayData.map((hour, index) => (
+            {hourlyForecastData.map((hour, index) => (
               <View key={index} style={styles.hourlyDetailItem}>
                 <View style={styles.hourlyDetailLeft}>
                   <Text style={styles.hourlyDetailTime}>{formatHour(hour.dt)}</Text>
@@ -65,17 +58,6 @@ export default function Hourly() {
                 </View>
               </View>
             ))}
-            
-            {hourlyForecastData.length > 8 && (
-              <TouchableOpacity 
-                style={styles.showMoreButton}
-                onPress={() => setShowAllHours(!showAllHours)}
-              >
-                <Text style={styles.showMoreText}>
-                  {showAllHours ? 'Show Less' : 'Show More'}
-                </Text>
-              </TouchableOpacity>
-            )}
           </View>
           
           {/* Additional Information */}

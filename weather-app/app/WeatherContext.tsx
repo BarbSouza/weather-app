@@ -4,6 +4,7 @@ import { Alert, Platform } from 'react-native';
 import { 
   fetchCurrentWeather, 
   fetchForecast,
+  fetchHourlyForecast,
   searchLocation as apiSearchLocation
 } from './api';
 import { SearchHistoryService } from './SearchHistoryService';
@@ -162,7 +163,8 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
       
       setDailyForecastData(forecastWithPrecip);
       
-      // Generate hourly data from regular forecast endpoints
+      // Generate hourly data from forecast endpoint - use all available 3-hour intervals
+      // to display 24 hours (up to 40 entries in the API response covering 5 days)
       const hourlyForecasts = generateHourlyData(forecastResponse.list);
       setHourlyForecastData(hourlyForecasts);
       
@@ -194,16 +196,62 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const generateHourlyData = (forecastList: ForecastItem[]): HourlyForecastItem[] => {
-    // Extract the next 24 hours from the 3-hourly forecast data
-    const next24Hours = forecastList.slice(0, 8); // 8 items * 3 hours = 24 hours
-
-    // Convert to the expected hourly data format
-    return next24Hours.map(item => ({
-      dt: item.dt,
-      temp: item.main.temp,
-      weather: item.weather,
-      pop: item.pop || 0
-    }));
+    // Use the first 24 hours of data (8 entries with 3-hour intervals)
+    const now = new Date().getTime();
+    
+    // Filter forecast items to only include future forecasts (from current time forward)
+    const futureForecasts = forecastList.filter(item => item.dt * 1000 >= now);
+    
+    // Take the first 8 items (covering 24 hours with 3-hour intervals)
+    const next24Hours = futureForecasts.slice(0, 8);
+    
+    // If we need all 24 hours with hourly resolution, we need to interpolate
+    // between the 3-hour intervals to generate hourly data
+    const hourlyData: HourlyForecastItem[] = [];
+    
+    for (let i = 0; i < next24Hours.length; i++) {
+      const currentForecast = next24Hours[i];
+      
+      // Add the current 3-hour point
+      hourlyData.push({
+        dt: currentForecast.dt,
+        temp: currentForecast.main.temp,
+        weather: currentForecast.weather,
+        pop: currentForecast.pop || 0
+      });
+      
+      // If there's a next forecast, interpolate between current and next
+      if (i < next24Hours.length - 1) {
+        const nextForecast = next24Hours[i + 1];
+        
+        // Calculate hours between forecasts (normally 3)
+        const hoursBetween = (nextForecast.dt - currentForecast.dt) / 3600;
+        
+        // Generate hourly points between 3-hour intervals (typically 2 more points)
+        for (let h = 1; h < hoursBetween; h++) {
+          const ratio = h / hoursBetween;
+          const interpolatedTime = currentForecast.dt + (h * 3600);
+          const interpolatedTemp = currentForecast.main.temp + 
+            ratio * (nextForecast.main.temp - currentForecast.main.temp);
+          
+          // For precipitation and weather condition, just use the nearest forecast
+          const useNextForecast = ratio >= 0.5;
+          const weatherData = useNextForecast ? nextForecast.weather : currentForecast.weather;
+          const popValue = useNextForecast ? 
+            (nextForecast.pop || 0) : (currentForecast.pop || 0);
+          
+          hourlyData.push({
+            dt: interpolatedTime,
+            temp: interpolatedTemp,
+            weather: weatherData,
+            pop: popValue
+          });
+        }
+      }
+    }
+    
+    // Ensure we have 24 data points (hours)
+    return hourlyData.slice(0, 24);
   };
 
   const handleSearchLocation = async () => {

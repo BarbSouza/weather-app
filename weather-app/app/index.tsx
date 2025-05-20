@@ -166,9 +166,9 @@ export default function Home() {
 
           {/* Hourly Forecast Preview */}
           <View style={styles.hourlyForecastContainer}>
-            <Text style={styles.forecastTitle}>24-Hour Forecast</Text>
+            <Text style={styles.forecastTitle}>Hourly Forecast</Text>
             <FlatList
-              data={hourlyForecastData.slice(0, 8)}
+              data={hourlyForecastData.slice(0, 24)}
               renderItem={renderHourlyItem}
               keyExtractor={(item) => item.dt.toString()}
               horizontal
