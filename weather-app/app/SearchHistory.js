@@ -4,11 +4,9 @@ import {
   Text,
   TouchableOpacity,
   FlatList,
-  StyleSheet,
-  Alert
+  StyleSheet
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { SearchHistoryService } from './SearchHistoryService';
 
 const SearchHistory = ({ 
   visible, 
@@ -18,21 +16,6 @@ const SearchHistory = ({
   onDismiss 
 }) => {
   if (!visible || history.length === 0) return null;
-
-  const confirmClearHistory = () => {
-    Alert.alert(
-      "Clear Search History",
-      "Are you sure you want to clear all search history?",
-      [
-        { text: "Cancel", style: "cancel" },
-        { 
-          text: "Clear", 
-          onPress: onClearHistory,
-          style: "destructive" 
-        }
-      ]
-    );
-  };
 
   const renderHistoryItem = ({ item }) => (
     <TouchableOpacity 
@@ -50,7 +33,10 @@ const SearchHistory = ({
         <View style={styles.header}>
           <Text style={styles.title}>Recent Searches</Text>
           <View style={styles.actions}>
-            <TouchableOpacity onPress={confirmClearHistory} style={styles.clearButton}>
+            <TouchableOpacity 
+              onPress={onClearHistory} 
+              style={styles.clearButton}
+            >
               <Text style={styles.clearButtonText}>Clear All</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={onDismiss} style={styles.closeButton}>
