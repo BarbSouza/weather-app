@@ -16,7 +16,7 @@ export default function AppLayout() {
           },
           headerStyle: {
             backgroundColor: '#0066cc',
-            height: 30,
+            height: 60,
           },
           headerTintColor: '#fff',
           headerTitleStyle: {

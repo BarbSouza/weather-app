@@ -554,4 +554,180 @@ export const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 4,
   },
+  // Calendar styles
+calendarContainer: {
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 15,
+  marginBottom: 16,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3,
+},
+calendarHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingVertical: 10,
+  paddingHorizontal: 5,
+  marginBottom: 10,
+},
+calendarMonthYear: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  color: '#333',
+},
+calendarNavButton: {
+  padding: 8,
+  borderRadius: 20,
+  backgroundColor: '#f0f0f0',
+},
+calendarWeekdayHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-around',
+  marginBottom: 10,
+},
+calendarWeekdayText: {
+  width: '14.28%',
+  textAlign: 'center',
+  fontWeight: '500',
+  color: '#666',
+  fontSize: 14,
+},
+calendarGrid: {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+},
+calendarDay: {
+  width: '14.28%',
+  aspectRatio: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginBottom: 6,
+  backgroundColor: '#E1F5FE',
+  borderRadius: 8,
+  padding: 4,
+},
+calendarToday: {
+  backgroundColor: '#B3E5FC',
+  borderWidth: 2,
+  borderColor: '#0288D1',
+},
+calendarTodayText: {
+  fontWeight: 'bold',
+  color: '#0288D1',
+},
+calendarSelectedDay: {
+  backgroundColor: '#0066cc',
+  elevation: 2,
+},
+calendarSelectedDayText: {
+  color: '#fff',
+  fontWeight: 'bold',
+},
+calendarDayNoData: {
+  backgroundColor: '#f5f5f5',
+},
+calendarEmptyDay: {
+  width: '14.28%',
+  aspectRatio: 1,
+},
+calendarDayText: {
+  fontSize: 14,
+  fontWeight: '500',
+  color: '#333',
+},
+calendarDayTemp: {
+  fontSize: 12,
+  color: '#444',
+  marginTop: 2,
+},
+calendarDayIcon: {
+  marginTop: 2,
+  opacity: 0.8,
+},
+calendarLegend: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  marginTop: 16,
+  marginBottom: 8,
+},
+legendItem: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginHorizontal: 8,
+},
+legendColorBox: {
+  width: 12,
+  height: 12,
+  borderRadius: 3, 
+  marginRight: 6,
+},
+legendText: {
+  fontSize: 12,
+  color: '#666',
+},
+selectedForecastContainer: {
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 20,
+  marginBottom: 16,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3,
+},
+selectedForecastTitle: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  color: '#333',
+  marginBottom: 15,
+},
+selectedForecastContent: {
+  alignItems: 'stretch',
+},
+selectedForecastMainInfo: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 20,
+  paddingBottom: 15,
+  borderBottomWidth: 1,
+  borderBottomColor: '#eee',
+},
+selectedForecastTemp: {
+  marginLeft: 15,
+},
+selectedForecastTempValue: {
+  fontSize: 28,
+  fontWeight: 'bold',
+  color: '#333',
+},
+selectedForecastDescription: {
+  fontSize: 16,
+  color: '#666',
+  textTransform: 'capitalize',
+  marginTop: 5,
+},
+selectedForecastDetails: {
+  marginTop: 5,
+},
+forecastDetailItem: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 12,
+},
+forecastDetailLabel: {
+  fontSize: 14,
+  color: '#666',
+  marginLeft: 10,
+  width: 100,
+},
+forecastDetailValue: {
+  fontSize: 14,
+  fontWeight: '500',
+  color: '#333',
+}
 });
