@@ -15,6 +15,7 @@ import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { styles } from './styles';
 import { useWeather } from './WeatherContext';
 import { WeatherIcon, formatHour, formatPrecipitation } from './components/WeatherUtils';
+import SearchHistory from './SearchHistory';
 
 export default function Home() {
   const { 
@@ -25,7 +26,13 @@ export default function Home() {
     searchQuery, 
     setSearchQuery, 
     handleSearchLocation, 
-    handleGetCurrentLocation 
+    handleGetCurrentLocation,
+    searchHistory,
+    showSearchHistory,
+    setShowSearchHistory,
+    handleSelectHistoryItem,
+    handleClearSearchHistory,
+    lastUpdated
   } = useWeather();
 
   const renderHourlyItem = ({ item }: { item: any }) => (
@@ -40,6 +47,23 @@ export default function Home() {
     </View>
   );
 
+  // Format the last updated time
+  const formatLastUpdated = () => {
+    if (!lastUpdated) return '';
+    
+    const now = new Date();
+    const diffMs = now.getTime() - lastUpdated.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return 'Updated just now';
+    if (diffMins === 1) return 'Updated 1 minute ago';
+    if (diffMins < 60) return `Updated ${diffMins} minutes ago`;
+    
+    const hours = Math.floor(diffMins / 60);
+    if (hours === 1) return 'Updated 1 hour ago';
+    return `Updated ${hours} hours ago`;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -53,13 +77,29 @@ export default function Home() {
           onChangeText={setSearchQuery}
           placeholderTextColor="#888"
           onSubmitEditing={handleSearchLocation}
+          onFocus={() => setShowSearchHistory(true)}
         />
-        <TouchableOpacity style={styles.searchButton} onPress={handleSearchLocation}>
+        <TouchableOpacity 
+          style={styles.searchButton} 
+          onPress={handleSearchLocation}
+        >
           <Feather name="search" size={22} color="#fff" />
         </TouchableOpacity>
       </View>
       
-      <TouchableOpacity style={styles.locationButton} onPress={handleGetCurrentLocation}>
+      {/* Search History Popup */}
+      <SearchHistory
+        visible={showSearchHistory}
+        history={searchHistory}
+        onSelectItem={handleSelectHistoryItem}
+        onClearHistory={handleClearSearchHistory}
+        onDismiss={() => setShowSearchHistory(false)}
+      />
+      
+      <TouchableOpacity 
+        style={styles.locationButton} 
+        onPress={handleGetCurrentLocation}
+      >
         <Feather name="map-pin" size={18} color="#fff" />
         <Text style={styles.locationButtonText}>Current Location</Text>
       </TouchableOpacity>
@@ -71,12 +111,21 @@ export default function Home() {
         </View>
       ) : errorMsg ? (
         <View style={styles.errorContainer}>
+          <MaterialCommunityIcons name="weather-cloudy-alert" size={60} color="#d32f2f" style={styles.emptyStateIcon} />
           <Text style={styles.errorText}>{errorMsg}</Text>
+          <TouchableOpacity 
+            style={[styles.locationButton, { marginTop: 20 }]} 
+            onPress={handleGetCurrentLocation}
+          >
+            <Feather name="refresh-cw" size={18} color="#fff" />
+            <Text style={styles.locationButtonText}>Try Again</Text>
+          </TouchableOpacity>
         </View>
       ) : weatherData ? (
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollViewContent}
+          onScrollBeginDrag={Keyboard.dismiss}
         >
           {/* Current Weather */}
           <View style={styles.currentWeatherContainer}>
@@ -109,6 +158,9 @@ export default function Home() {
                   Feels like {Math.round(weatherData.main.feels_like)}°C
                 </Text>
               </View>
+              {lastUpdated && (
+                <Text style={styles.lastUpdatedText}>{formatLastUpdated()}</Text>
+              )}
             </View>
           </View>
 
@@ -124,10 +176,25 @@ export default function Home() {
               contentContainerStyle={styles.hourlyForecastList}
             />
           </View>
+          
+          {/* Refresh button at the bottom */}
+          <TouchableOpacity 
+            style={styles.refreshContainer}
+            onPress={() => {
+              weatherData && handleSelectHistoryItem(weatherData.name);
+            }}
+          >
+            <Feather name="refresh-cw" size={16} color="#0066cc" />
+            <Text style={styles.refreshText}>Refresh Weather</Text>
+          </TouchableOpacity>
         </ScrollView>
       ) : (
-        <View style={styles.noDataContainer}>
-          <Text style={styles.noDataText}>Search for a location or allow location access to see weather data</Text>
+        <View style={styles.emptyStateContainer}>
+          <MaterialCommunityIcons name="weather-cloudy" size={80} color="#888" style={styles.emptyStateIcon} />
+          <Text style={styles.emptyStateText}>No Weather Data</Text>
+          <Text style={styles.emptyStateDescription}>
+            Search for a location or use your current location to view weather information.
+          </Text>
         </View>
       )}
     </SafeAreaView>

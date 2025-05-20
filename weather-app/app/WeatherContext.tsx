@@ -1,11 +1,13 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import * as Location from 'expo-location';
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { 
   fetchCurrentWeather, 
   fetchForecast,
   searchLocation as apiSearchLocation
 } from './api';
+import { SearchHistoryService } from './SearchHistoryService';
+
 
 // TypeScript interfaces
 export interface WeatherData {
@@ -31,6 +33,14 @@ export interface WeatherData {
     sunrise: number;
     sunset: number;
   };
+}
+
+interface ApiError {
+  response?: {
+    status: number;
+    data?: any;
+  };
+  isAxiosError?: boolean;
 }
 
 export interface ForecastItem {
@@ -71,6 +81,12 @@ interface WeatherContextType {
   setSearchQuery: (query: string) => void;
   handleSearchLocation: () => Promise<void>;
   handleGetCurrentLocation: () => Promise<void>;
+  searchHistory: string[];
+  showSearchHistory: boolean;
+  setShowSearchHistory: (show: boolean) => void;
+  handleSelectHistoryItem: (query: string) => Promise<void>;
+  handleClearSearchHistory: () => Promise<void>;
+  lastUpdated: Date | null;
 }
 
 const WeatherContext = createContext<WeatherContextType | undefined>(undefined);
@@ -83,6 +99,19 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [showSearchHistory, setShowSearchHistory] = useState<boolean>(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  // Load search history on initial mount
+  useEffect(() => {
+    loadSearchHistory();
+  }, []);
+
+  const loadSearchHistory = async () => {
+    const history = await SearchHistoryService.getSearchHistory();
+    setSearchHistory(history);
+  };
 
   useEffect(() => {
     (async () => {
@@ -138,6 +167,7 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setHourlyForecastData(hourlyForecasts);
       
       setErrorMsg(null);
+      setLastUpdated(new Date());
     } catch (error) {
       console.error('Error fetching weather data:', error);
       setErrorMsg('Failed to fetch weather data');
@@ -177,27 +207,111 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const handleSearchLocation = async () => {
-    if (!searchQuery.trim()) return;
+    if (!searchQuery.trim()) {
+      setShowSearchHistory(false);
+      return;
+    }
     
     try {
       setIsLoading(true);
+      setShowSearchHistory(false);
       
       // Use API function
       const response = await apiSearchLocation(searchQuery);
       
       const { lat, lon } = response.coord;
       await fetchWeatherData(lat, lon);
+      
+      // Save to search history
+      await SearchHistoryService.saveSearchQuery(searchQuery);
+      
+      // Reload search history
+      await loadSearchHistory();
+      
       setSearchQuery('');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error searching location:', error);
-      Alert.alert('Error', 'Location not found. Please try another search.');
+      
+      let errorMessage = 'Location not found. Please check spelling and try again.';
+      
+      // Type guard for API errors
+      const isApiError = (err: unknown): err is ApiError => {
+        return err !== null && typeof err === 'object' && 'response' in err;
+      };
+
+      // Check for network connectivity
+      const isOffline = () => {
+        if (Platform.OS === 'web') {
+          return typeof window !== 'undefined' && !window.navigator.onLine;
+        }
+        // For React Native, you might want to use NetInfo here
+        return false;
+      };
+
+      if (isApiError(error)) {
+        switch (error.response?.status) {
+          case 404:
+            errorMessage = `"${searchQuery}" not found. Please check spelling and try again.`;
+            break;
+          case 429:
+            errorMessage = 'Too many requests. Please try again later.';
+            break;
+          case 500:
+          case 502:
+          case 503:
+          case 504:
+            errorMessage = 'Weather service is currently unavailable. Please try again later.';
+            break;
+          default:
+            errorMessage = 'An unexpected error occurred. Please try again.';
+        }
+      } else if (isOffline()) {
+        errorMessage = 'No internet connection. Please check your connection and try again.';
+      }
+
+      Alert.alert('Search Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleSelectHistoryItem = async (query: string) => {
+    setSearchQuery(query);
+    setShowSearchHistory(false);
+    
+    try {
+      setIsLoading(true);
+      
+      // Use API function
+      const response = await apiSearchLocation(query);
+      
+      const { lat, lon } = response.coord;
+      await fetchWeatherData(lat, lon);
+      
+      // Move this item to the top of history
+      await SearchHistoryService.saveSearchQuery(query);
+      
+      // Reload search history
+      await loadSearchHistory();
+      
+      setSearchQuery('');
+    } catch (error) {
+      console.error('Error searching location from history:', error);
+      Alert.alert('Error', `Unable to load weather for "${query}". The location may no longer be valid.`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleClearSearchHistory = async () => {
+    await SearchHistoryService.clearSearchHistory();
+    setSearchHistory([]);
+    setShowSearchHistory(false);
+  };
+
   const handleGetCurrentLocation = async () => {
     setIsLoading(true);
+    setShowSearchHistory(false);
     try {
       const location = await Location.getCurrentPositionAsync({});
       setLocation(location);
@@ -222,6 +336,12 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setSearchQuery,
         handleSearchLocation,
         handleGetCurrentLocation,
+        searchHistory,
+        showSearchHistory,
+        setShowSearchHistory,
+        handleSelectHistoryItem,
+        handleClearSearchHistory,
+        lastUpdated,
       }}
     >
       {children}
