@@ -348,4 +348,167 @@ export const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
   },
+  // Tab styles
+  tabContainer: {
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+  },
+  tabBar: {
+    height: 60,
+    paddingBottom: 5,
+    paddingTop: 5,
+  },
+  tabBarLabel: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  tabBarIcon: {
+    marginTop: 4,
+  },
+  tabBarActive: {
+    color: '#0066cc',
+  },
+  tabBarInactive: {
+    color: '#888',
+  },
+  // Additional styles for WeatherContext and components
+  forecastInfoText: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 10,
+    lineHeight: 20,
+  },
+  additionalInfoContainer: {
+    marginTop: 16,
+  },
+  detailsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 5,
+  },
+  detailLabel: {
+    fontSize: 14,
+    color: '#666',
+  },
+  detailValue: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+  },
+  airQualityContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 15,
+    marginTop: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  airQualityTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  airQualityIndex: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginVertical: 5,
+  },
+  airQualityDescription: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 10,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#eee',
+    marginVertical: 10,
+    width: '100%',
+  },
+  footerContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+    paddingBottom: 20,
+  },
+  footerText: {
+    fontSize: 12,
+    color: '#888',
+    textAlign: 'center',
+  },
+  refreshContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+  },
+  refreshText: {
+    fontSize: 14,
+    color: '#0066cc',
+    marginLeft: 5,
+  },
+  lastUpdatedText: {
+    fontSize: 12,
+    color: '#888',
+    textAlign: 'center',
+    marginTop: 5,
+  },
+  settingsButton: {
+    position: 'absolute',
+    top: 10,
+    right: 16,
+    zIndex: 10,
+  },
+  unitToggleContainer: {
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
+    overflow: 'hidden',
+    alignSelf: 'center',
+    marginVertical: 10,
+  },
+  unitToggleButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  unitToggleButtonActive: {
+    backgroundColor: '#0066cc',
+  },
+  unitToggleText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  unitToggleTextActive: {
+    color: '#fff',
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyStateIcon: {
+    marginBottom: 20,
+    opacity: 0.7,
+  },
+  emptyStateText: {
+    fontSize: 18,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  emptyStateDescription: {
+    fontSize: 14,
+    color: '#888',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
 });
