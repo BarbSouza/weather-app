@@ -144,6 +144,13 @@ export default function Home() {
         >
           {/* Current Weather */}
           <View style={styles.currentWeatherContainer}>
+            <Text style={styles.currentDateTime}>
+              {new Date().toLocaleDateString('en-US', { 
+              weekday: 'long',
+              hour: 'numeric',
+              minute: 'numeric',
+              })}
+            </Text>
             <Text style={styles.locationName}>{weatherData.name}, {weatherData.sys.country}</Text>
             <View style={styles.currentWeatherContent}>
               <View style={styles.temperatureContainer}>

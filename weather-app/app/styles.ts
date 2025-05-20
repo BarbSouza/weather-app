@@ -89,6 +89,13 @@ export const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+
+  currentDateTime: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 5,
+},
   locationName: {
     fontSize: 22,
     fontWeight: 'bold',

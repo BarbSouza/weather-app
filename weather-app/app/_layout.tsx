@@ -12,10 +12,11 @@ export default function AppLayout() {
           tabBarStyle: {
             paddingBottom: 5,
             paddingTop: 5,
-            height: 30,
+            height: 60,
           },
           headerStyle: {
             backgroundColor: '#0066cc',
+            height: 30,
           },
           headerTintColor: '#fff',
           headerTitleStyle: {
