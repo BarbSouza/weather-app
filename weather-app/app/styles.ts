@@ -511,4 +511,38 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
+  dailyForecastContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  dailyForecastList: {
+    paddingVertical: 10,
+  },
+  dailyItem: {
+    alignItems: 'center',
+    marginHorizontal: 12,
+    width: 100,
+  },
+  dailyDay: {
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 8,
+  },
+  dailyTempContainer: {
+    alignItems: 'center',
+    marginTop: 6,
+  },
+  dailyTemp: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 4,
+  },
 });

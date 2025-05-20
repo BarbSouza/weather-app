@@ -14,13 +14,14 @@ import {
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { styles } from './styles';
 import { useWeather } from './WeatherContext';
-import { WeatherIcon, formatHour, formatPrecipitation } from './components/WeatherUtils';
+import { WeatherIcon, formatHour, formatDate, formatPrecipitation } from './components/WeatherUtils';
 import SearchHistory from './SearchHistory';
 
 export default function Home() {
   const { 
     weatherData, 
     hourlyForecastData, 
+    dailyForecastData,
     isLoading, 
     errorMsg, 
     searchQuery, 
@@ -43,6 +44,20 @@ export default function Home() {
       <View style={styles.precipContainer}>
         <Feather name="droplet" size={12} color="#1E90FF" />
         <Text style={styles.precipText}>{formatPrecipitation(item.pop)}</Text>
+      </View>
+    </View>
+  );
+
+  const renderDailyItem = ({ item }: { item: any }) => (
+    <View style={styles.dailyItem}>
+      <Text style={styles.dailyDay}>{formatDate(item.dt)}</Text>
+      <WeatherIcon weatherId={item.weather[0].id} size={22} />
+      <View style={styles.dailyTempContainer}>
+        <Text style={styles.dailyTemp}>{Math.round(item.main.temp)}°</Text>
+        <View style={styles.precipContainer}>
+          <Feather name="droplet" size={12} color="#1E90FF" />
+          <Text style={styles.precipText}>{formatPrecipitation(item.pop)}</Text>
+        </View>
       </View>
     </View>
   );
@@ -174,6 +189,19 @@ export default function Home() {
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.hourlyForecastList}
+            />
+          </View>
+
+          {/* Daily Forecast Preview */}
+          <View style={styles.dailyForecastContainer}>
+            <Text style={styles.forecastTitle}>5-Day Forecast</Text>
+            <FlatList
+              data={dailyForecastData.slice(0, 5)}
+              renderItem={renderDailyItem}
+              keyExtractor={(item) => item.dt.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.dailyForecastList}
             />
           </View>
           
