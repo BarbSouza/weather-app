@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { WeatherProvider } from './WeatherContext';
 
 export default function AppLayout() {
@@ -51,6 +51,12 @@ export default function AppLayout() {
             tabBarIcon: ({ color }) => (
               <MaterialCommunityIcons name="clock-outline" size={28} color={color} />
             ),
+          }}
+        />
+        <Tabs.Screen
+          name="SearchHistory"
+          options={{
+            href: null, // This will hide the tab
           }}
         />
       </Tabs>
