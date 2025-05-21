@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import {
   Text,
   View,
@@ -9,9 +9,12 @@ import {
   StatusBar,
 } from 'react-native';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
-import { styles } from './styles';
+import { getStyles } from './styles';
 import { useWeather } from './WeatherContext';
 import { WeatherIcon, formatPrecipitation } from './components/WeatherUtils';
+import { useTheme } from './ThemeContext';
+import { useNavigation } from 'expo-router';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = [
@@ -26,7 +29,23 @@ export default function MonthlyCalendarForecast() {
   const [calendarDays, setCalendarDays] = useState<Array<any>>([]);
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
   const [selectedForecast, setSelectedForecast] = useState<any>(null);
-
+    const { isDarkTheme, toggleTheme } = useTheme();
+    const navigation = useNavigation();
+    useLayoutEffect(() => {
+          navigation.setOptions({
+              headerRight: () => (
+                  <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 16 }}>
+                  <FontAwesome5
+                      name={isDarkTheme ? 'sun' : 'moon'}
+                      size={20}
+                      color="#fff"
+                  />
+                  </TouchableOpacity>
+          ),
+      });
+    }, [navigation, isDarkTheme]);
+    
+    const styles = getStyles(isDarkTheme); // Dynamic styles
   // Create calendar grid for month view
   useEffect(() => {
     const firstDayOfMonth = new Date(selectedYear, selectedMonth, 1).getDay();

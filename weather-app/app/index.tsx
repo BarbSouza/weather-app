@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import {
   Text,
   View,
@@ -12,12 +12,36 @@ import {
   FlatList
 } from 'react-native';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
-import { styles } from './styles';
+import { getStyles } from './styles';
 import { useWeather } from './WeatherContext';
 import { WeatherIcon, formatHour, formatDate, formatPrecipitation } from './components/WeatherUtils';
 import SearchHistory from './SearchHistory';
+import { useNavigation } from 'expo-router';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { useTheme } from './ThemeContext'; // Adjust path
+
 
 export default function Home() {
+     
+     const { isDarkTheme, toggleTheme } = useTheme();
+     const navigation = useNavigation();
+  
+    
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 16 }}>
+                <FontAwesome5
+                    name={isDarkTheme ? 'sun' : 'moon'}
+                    size={20}
+                    color="#fff"
+                />
+                </TouchableOpacity>
+        ),
+    });
+  }, [navigation, isDarkTheme]);
+
+  const styles = getStyles(isDarkTheme); // Dynamic styles
   const { 
     weatherData, 
     hourlyForecastData, 
@@ -79,8 +103,12 @@ export default function Home() {
     return `Updated ${hours} hours ago`;
   };
 
+ 
+
   return (
     <SafeAreaView style={styles.container}>
+      
+      {/* Other components */}
       <StatusBar barStyle="light-content" />
       
       {/* Search Bar */}
@@ -152,9 +180,9 @@ export default function Home() {
               })}
             </Text>
             <Text style={styles.locationName}>{weatherData.name}, {weatherData.sys.country}</Text>
-            <View style={styles.currentWeatherContent}>
+            <View style={styles.currentWeatherContent} >
               <View style={styles.temperatureContainer}>
-                <WeatherIcon weatherId={weatherData.weather[0].id} />
+                <WeatherIcon weatherId={500} />
                 <Text style={styles.temperature}>{Math.round(weatherData.main.temp)}°C</Text>
               </View>
               <Text style={styles.weatherDescription}>{weatherData.weather[0].description}</Text>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import {
   Text,
   View,
@@ -6,15 +6,35 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
+  TouchableOpacity,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { styles } from './styles';
+import { getStyles } from './styles';
 import { useWeather } from './WeatherContext';
 import { WeatherIcon, formatHour, formatPrecipitation } from './components/WeatherUtils';
+import { useTheme } from './ThemeContext';
+import { useNavigation } from 'expo-router';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 export default function Hourly() {
   const { hourlyForecastData, isLoading, errorMsg } = useWeather();
-
+  const { isDarkTheme, toggleTheme } = useTheme();
+  const navigation = useNavigation();
+  useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 16 }}>
+                <FontAwesome5
+                    name={isDarkTheme ? 'sun' : 'moon'}
+                    size={20}
+                    color="#fff"
+                />
+                </TouchableOpacity>
+        ),
+    });
+  }, [navigation, isDarkTheme]);
+  
+  const styles = getStyles(isDarkTheme); // Dynamic styles
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />

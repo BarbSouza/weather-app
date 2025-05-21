@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import {
   Text,
   View,
@@ -9,12 +9,32 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { styles } from './styles';
+import { getStyles } from './styles';
 import { useWeather } from './WeatherContext';
 import { WeatherIcon, formatDate, formatPrecipitation } from './components/WeatherUtils';
 import MonthlyCalendarForecast from './MontlyCalendarForecast'; 
+import { useTheme } from './ThemeContext';
+import { useNavigation } from 'expo-router';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 export default function Daily() {
+  const { isDarkTheme, toggleTheme } = useTheme();
+  const navigation = useNavigation();
+  useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 16 }}>
+                <FontAwesome5
+                    name={isDarkTheme ? 'sun' : 'moon'}
+                    size={20}
+                    color="#fff"
+                />
+                </TouchableOpacity>
+        ),
+    });
+  }, [navigation, isDarkTheme]);
+  
+  const styles = getStyles(isDarkTheme); // Dynamic styles
   const { dailyForecastData, monthlyForecastData, isLoading, errorMsg } = useWeather();
   const [showMonthly, setShowMonthly] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list'); // Add this state variable

@@ -1,9 +1,10 @@
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+export const getStyles = (isDarkTheme:boolean) =>
+ StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: isDarkTheme ? '' : '#f5f5f5',
     padding: 16,
   },
   searchContainer: {
@@ -14,7 +15,7 @@ export const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 46,
-    backgroundColor: '#fff',
+    backgroundColor: isDarkTheme ? '#000' : '#fff',
     borderRadius: 8,
     paddingHorizontal: 15,
     fontSize: 16,
@@ -27,7 +28,7 @@ export const styles = StyleSheet.create({
   searchButton: {
     width: 46,
     height: 46,
-    backgroundColor: '#0066cc',
+    backgroundColor: isDarkTheme ? '#000' :'#0066cc',
     borderRadius: 8,
     marginLeft: 10,
     justifyContent: 'center',
@@ -105,6 +106,7 @@ export const styles = StyleSheet.create({
   },
   currentWeatherContent: {
     alignItems: 'center',
+   
   },
   temperatureContainer: {
     flexDirection: 'row',
