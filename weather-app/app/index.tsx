@@ -72,6 +72,7 @@ export default function Home() {
     </View>
   );
 
+  
   const renderDailyItem = ({ item }: { item: any }) => (
     <View style={styles.dailyItem}>
       <Text style={styles.dailyDay}>{formatDate(item.dt)}</Text>
@@ -182,7 +183,7 @@ export default function Home() {
             <Text style={styles.locationName}>{weatherData.name}, {weatherData.sys.country}</Text>
             <View style={styles.currentWeatherContent} >
               <View style={styles.temperatureContainer}>
-                <WeatherIcon weatherId={500} />
+                <WeatherIcon weatherId={weatherData.weather[0].id} />
                 <Text style={styles.temperature}>{Math.round(weatherData.main.temp)}°C</Text>
               </View>
               <Text style={styles.weatherDescription}>{weatherData.weather[0].description}</Text>
