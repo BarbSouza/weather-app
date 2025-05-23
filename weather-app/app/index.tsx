@@ -19,6 +19,8 @@ import SearchHistory from './SearchHistory';
 import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useTheme } from './ThemeContext'; 
+import { LinearGradient } from 'expo-linear-gradient';
+
 
 
 export default function Home() {
@@ -104,10 +106,14 @@ export default function Home() {
     return `Updated ${hours} hours ago`;
   };
 
- 
 
   return (
-    <SafeAreaView style={styles.container}>
+    <LinearGradient 
+        colors={isDarkTheme ? ['#1E293B', '#0F172A'] : ['#C2E9FB', '#A1C4FD']}
+       start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+      style={styles.container} 
+    >
       
       {/* Other components */}
       <StatusBar barStyle="light-content" />
@@ -184,6 +190,7 @@ export default function Home() {
             <View style={styles.currentWeatherContent} >
               <View style={styles.temperatureContainer}>
                 <WeatherIcon weatherId={weatherData.weather[0].id} />
+                 
                 <Text style={styles.temperature}>{Math.round(weatherData.main.temp)}°C</Text>
               </View>
               <Text style={styles.weatherDescription}>{weatherData.weather[0].description}</Text>
@@ -261,6 +268,6 @@ export default function Home() {
           </Text>
         </View>
       )}
-    </SafeAreaView>
+    </LinearGradient>
   );
 }

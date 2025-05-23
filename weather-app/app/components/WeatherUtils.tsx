@@ -6,7 +6,7 @@ interface WeatherIconProps {
   size?: number;
 }
 
-export const WeatherIcon: React.FC<WeatherIconProps> = ({ weatherId, size = 42 }) => {
+export const WeatherIcon: React.FC<WeatherIconProps> = ({ weatherId, size = 75 }) => {
   if (weatherId >= 200 && weatherId < 300) {
     return <MaterialCommunityIcons name="weather-lightning" size={size} color="#FFD700" />;
   } else if (weatherId >= 300 && weatherId < 400) {
@@ -20,9 +20,9 @@ export const WeatherIcon: React.FC<WeatherIconProps> = ({ weatherId, size = 42 }
   } else if (weatherId === 800) {
     return <MaterialCommunityIcons name="weather-sunny" size={size} color="#FFD700" />;
   } else if (weatherId >= 801 && weatherId < 900) {
-    return <MaterialCommunityIcons name="weather-cloudy" size={size} color="#D3D3D3" />;
+    return <MaterialCommunityIcons name="weather-cloudy" size={size} color="#71aaac" />;
   } else {
-    return <MaterialCommunityIcons name="weather-cloudy" size={size} color="#D3D3D3" />;
+    return <MaterialCommunityIcons name="weather-cloudy" size={size} color="#71aaac" />;
   }
 };
 
