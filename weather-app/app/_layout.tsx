@@ -8,7 +8,27 @@ import { ThemeProvider, useTheme } from './ThemeContext';
 
 
 export default function AppLayout() {
-
+  const HeaderRight = () => {
+    const { unit, toggleUnit } = useTemperature();
+    const { isDarkTheme, toggleTheme } = useTheme();
+    
+    return (
+      <View style={{ flexDirection: 'row', marginRight: 16 }}>
+        <TouchableOpacity onPress={toggleUnit} style={{ marginRight: 12 }}>
+          <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>
+            °{unit}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={toggleTheme}>
+          <FontAwesome5
+            name={isDarkTheme ? 'sun' : 'moon'}
+            size={20}
+            color="#fff"
+          />
+        </TouchableOpacity>
+      </View>
+    );
+  };
   
   return (
     <ThemeProvider>
@@ -16,7 +36,7 @@ export default function AppLayout() {
         <WeatherProvider>
           <Tabs
             screenOptions={{
-
+              headerRight: () => <HeaderRight />,
               tabBarActiveTintColor: '#0066cc',
               tabBarInactiveTintColor: '#888',
               tabBarStyle: {
