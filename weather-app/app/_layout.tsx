@@ -1,94 +1,99 @@
 import { Tabs } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Platform } from 'react-native'; // Add this import
+import { Platform, View, TouchableOpacity, Text } from 'react-native'; 
+import { FontAwesome5 } from '@expo/vector-icons';
 import { WeatherProvider } from './WeatherContext';
-
-
-import { ThemeProvider } from './ThemeContext'; // adjust path as needed
+import { TemperatureProvider, useTemperature } from './TemperatureContext';
+import { ThemeProvider, useTheme } from './ThemeContext'; 
 
 
 export default function AppLayout() {
+
   
   return (
     <ThemeProvider>
-      <WeatherProvider>
-        <Tabs
-          screenOptions={{
-            tabBarActiveTintColor: '#0066cc',
-            tabBarInactiveTintColor: '#888',
-            tabBarStyle: {
-              paddingBottom: 5,
-              paddingTop: 5,
-              height: 60,
-            },
-            headerStyle: {
-              backgroundColor: '#0066cc',
-              height: Platform.select({
-                ios: 100,
-                android: 60,
-                default: 50,
-              }),
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            }
-          }}
-        >
-          <Tabs.Screen
-            name="index"
-            options={{
-              title: "Current Weather",
-              tabBarLabel: "Current",
-              tabBarIcon: ({ color }) => (
-                <MaterialCommunityIcons name="weather-partly-cloudy" size={28} color={color} />
-              )
+      <TemperatureProvider>
+        <WeatherProvider>
+          <Tabs
+            screenOptions={{
+
+              tabBarActiveTintColor: '#0066cc',
+              tabBarInactiveTintColor: '#888',
+              tabBarStyle: {
+                paddingBottom: 5,
+                paddingTop: 5,
+                height: 60,
+              },
+              headerStyle: {
+                backgroundColor: '#0066cc',
+                height: Platform.select({
+                  ios: 100,
+                  android: 60,
+                  default: 50,
+                }),
+              },
+              
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              }
             }}
-          />
-          <Tabs.Screen
-            name="daily"
+          >
+            <Tabs.Screen
+              name="index"
+              options={{
+                title: "Current Weather",
+                tabBarLabel: "Current",
+                tabBarIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="weather-partly-cloudy" size={28} color={color} />
+                )
+              }}
+            />
+            <Tabs.Screen
+              name="daily"
+              options={{
+                title: "5-Day Forecast",
+                tabBarLabel: "Daily",
+                tabBarIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="calendar-week" size={28} color={color} />
+                ),
+              }}
+            />
+            <Tabs.Screen
+              name="hourly"
+              options={{
+                title: "Hourly Forecast",
+                tabBarLabel: "Hourly",
+                tabBarIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="clock-outline" size={28} color={color} />
+                ),
+              }}
+            />
+            <Tabs.Screen
+            name="WeatherMaps"
             options={{
-              title: "5-Day Forecast",
-              tabBarLabel: "Daily",
+              title: "Weather Map",
+              tabBarLabel: "Maps",
               tabBarIcon: ({ color }) => (
-                <MaterialCommunityIcons name="calendar-week" size={28} color={color} />
+                <MaterialCommunityIcons name="map" size={28} color={color} />
               ),
             }}
           />
           <Tabs.Screen
-            name="hourly"
+            name="SearchHistory"
             options={{
-              title: "Hourly Forecast",
-              tabBarLabel: "Hourly",
-              tabBarIcon: ({ color }) => (
-                <MaterialCommunityIcons name="clock-outline" size={28} color={color} />
-              ),
+              href: null, 
             }}
           />
-          <Tabs.Screen
-          name="WeatherMaps"
-          options={{
-            title: "Weather Map",
-            tabBarLabel: "Maps",
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name="map" size={28} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="SearchHistory"
-          options={{
-            href: null, 
-          }}
-        />
-              <Tabs.Screen
-          name="MontlyCalendarForecast"
-          options={{
-            href: null, 
-          }}
-        />
-      </Tabs>
-    </WeatherProvider>
+                <Tabs.Screen
+            name="MontlyCalendarForecast"
+            options={{
+              href: null, 
+            }}
+          />
+        </Tabs>
+      </WeatherProvider>
+    </TemperatureProvider>
     </ThemeProvider>
   );
 }

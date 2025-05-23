@@ -9,6 +9,7 @@ import {
   searchLocation as apiSearchLocation
 } from './api';
 import { SearchHistoryService } from './SearchHistoryService';
+import { useTemperature } from './TemperatureContext';
 
 
 // TypeScript interfaces
@@ -126,6 +127,7 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [showSearchHistory, setShowSearchHistory] = useState<boolean>(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const { unit } = useTemperature();
 
   // Load search history on initial mount
   useEffect(() => {
@@ -164,7 +166,7 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setIsLoading(true);
       
       // Use API functions to fetch data
-      const weatherResponse = await fetchCurrentWeather(latitude, longitude);
+      const weatherResponse = await fetchCurrentWeather(latitude, longitude, unit === 'F' ? 'imperial' : 'metric');
       const forecastResponse = await fetchForecast(latitude, longitude);
       
       setWeatherData(weatherResponse);

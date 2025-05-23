@@ -19,6 +19,9 @@ import SearchHistory from './SearchHistory';
 import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useTheme } from './ThemeContext'; 
+import { TemperatureDisplay } from './components/TemperatureDisplay';
+import { useTemperature } from './TemperatureContext';
+
 
 
 export default function Home() {
@@ -59,6 +62,8 @@ export default function Home() {
     handleClearSearchHistory,
     lastUpdated
   } = useWeather();
+
+  const { unit, toggleUnit, formatTemp } = useTemperature();
 
   const renderHourlyItem = ({ item }: { item: any }) => (
     <View style={styles.hourlyItem}>
@@ -182,8 +187,13 @@ export default function Home() {
             <Text style={styles.locationName}>{weatherData.name}, {weatherData.sys.country}</Text>
             <View style={styles.currentWeatherContent} >
               <View style={styles.temperatureContainer}>
-                <WeatherIcon weatherId={500} />
-                <Text style={styles.temperature}>{Math.round(weatherData.main.temp)}°C</Text>
+                <WeatherIcon weatherId={weatherData.weather[0].id} />
+                <TemperatureDisplay
+                  temperature={weatherData.main.temp}
+                  unit={unit}
+                  onToggleUnit={toggleUnit}
+                  size="large"
+                />
               </View>
               <Text style={styles.weatherDescription}>{weatherData.weather[0].description}</Text>
               <View style={styles.weatherDetailsContainer}>
@@ -198,15 +208,15 @@ export default function Home() {
                 <View style={styles.weatherDetail}>
                   <MaterialCommunityIcons name="thermometer" size={18} color="#555" />
                   <Text style={styles.weatherDetailText}>
-                    {Math.round(weatherData.main.temp_min)}°/{Math.round(weatherData.main.temp_max)}°
+                    {formatTemp(weatherData.main.temp_min)}/{formatTemp(weatherData.main.temp_max)}
                   </Text>
                 </View>
               </View>
               <View style={styles.feelsLikeContainer}>
                 <MaterialCommunityIcons name="thermometer-lines" size={18} color="#555" />
-                <Text style={styles.feelsLikeText}>
-                  Feels like {Math.round(weatherData.main.feels_like)}°C
-                </Text>
+                  <Text style={styles.feelsLikeText}>
+                    Feels like {formatTemp(weatherData.main.feels_like)}
+                  </Text>
               </View>
               {lastUpdated && (
                 <Text style={styles.lastUpdatedText}>{formatLastUpdated()}</Text>
@@ -217,6 +227,7 @@ export default function Home() {
           {/* Hourly Forecast Preview */}
           <View style={styles.hourlyForecastContainer}>
             <Text style={styles.forecastTitle}>Hourly Forecast</Text>
+            
             <FlatList
               data={hourlyForecastData.slice(0, 8)}
               renderItem={renderHourlyItem}
@@ -224,6 +235,7 @@ export default function Home() {
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.hourlyForecastList}
+              
             />
           </View>
 
