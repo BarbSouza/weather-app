@@ -55,12 +55,29 @@ export default function AppLayout() {
           }}
         />
         <Tabs.Screen
+          name="WeatherMaps"
+          options={{
+            title: "Weather Map",
+            tabBarLabel: "Maps",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons name="map" size={28} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="SearchHistory"
           options={{
-            href: null, // This will hide the tab
+            href: null, 
+          }}
+        />
+              <Tabs.Screen
+          name="MontlyCalendarForecast"
+          options={{
+            href: null, 
           }}
         />
       </Tabs>
     </WeatherProvider>
   );
+
 }
