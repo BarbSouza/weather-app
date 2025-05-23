@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Platform } from 'react-native'; // Add this import
 import { WeatherProvider } from './WeatherContext';
 
 
@@ -22,7 +23,11 @@ export default function AppLayout() {
             },
             headerStyle: {
               backgroundColor: '#0066cc',
-              height: 60,
+              height: Platform.select({
+                ios: 100,
+                android: 60,
+                default: 50,
+              }),
             },
             headerTintColor: '#fff',
             headerTitleStyle: {
@@ -61,13 +66,29 @@ export default function AppLayout() {
             }}
           />
           <Tabs.Screen
-            name="SearchHistory"
-            options={{
-              href: null, // This will hide the tab
-            }}
-          />
-        </Tabs>
-      </WeatherProvider>
+          name="WeatherMaps"
+          options={{
+            title: "Weather Map",
+            tabBarLabel: "Maps",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons name="map" size={28} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="SearchHistory"
+          options={{
+            href: null, 
+          }}
+        />
+              <Tabs.Screen
+          name="MontlyCalendarForecast"
+          options={{
+            href: null, 
+          }}
+        />
+      </Tabs>
+    </WeatherProvider>
     </ThemeProvider>
   );
 }
