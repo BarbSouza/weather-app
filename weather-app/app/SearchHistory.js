@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,25 +6,48 @@ import {
   FlatList,
   StyleSheet
 } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { Feather, FontAwesome } from '@expo/vector-icons';
 
-const SearchHistory = ({ 
-  visible, 
-  history, 
-  onSelectItem, 
-  onClearHistory, 
-  onDismiss 
+const SearchHistory = ({
+  visible,
+  history,
+  onSelectItem,
+  onClearHistory,
+  onDismiss
 }) => {
-  if (!visible || history.length === 0) return null;
+  const [favorites, setFavorites] = useState([]);
+
+  const toggleFavorite = (city) => {
+    setFavorites((prev) =>
+      prev.includes(city)
+        ? prev.filter((c) => c !== city)
+        : [...prev, city]
+    );
+  };
+
+  // Show if visible OR any favorites exist
+  if (!visible || (history.length === 0 && favorites.length === 0)) return null;
+
+  // Combine history and favorites (de-duplicate)
+  const combinedList = [...new Set([...history, ...favorites])];
 
   const renderHistoryItem = ({ item }) => (
-    <TouchableOpacity 
-      style={styles.historyItem} 
-      onPress={() => onSelectItem(item)}
-    >
-      <Feather name="clock" size={16} color="#666" />
-      <Text style={styles.historyText}>{item}</Text>
-    </TouchableOpacity>
+    <View style={styles.historyItem}>
+      <TouchableOpacity
+        style={styles.itemLeft}
+        onPress={() => onSelectItem(item)}
+      >
+        <Feather name="clock" size={16} color="#666" />
+        <Text style={styles.historyText}>{item}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => toggleFavorite(item)}>
+        <FontAwesome
+          name={favorites.includes(item) ? 'heart' : 'heart-o'}
+          size={18}
+          color={favorites.includes(item) ? '#e91e63' : '#aaa'}
+        />
+      </TouchableOpacity>
+    </View>
   );
 
   return (
@@ -33,8 +56,8 @@ const SearchHistory = ({
         <View style={styles.header}>
           <Text style={styles.title}>Recent Searches</Text>
           <View style={styles.actions}>
-            <TouchableOpacity 
-              onPress={onClearHistory} 
+            <TouchableOpacity
+              onPress={onClearHistory}
               style={styles.clearButton}
             >
               <Text style={styles.clearButtonText}>Clear All</Text>
@@ -44,9 +67,9 @@ const SearchHistory = ({
             </TouchableOpacity>
           </View>
         </View>
-        
+
         <FlatList
-          data={history}
+          data={combinedList}
           renderItem={renderHistoryItem}
           keyExtractor={(item, index) => index.toString()}
           style={styles.list}
@@ -59,7 +82,7 @@ const SearchHistory = ({
 const styles = StyleSheet.create({
   overlay: {
     position: 'absolute',
-    top: 56, // Below the search bar
+    top: 56,
     left: 16,
     right: 16,
     zIndex: 100,
@@ -110,11 +133,16 @@ const styles = StyleSheet.create({
   },
   historyItem: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
+  },
+  itemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   historyText: {
     marginLeft: 10,

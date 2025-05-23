@@ -4,21 +4,22 @@ export const getStyles = (isDarkTheme:boolean) =>
  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: isDarkTheme ? '' : '#f5f5f5',
+    backgroundColor: isDarkTheme ? '#0F172A' : '#E0F2FE',
     padding: 16,
   },
   searchContainer: {
     flexDirection: 'row',
     marginTop: 10,
-    marginBottom: 10,
   },
+
   searchInput: {
     flex: 1,
     height: 46,
-    backgroundColor: isDarkTheme ? '#000' : '#fff',
+    backgroundColor: isDarkTheme ? '#1E293B' : 'white',
     borderRadius: 8,
     paddingHorizontal: 15,
     fontSize: 16,
+    color: isDarkTheme ? '#F1F5F9' : '#333',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -28,11 +29,12 @@ export const getStyles = (isDarkTheme:boolean) =>
   searchButton: {
     width: 46,
     height: 46,
-    backgroundColor: isDarkTheme ? '#000' :'#0066cc',
+    backgroundColor: isDarkTheme ? '#0066cc' :'#0066cc',
     borderRadius: 8,
     marginLeft: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 0,
   },
   locationButton: {
     flexDirection: 'row',
@@ -40,7 +42,7 @@ export const getStyles = (isDarkTheme:boolean) =>
     borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 15,
-    marginBottom: 16,
+    marginBottom: 20,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -48,6 +50,7 @@ export const getStyles = (isDarkTheme:boolean) =>
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
+    marginTop:10,
   },
   locationButtonText: {
     color: '#fff',
@@ -59,11 +62,12 @@ export const getStyles = (isDarkTheme:boolean) =>
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    //backgroundColor: isDarkTheme ? '#000' :'#0066cc',
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#555',
+    color: isDarkTheme ? '#F1F5F9' : '#555',
   },
   errorContainer: {
     flex: 1,
@@ -80,7 +84,7 @@ export const getStyles = (isDarkTheme:boolean) =>
     paddingBottom: 20,
   },
   currentWeatherContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: isDarkTheme ? '#1E293B' : 'white',
     borderRadius: 12,
     padding: 20,
     marginBottom: 16,
@@ -93,20 +97,21 @@ export const getStyles = (isDarkTheme:boolean) =>
 
   currentDateTime: {
     fontSize: 16,
-    color: '#666',
+    color: isDarkTheme ? '#F1F5F9' : '#666',
     textAlign: 'center',
     marginBottom: 5,
+    
 },
   locationName: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
     textAlign: 'center',
   },
   currentWeatherContent: {
     alignItems: 'center',
-   
+    //experimental_backgroundImage:'x/assets/images/NO8hx.png',
   },
   temperatureContainer: {
     flexDirection: 'row',
@@ -116,12 +121,12 @@ export const getStyles = (isDarkTheme:boolean) =>
   temperature: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
     marginLeft: 10,
   },
   weatherDescription: {
     fontSize: 18,
-    color: '#666',
+    color: isDarkTheme ? '#F1F5F9' : '#666',
     textTransform: 'capitalize',
     marginBottom: 15,
   },
@@ -138,7 +143,7 @@ export const getStyles = (isDarkTheme:boolean) =>
   },
   weatherDetailText: {
     fontSize: 14,
-    color: '#555',
+    color: isDarkTheme ? '#F1F5F9' : '#555',
     marginLeft: 5,
   },
   feelsLikeContainer: {
@@ -148,11 +153,11 @@ export const getStyles = (isDarkTheme:boolean) =>
   },
   feelsLikeText: {
     fontSize: 14,
-    color: '#555',
+    color: isDarkTheme ? '#F1F5F9' : '#555',
     marginLeft: 5,
   },
   hourlyForecastContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: isDarkTheme ? '#1E293B' : '#fff',
     borderRadius: 12,
     padding: 15,
     marginBottom: 16,
@@ -173,13 +178,13 @@ export const getStyles = (isDarkTheme:boolean) =>
   },
   hourlyTime: {
     fontSize: 14,
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
     marginBottom: 8,
   },
   hourlyTemp: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
     marginTop: 6,
     marginBottom: 4,
   },
@@ -200,23 +205,23 @@ export const getStyles = (isDarkTheme:boolean) =>
     flex: 1,
     paddingVertical: 10,
     alignItems: 'center',
-    backgroundColor: '#e0e0e0',
+    backgroundColor: isDarkTheme ? '#374151' : '#e0e0e0',
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: isDarkTheme ? '#4B5563' : '#ccc',
   },
   toggleButtonActive: {
     backgroundColor: '#0066cc',
   },
   toggleButtonText: {
     fontSize: 16,
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
   },
   toggleButtonTextActive: {
     color: '#fff',
     fontWeight: '500',
   },
   forecastContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: isDarkTheme ? '#1E293B' : '#fff',
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
@@ -229,7 +234,7 @@ export const getStyles = (isDarkTheme:boolean) =>
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 15,
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
   },
   forecastItem: {
     flexDirection: 'row',
@@ -237,11 +242,11 @@ export const getStyles = (isDarkTheme:boolean) =>
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: isDarkTheme ? '#374151' : '#eee',
   },
   forecastDay: {
     fontSize: 16,
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
     width: '30%',
   },
   forecastDetails: {
@@ -260,7 +265,7 @@ export const getStyles = (isDarkTheme:boolean) =>
   forecastTemp: {
     fontSize: 18,
     fontWeight: '500',
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
   },
   forecastMinMaxContainer: {
     flexDirection: 'row',
@@ -268,14 +273,14 @@ export const getStyles = (isDarkTheme:boolean) =>
   },
   forecastMinMax: {
     fontSize: 12,
-    color: '#666',
+    color: isDarkTheme ? '#D1D5DB' : '#666',
   },
   forecastRightColumn: {
     alignItems: 'flex-end',
   },
   forecastDescription: {
     fontSize: 14,
-    color: '#666',
+    color: isDarkTheme ? '#D1D5DB' : '#666',
     textTransform: 'capitalize',
     marginBottom: 4,
   },
@@ -294,7 +299,7 @@ export const getStyles = (isDarkTheme:boolean) =>
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: isDarkTheme ? '#374151' : '#eee',
   },
   hourlyDetailLeft: {
     width: '25%',
@@ -304,14 +309,14 @@ export const getStyles = (isDarkTheme:boolean) =>
   hourlyDetailTime: {
     marginRight: 8,
     fontSize: 14,
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
   },
   hourlyDetailCenter: {
     width: '40%',
   },
   hourlyDetailDescription: {
     fontSize: 14,
-    color: '#666',
+    color: isDarkTheme ? '#D1D5DB' : '#666',
     textTransform: 'capitalize',
   },
   hourlyDetailRight: {
@@ -323,7 +328,7 @@ export const getStyles = (isDarkTheme:boolean) =>
   hourlyDetailTemp: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
     marginRight: 10,
   },
   hourlyDetailPrecip: {
@@ -339,7 +344,7 @@ export const getStyles = (isDarkTheme:boolean) =>
     paddingVertical: 12,
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: isDarkTheme ? '#374151' : '#eee',
     marginTop: 10,
   },
   showMoreText: {
@@ -355,14 +360,14 @@ export const getStyles = (isDarkTheme:boolean) =>
   },
   noDataText: {
     fontSize: 16,
-    color: '#666',
+    color: isDarkTheme ? '#F1F5F9' : '#666',
     textAlign: 'center',
   },
   // Tab styles
   tabContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: isDarkTheme ? '#1E293B' : '#fff',
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: isDarkTheme ? '#374151' : '#e0e0e0',
   },
   tabBar: {
     height: 60,
@@ -381,12 +386,12 @@ export const getStyles = (isDarkTheme:boolean) =>
     color: '#0066cc',
   },
   tabBarInactive: {
-    color: '#888',
+    color: isDarkTheme ? '#9CA3AF' : '#888',
   },
   // Additional styles for WeatherContext and components
   forecastInfoText: {
     fontSize: 14,
-    color: '#666',
+    color: isDarkTheme ? '#D1D5DB' : '#666',
     marginBottom: 10,
     lineHeight: 20,
   },
@@ -400,15 +405,15 @@ export const getStyles = (isDarkTheme:boolean) =>
   },
   detailLabel: {
     fontSize: 14,
-    color: '#666',
+    color: isDarkTheme ? '#D1D5DB' : '#666',
   },
   detailValue: {
     fontSize: 14,
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
     fontWeight: '500',
   },
   airQualityContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: isDarkTheme ? '#1E293B' : '#fff',
     borderRadius: 12,
     padding: 15,
     marginTop: 16,
@@ -422,22 +427,22 @@ export const getStyles = (isDarkTheme:boolean) =>
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
   },
   airQualityIndex: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
     marginVertical: 5,
   },
   airQualityDescription: {
     fontSize: 16,
-    color: '#666',
+    color: isDarkTheme ? '#D1D5DB' : '#666',
     marginBottom: 10,
   },
   divider: {
     height: 1,
-    backgroundColor: '#eee',
+    backgroundColor: isDarkTheme ? '#374151' : '#eee',
     marginVertical: 10,
     width: '100%',
   },
@@ -448,7 +453,7 @@ export const getStyles = (isDarkTheme:boolean) =>
   },
   footerText: {
     fontSize: 12,
-    color: '#888',
+    color: isDarkTheme ? '#9CA3AF' : '#888',
     textAlign: 'center',
   },
   refreshContainer: {
@@ -464,7 +469,7 @@ export const getStyles = (isDarkTheme:boolean) =>
   },
   lastUpdatedText: {
     fontSize: 12,
-    color: '#888',
+    color: isDarkTheme ? '#9CA3AF' : '#888',
     textAlign: 'center',
     marginTop: 5,
   },
@@ -477,7 +482,7 @@ export const getStyles = (isDarkTheme:boolean) =>
   unitToggleContainer: {
     flexDirection: 'row',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: isDarkTheme ? '#4B5563' : '#ddd',
     borderRadius: 4,
     overflow: 'hidden',
     alignSelf: 'center',
@@ -488,13 +493,14 @@ export const getStyles = (isDarkTheme:boolean) =>
     paddingHorizontal: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: isDarkTheme ? '#374151' : 'transparent',
   },
   unitToggleButtonActive: {
     backgroundColor: '#0066cc',
   },
   unitToggleText: {
     fontSize: 14,
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
   },
   unitToggleTextActive: {
     color: '#fff',
@@ -511,18 +517,18 @@ export const getStyles = (isDarkTheme:boolean) =>
   },
   emptyStateText: {
     fontSize: 18,
-    color: '#666',
+    color: isDarkTheme ? '#F1F5F9' : '#666',
     textAlign: 'center',
     marginBottom: 10,
   },
   emptyStateDescription: {
     fontSize: 14,
-    color: '#888',
+    color: isDarkTheme ? '#9CA3AF' : '#888',
     textAlign: 'center',
     marginBottom: 20,
   },
   dailyForecastContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: isDarkTheme ? '#1E293B' : '#fff',
     borderRadius: 12,
     padding: 15,
     marginBottom: 16,
@@ -543,7 +549,7 @@ export const getStyles = (isDarkTheme:boolean) =>
   },
   dailyDay: {
     fontSize: 14,
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
     marginBottom: 8,
   },
   dailyTempContainer: {
@@ -553,12 +559,12 @@ export const getStyles = (isDarkTheme:boolean) =>
   dailyTemp: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: isDarkTheme ? '#F1F5F9' : '#333',
     marginBottom: 4,
   },
   // Calendar styles
 calendarContainer: {
-  backgroundColor: '#fff',
+  backgroundColor: isDarkTheme ? '#1E293B' : '#fff',
   borderRadius: 12,
   padding: 15,
   marginBottom: 16,
@@ -579,12 +585,12 @@ calendarHeader: {
 calendarMonthYear: {
   fontSize: 18,
   fontWeight: 'bold',
-  color: '#333',
+  color: isDarkTheme ? '#F1F5F9' : '#333',
 },
 calendarNavButton: {
   padding: 8,
   borderRadius: 20,
-  backgroundColor: '#f0f0f0',
+  backgroundColor: isDarkTheme ? '#374151' : '#f0f0f0',
 },
 calendarWeekdayHeader: {
   flexDirection: 'row',
@@ -595,7 +601,7 @@ calendarWeekdayText: {
   width: '14.28%',
   textAlign: 'center',
   fontWeight: '500',
-  color: '#666',
+  color: isDarkTheme ? '#D1D5DB' : '#666',
   fontSize: 14,
 },
 calendarGrid: {
@@ -608,18 +614,18 @@ calendarDay: {
   justifyContent: 'center',
   alignItems: 'center',
   marginBottom: 6,
-  backgroundColor: '#E1F5FE',
+  backgroundColor: isDarkTheme ? '#374151' : '#E1F5FE',
   borderRadius: 8,
   padding: 4,
 },
 calendarToday: {
-  backgroundColor: '#B3E5FC',
+  backgroundColor: isDarkTheme ? '#1D4ED8' : '#B3E5FC',
   borderWidth: 2,
   borderColor: '#0288D1',
 },
 calendarTodayText: {
   fontWeight: 'bold',
-  color: '#0288D1',
+  color: isDarkTheme ? '#F1F5F9' : '#0288D1',
 },
 calendarSelectedDay: {
   backgroundColor: '#0066cc',
@@ -630,7 +636,7 @@ calendarSelectedDayText: {
   fontWeight: 'bold',
 },
 calendarDayNoData: {
-  backgroundColor: '#f5f5f5',
+  backgroundColor: isDarkTheme ? '#2D3748' : '#f5f5f5',
 },
 calendarEmptyDay: {
   width: '14.28%',
@@ -639,11 +645,11 @@ calendarEmptyDay: {
 calendarDayText: {
   fontSize: 14,
   fontWeight: '500',
-  color: '#333',
+  color: isDarkTheme ? '#F1F5F9' : '#333',
 },
 calendarDayTemp: {
   fontSize: 12,
-  color: '#444',
+  color: isDarkTheme ? '#D1D5DB' : '#444',
   marginTop: 2,
 },
 calendarDayIcon: {
@@ -669,10 +675,10 @@ legendColorBox: {
 },
 legendText: {
   fontSize: 12,
-  color: '#666',
+  color: isDarkTheme ? '#D1D5DB' : '#666',
 },
 selectedForecastContainer: {
-  backgroundColor: '#fff',
+  backgroundColor: isDarkTheme ? '#1E293B' : '#fff',
   borderRadius: 12,
   padding: 20,
   marginBottom: 16,
@@ -685,7 +691,7 @@ selectedForecastContainer: {
 selectedForecastTitle: {
   fontSize: 18,
   fontWeight: 'bold',
-  color: '#333',
+  color: isDarkTheme ? '#F1F5F9' : '#333',
   marginBottom: 15,
 },
 selectedForecastContent: {
@@ -697,7 +703,7 @@ selectedForecastMainInfo: {
   marginBottom: 20,
   paddingBottom: 15,
   borderBottomWidth: 1,
-  borderBottomColor: '#eee',
+  borderBottomColor: isDarkTheme ? '#374151' : '#eee',
 },
 selectedForecastTemp: {
   marginLeft: 15,
@@ -705,11 +711,11 @@ selectedForecastTemp: {
 selectedForecastTempValue: {
   fontSize: 28,
   fontWeight: 'bold',
-  color: '#333',
+  color: isDarkTheme ? '#F1F5F9' : '#333',
 },
 selectedForecastDescription: {
   fontSize: 16,
-  color: '#666',
+  color: isDarkTheme ? '#D1D5DB' : '#666',
   textTransform: 'capitalize',
   marginTop: 5,
 },
@@ -723,13 +729,13 @@ forecastDetailItem: {
 },
 forecastDetailLabel: {
   fontSize: 14,
-  color: '#666',
+  color: isDarkTheme ? '#D1D5DB' : '#666',
   marginLeft: 10,
   width: 100,
 },
 forecastDetailValue: {
   fontSize: 14,
   fontWeight: '500',
-  color: '#333',
+  color: isDarkTheme ? '#F1F5F9' : '#333',
 }
 });
