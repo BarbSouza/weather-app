@@ -26,26 +26,11 @@ import { useTemperature } from './TemperatureContext';
 
 
 export default function Home() {
-     
-     const { isDarkTheme, toggleTheme } = useTheme();
-     const navigation = useNavigation();
-   
-    
-    useLayoutEffect(() => {
-        navigation.setOptions({
-        headerRight: () => (
-            <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 16 }}>
-            <FontAwesome5
-                name={isDarkTheme ? 'sun' : 'moon'}
-                size={20}
-                color="#fff"
-            />
-            </TouchableOpacity>
-        ),
-    });
-  }, [navigation, isDarkTheme]);
+  const { isDarkTheme, toggleTheme } = useTheme();
+  const { unit, toggleUnit, formatTemp } = useTemperature();
+  const navigation = useNavigation();
 
-  const styles = getStyles(isDarkTheme); // Dynamic styles
+const styles = getStyles(isDarkTheme); 
   const { 
     weatherData, 
     hourlyForecastData, 
@@ -64,13 +49,13 @@ export default function Home() {
     lastUpdated
   } = useWeather();
 
-    const { unit, toggleUnit, formatTemp } = useTemperature();
+ 
 
   const renderHourlyItem = ({ item }: { item: any }) => (
     <View style={styles.hourlyItem}>
       <Text style={styles.hourlyTime}>{formatHour(item.dt)}</Text>
       <WeatherIcon weatherId={item.weather[0].id} size={22} />
-      <Text style={styles.hourlyTemp}>{Math.round(item.temp)}°C</Text>
+      <Text style={styles.hourlyTemp}>{formatTemp(item.temp)}</Text>
       <View style={styles.precipContainer}>
         <Feather name="droplet" size={12} color="#1E90FF" />
         <Text style={styles.precipText}>{formatPrecipitation(item.pop)}</Text>
@@ -84,7 +69,7 @@ export default function Home() {
       <Text style={styles.dailyDay}>{formatDate(item.dt)}</Text>
       <WeatherIcon weatherId={item.weather[0].id} size={22} />
       <View style={styles.dailyTempContainer}>
-        <Text style={styles.dailyTemp}>{Math.round(item.main.temp)}°</Text>
+        <Text style={styles.dailyTemp}>{formatTemp(item.main.temp)}</Text>
         <View style={styles.precipContainer}>
           <Feather name="droplet" size={12} color="#1E90FF" />
           <Text style={styles.precipText}>{formatPrecipitation(item.pop)}</Text>
@@ -181,7 +166,7 @@ export default function Home() {
           contentContainerStyle={styles.scrollViewContent}
           onScrollBeginDrag={Keyboard.dismiss}
         >
-          {/* Current Weather */}
+                    {/* Current Weather */}
           <View style={styles.currentWeatherContainer}>
             <Text style={styles.currentDateTime}>
               {new Date().toLocaleDateString('en-US', { 
@@ -191,7 +176,7 @@ export default function Home() {
               })}
             </Text>
             <Text style={styles.locationName}>{weatherData.name}, {weatherData.sys.country}</Text>
-            <View style={styles.currentWeatherContent} >
+            <View style={styles.currentWeatherContent}>
               <View style={styles.temperatureContainer}>
                 <WeatherIcon weatherId={weatherData.weather[0].id} />
                 <TemperatureDisplay
@@ -214,16 +199,14 @@ export default function Home() {
                 <View style={styles.weatherDetail}>
                   <MaterialCommunityIcons name="thermometer" size={18} color="#555" />
                   <Text style={styles.weatherDetailText}>
-                  <Text style={styles.feelsLikeText}>
-                    Feels like {formatTemp(weatherData.main.feels_like)}
-                  </Text>
+                    {formatTemp(weatherData.main.temp_min)}/{formatTemp(weatherData.main.temp_max)}
                   </Text>
                 </View>
               </View>
               <View style={styles.feelsLikeContainer}>
                 <MaterialCommunityIcons name="thermometer-lines" size={18} color="#555" />
                 <Text style={styles.feelsLikeText}>
-                  Feels like {Math.round(weatherData.main.feels_like)}°C
+                  Feels like {formatTemp(weatherData.main.feels_like)}
                 </Text>
               </View>
               {lastUpdated && (
