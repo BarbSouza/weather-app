@@ -14,6 +14,10 @@ import { SearchHistoryService } from './SearchHistoryService';
 // TypeScript interfaces
 export interface WeatherData {
   name: string;
+    coord: {
+    lat: number;
+    lon: number;
+  };
   main: {
     temp: number;
     humidity: number;
