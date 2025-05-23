@@ -1,136 +1,95 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useTheme } from './ThemeContext';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface TemperatureDisplayProps {
-  temperature: number;
-  unit: 'C' | 'F';
-  onToggleUnit: () => void;
-  style?: any;
-  showToggle?: boolean;
-  size?: 'small' | 'medium' | 'large';
+type TemperatureUnit = 'C' | 'F';
+
+interface TemperatureContextType {
+  unit: TemperatureUnit;
+  toggleUnit: () => void;
+  setUnit: (unit: TemperatureUnit) => void;
+  convertTemp: (temp: number, fromUnit?: TemperatureUnit) => number;
+  formatTemp: (temp: number, fromUnit?: TemperatureUnit, showUnit?: boolean) => string;
 }
 
-export const TemperatureDisplay: React.FC<TemperatureDisplayProps> = ({
-  temperature,
-  unit,
-  onToggleUnit,
-  style,
-  showToggle = true,
-  size = 'medium'
-}) => {
-  const { isDarkTheme } = useTheme();
-  
-  const convertTemperature = (temp: number, from: 'C' | 'F', to: 'C' | 'F'): number => {
-    if (from === to) return temp;
+const TemperatureContext = createContext<TemperatureContextType | undefined>(undefined);
+
+interface TemperatureProviderProps {
+  children: ReactNode;
+}
+
+export const TemperatureProvider: React.FC<TemperatureProviderProps> = ({ children }) => {
+  const [unit, setUnitState] = useState<TemperatureUnit>('C');
+
+  // Load saved temperature unit preference
+  useEffect(() => {
+    const loadTemperatureUnit = async () => {
+      try {
+        const savedUnit = await AsyncStorage.getItem('temperatureUnit');
+        if (savedUnit === 'C' || savedUnit === 'F') {
+          setUnitState(savedUnit);
+        }
+      } catch (error) {
+        console.error('Error loading temperature unit:', error);
+      }
+    };
+
+    loadTemperatureUnit();
+  }, []);
+
+  // Save temperature unit preference
+  const setUnit = async (newUnit: TemperatureUnit) => {
+    try {
+      await AsyncStorage.setItem('temperatureUnit', newUnit);
+      setUnitState(newUnit);
+    } catch (error) {
+      console.error('Error saving temperature unit:', error);
+      setUnitState(newUnit); // Still update the state even if saving fails
+    }
+  };
+
+  const toggleUnit = () => {
+    const newUnit = unit === 'C' ? 'F' : 'C';
+    setUnit(newUnit);
+  };
+
+  // Convert temperature from Celsius (API default) to current unit
+  const convertTemp = (temp: number, fromUnit: TemperatureUnit = 'C'): number => {
+    if (fromUnit === unit) return temp;
     
-    if (from === 'C' && to === 'F') {
+    if (fromUnit === 'C' && unit === 'F') {
       return (temp * 9/5) + 32;
-    } else if (from === 'F' && to === 'C') {
+    } else if (fromUnit === 'F' && unit === 'C') {
       return (temp - 32) * 5/9;
     }
     
     return temp;
   };
 
-  const displayTemp = Math.round(convertTemperature(temperature, 'C', unit));
-  
-  const getStyles = () => ({
-    container: {
-      flexDirection: 'row' as const,
-      alignItems: 'center' as const,
-      ...style,
-    },
-    temperatureText: {
-      fontSize: size === 'large' ? 48 : size === 'medium' ? 32 : 20,
-      fontWeight: 'bold' as const,
-      color: isDarkTheme ? '#fff' : '#333',
-    },
-    unitContainer: {
-      marginLeft: 4,
-      flexDirection: 'column' as const,
-      alignItems: 'center' as const,
-    },
-    unitButton: {
-      paddingHorizontal: 6,
-      paddingVertical: 2,
-      borderRadius: 12,
-      backgroundColor: isDarkTheme ? '#444' : '#f0f0f0',
-      marginVertical: 1,
-    },
-    activeUnit: {
-      backgroundColor: '#0066cc',
-    },
-    unitText: {
-      fontSize: size === 'large' ? 16 : size === 'medium' ? 14 : 12,
-      fontWeight: '600' as const,
-      color: isDarkTheme ? '#fff' : '#333',
-    },
-    activeUnitText: {
-      color: '#fff',
-    },
-  });
+  // Format temperature with unit
+  const formatTemp = (temp: number, fromUnit: TemperatureUnit = 'C', showUnit: boolean = true): string => {
+    const convertedTemp = Math.round(convertTemp(temp, fromUnit));
+    return showUnit ? `${convertedTemp}°${unit}` : `${convertedTemp}°`;
+  };
 
-  const styles = getStyles();
-
-  if (!showToggle) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.temperatureText}>
-          {displayTemp}°{unit}
-        </Text>
-      </View>
-    );
-  }
+  const value: TemperatureContextType = {
+    unit,
+    toggleUnit,
+    setUnit,
+    convertTemp,
+    formatTemp,
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.temperatureText}>
-        {displayTemp}°
-      </Text>
-      <View style={styles.unitContainer}>
-        <TouchableOpacity
-          style={[
-            styles.unitButton,
-            unit === 'C' && styles.activeUnit
-          ]}
-          onPress={() => unit !== 'C' && onToggleUnit()}
-        >
-          <Text style={[
-            styles.unitText,
-            unit === 'C' && styles.activeUnitText
-          ]}>
-            C
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.unitButton,
-            unit === 'F' && styles.activeUnit
-          ]}
-          onPress={() => unit !== 'F' && onToggleUnit()}
-        >
-          <Text style={[
-            styles.unitText,
-            unit === 'F' && styles.activeUnitText
-          ]}>
-            F
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <TemperatureContext.Provider value={value}>
+      {children}
+    </TemperatureContext.Provider>
   );
 };
 
-// Utility functions for temperature conversion
-export const celsiusToFahrenheit = (celsius: number): number => {
-  return (celsius * 9/5) + 32;
-};
-
-export const fahrenheitToCelsius = (fahrenheit: number): number => {
-  return (fahrenheit - 32) * 5/9;
-};
-
-export const formatTemperature = (temp: number, unit: 'C' | 'F'): string => {
-  return `${Math.round(temp)}°${unit}`;
+export const useTemperature = (): TemperatureContextType => {
+  const context = useContext(TemperatureContext);
+  if (!context) {
+    throw new Error('useTemperature must be used within a TemperatureProvider');
+  }
+  return context;
 };
