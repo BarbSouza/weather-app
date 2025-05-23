@@ -20,6 +20,8 @@ import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useTheme } from './ThemeContext'; 
 import { LinearGradient } from 'expo-linear-gradient';
+import { TemperatureDisplay } from './components/TemperatureDisplay';
+import { useTemperature } from './TemperatureContext';
 
 
 
@@ -61,6 +63,8 @@ export default function Home() {
     handleClearSearchHistory,
     lastUpdated
   } = useWeather();
+
+    const { unit, toggleUnit, formatTemp } = useTemperature();
 
   const renderHourlyItem = ({ item }: { item: any }) => (
     <View style={styles.hourlyItem}>
@@ -190,8 +194,12 @@ export default function Home() {
             <View style={styles.currentWeatherContent} >
               <View style={styles.temperatureContainer}>
                 <WeatherIcon weatherId={weatherData.weather[0].id} />
-                 
-                <Text style={styles.temperature}>{Math.round(weatherData.main.temp)}°C</Text>
+                <TemperatureDisplay
+                  temperature={weatherData.main.temp}
+                  unit={unit}
+                  onToggleUnit={toggleUnit}
+                  size="large"
+                />
               </View>
               <Text style={styles.weatherDescription}>{weatherData.weather[0].description}</Text>
               <View style={styles.weatherDetailsContainer}>
@@ -206,7 +214,9 @@ export default function Home() {
                 <View style={styles.weatherDetail}>
                   <MaterialCommunityIcons name="thermometer" size={18} color="#555" />
                   <Text style={styles.weatherDetailText}>
-                    {Math.round(weatherData.main.temp_min)}°/{Math.round(weatherData.main.temp_max)}°
+                  <Text style={styles.feelsLikeText}>
+                    Feels like {formatTemp(weatherData.main.feels_like)}
+                  </Text>
                   </Text>
                 </View>
               </View>
