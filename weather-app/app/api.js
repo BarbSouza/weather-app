@@ -3,10 +3,10 @@ import axios from 'axios';
 const WEATHER_API_KEY = 'ddde560ae7ec6510c8d92298fc9da08f';
 const WEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5';
 
-export const fetchCurrentWeather = async (latitude, longitude) => {
+export const fetchCurrentWeather = async (latitude, longitude, units = 'metric') => {
   try {
     const response = await axios.get(
-      `${WEATHER_BASE_URL}/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${WEATHER_API_KEY}`
+      `${WEATHER_BASE_URL}/weather?lat=${latitude}&lon=${longitude}&units=${units}&appid=${WEATHER_API_KEY}`
     );
     return response.data;
   } catch (error) {
@@ -15,10 +15,10 @@ export const fetchCurrentWeather = async (latitude, longitude) => {
   }
 };
 
-export const fetchForecast = async (latitude, longitude) => {
+export const fetchForecast = async (latitude, longitude, units = 'metric') => {
   try {
     const response = await axios.get(
-      `${WEATHER_BASE_URL}/forecast?lat=${latitude}&lon=${longitude}&units=metric&appid=${WEATHER_API_KEY}`
+      `${WEATHER_BASE_URL}/forecast?lat=${latitude}&lon=${longitude}&units=${units}&appid=${WEATHER_API_KEY}`
     );
     return response.data;
   } catch (error) {
@@ -27,11 +27,11 @@ export const fetchForecast = async (latitude, longitude) => {
   }
 };
 
-export const fetchHourlyForecast = async (latitude, longitude) => {
+export const fetchHourlyForecast = async (latitude, longitude, units = 'metric') => {
   try {
     // OpenWeatherMap's OneCall API provides hourly forecasts
     const response = await axios.get(
-      `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&exclude=minutely&units=metric&appid=${WEATHER_API_KEY}`
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&exclude=minutely&units=${units}&appid=${WEATHER_API_KEY}`
     );
     return response.data;
   } catch (error) {
@@ -52,11 +52,11 @@ export const fetchAirPollution = async (latitude, longitude) => {
   }
 };
 
-export const fetchMonthlyForecast = async (latitude, longitude) => {
+export const fetchMonthlyForecast = async (latitude, longitude, units = 'metric') => {
   try {
     // This uses the Climate Forecast API (requires subscription)
     const response = await axios.get(
-      `https://api.openweathermap.org/data/2.5/climate/month?lat=${latitude}&lon=${longitude}&units=metric&appid=${WEATHER_API_KEY}`
+      `https://api.openweathermap.org/data/2.5/climate/month?lat=${latitude}&lon=${longitude}&units=${units}&appid=${WEATHER_API_KEY}`
     );
     return response.data;
   } catch (error) {
@@ -65,10 +65,10 @@ export const fetchMonthlyForecast = async (latitude, longitude) => {
   }
 };
 
-export const searchLocation = async (query) => {
+export const searchLocation = async (query, units = 'metric') => {
   try {
     const response = await axios.get(
-      `${WEATHER_BASE_URL}/weather?q=${query}&units=metric&appid=${WEATHER_API_KEY}`
+      `${WEATHER_BASE_URL}/weather?q=${query}&units=${units}&appid=${WEATHER_API_KEY}`
     );
     return response.data;
   } catch (error) {
