@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useWeather } from './WeatherContext';
-import { styles } from './styles';
+import { getStyles } from './styles';
 
 const WEATHER_API_KEY = 'ddde560ae7ec6510c8d92298fc9da08f';
 const MAP_BASE_URL = 'https://tile.openweathermap.org/map';
@@ -32,6 +32,8 @@ const WeatherMaps = () => {
   const [mapType, setMapType] = useState('precipitation_new');
   const [zoom, setZoom] = useState(5);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDarkTheme] = useState(false);
+  const styles = getStyles(isDarkTheme);
   
   // City coordinates from weather data
   const lat = weatherData?.coord?.lat || 0;
