@@ -18,7 +18,7 @@ import { WeatherIcon, formatHour, formatDate, formatPrecipitation } from './comp
 import SearchHistory from './SearchHistory';
 import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import { useTheme } from './ThemeContext'; // Adjust path
+import { useTheme } from './ThemeContext'; 
 
 
 export default function Home() {
