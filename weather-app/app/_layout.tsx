@@ -73,7 +73,7 @@ export default function AppLayout() {
         <Tabs.Screen
           name="daily"
           options={{
-            title: "5-Day Forecast",
+            title: "Daily Forecast",
             tabBarLabel: "Daily",
             tabBarIcon: ({ color }) => (
               <MaterialCommunityIcons name="calendar-week" size={28} color={color} />
@@ -103,7 +103,7 @@ export default function AppLayout() {
         <Tabs.Screen
         name="WeatherMaps"
         options={{
-          title: "Weather Map",
+          title: "Weather Maps",
           tabBarLabel: "Maps",
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="map" size={28} color={color} />
