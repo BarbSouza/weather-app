@@ -13,6 +13,7 @@ import { MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
 import { FavoritesService } from './FavoritesService';
 import { searchLocation } from './api';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTemperature } from './TemperatureContext';
 
 interface WeatherData {
   city: string;
@@ -30,7 +31,7 @@ const Favorites: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [isDarkTheme] = useState(false); // Simplified theme
-  const [unit] = useState('C'); // Simplified temperature unit
+  const { unit } = useTemperature(); // Use the temperature context
 
   // Load favorites from storage
   const loadFavorites = useCallback(async () => {
@@ -184,9 +185,9 @@ const Favorites: React.FC = () => {
     loadFavorites();
   }, [loadFavorites]);
 
-  // Fetch weather data when favorites change
+  // Fetch weather data when favorites change or unit changes
   useEffect(() => {
-    console.log('Favorites changed:', favorites);
+    console.log('Favorites or unit changed:', favorites, unit);
     if (favorites.length > 0) {
       fetchAllWeatherData();
     } else {
