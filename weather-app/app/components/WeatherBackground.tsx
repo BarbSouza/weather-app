@@ -1,6 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, StyleSheet, Dimensions } from 'react-native';
 
+/**
+ * Props for the WeatherBackground component
+ * @param weatherId - OpenWeatherMap weather condition code
+ * @param isDarkTheme - Flag indicating if dark theme is active
+ */
 interface WeatherBackgroundProps {
   weatherId: number;
   isDarkTheme: boolean;
@@ -8,10 +13,13 @@ interface WeatherBackgroundProps {
 
 const { width, height } = Dimensions.get('window');
 
+/**
+ * Renders animated weather effects (rain, snow, clouds) based on weather condition
+ */
 export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId, isDarkTheme }) => {
   const raindrops = useRef(Array.from({ length: 15 }, () => new Animated.Value(0))).current;
   const snowflakes = useRef(Array.from({ length: 12 }, () => new Animated.Value(0))).current;
-  const clouds = useRef(Array.from({ length: 3 }, () => new Animated.Value(0))).current;
+  const clouds = useRef(Array.from({ length: 5 }, () => new Animated.Value(0))).current;
 
   // Stop all animations
   const stopAllAnimations = () => {
@@ -27,9 +35,11 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId,
     clouds.forEach(cloud => cloud.setValue(0));
   };
 
-  // Rain animation
+  /**
+   * Animates raindrops falling with staggered timing
+   */
   const startRainAnimation = () => {
-    const animations = raindrops.map((drop, index) => {
+    const animations = raindrops.map(drop => {
       return Animated.loop(
         Animated.timing(drop, {
           toValue: 1,
@@ -43,9 +53,11 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId,
     Animated.stagger(150, animations).start();
   };
 
-  // Snow animation
+  /**
+   * Animates snowflakes falling with swaying motion
+   */
   const startSnowAnimation = () => {
-    const animations = snowflakes.map((flake, index) => {
+    const animations = snowflakes.map(flake => {
       return Animated.loop(
         Animated.timing(flake, {
           toValue: 1,
@@ -59,13 +71,15 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId,
     Animated.stagger(300, animations).start();
   };
 
-  // Cloud animation
+  /**
+   * Animates clouds moving across the screen
+   */
   const startCloudAnimation = () => {
     const animations = clouds.map((cloud, index) => {
       return Animated.loop(
         Animated.timing(cloud, {
           toValue: 1,
-          duration: 15000 + index * 3000, // Much longer duration
+          duration: 15000 + index * 3000,
           useNativeDriver: true,
         })
       );
