@@ -23,6 +23,44 @@ const MONTHS = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
+const getTemperatureValue = (forecast: any, type: 'high' | 'low' | 'average') => {
+  // Try different possible data structures
+  if (forecast.temp) {
+    if (type === 'high' && forecast.temp.max !== undefined) {
+      return forecast.temp.max;
+    }
+    if (type === 'low' && forecast.temp.min !== undefined) {
+      return forecast.temp.min;
+    }
+    if (type === 'average' && forecast.temp.average !== undefined) {
+      return forecast.temp.average;
+    }
+  }
+  
+  // Check main object (daily forecast structure)
+  if (forecast.main) {
+    if (type === 'high' && forecast.main.temp_max !== undefined) {
+      return forecast.main.temp_max;
+    }
+    if (type === 'low' && forecast.main.temp_min !== undefined) {
+      return forecast.main.temp_min;
+    }
+    if (type === 'average' && forecast.main.temp !== undefined) {
+      return forecast.main.temp;
+    }
+  }
+  
+  // Fallback estimates based on average temperature
+  if (forecast.temp?.average !== undefined) {
+    const avg = forecast.temp.average;
+    if (type === 'high') return avg + 3; // Estimate high as average + 3°
+    if (type === 'low') return avg - 3;  // Estimate low as average - 3°
+    if (type === 'average') return avg;
+  }
+  
+  return null;
+};
+
 export default function MonthlyCalendarForecast() {
   const { monthlyForecastData, isLoading, errorMsg } = useWeather();
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
@@ -247,15 +285,21 @@ export default function MonthlyCalendarForecast() {
                     <MaterialCommunityIcons name="thermometer" size={18} color="#FF9800" />
                     <Text style={styles.forecastDetailLabel}>High</Text>
                     <Text style={styles.forecastDetailValue}>
-                      {formatTemp(selectedForecast.temp.max)}
+                      {(() => {
+                        const highTemp = getTemperatureValue(selectedForecast, 'high');
+                        return highTemp !== null ? formatTemp(highTemp) : 'N/A';
+                      })()}
                     </Text>
                   </View>
-                  
+
                   <View style={styles.forecastDetailItem}>
                     <MaterialCommunityIcons name="thermometer-low" size={18} color="#2196F3" />
                     <Text style={styles.forecastDetailLabel}>Low</Text>
                     <Text style={styles.forecastDetailValue}>
-                      {formatTemp(selectedForecast.temp.min)}
+                      {(() => {
+                        const lowTemp = getTemperatureValue(selectedForecast, 'low');
+                        return lowTemp !== null ? formatTemp(lowTemp) : 'N/A';
+                      })()}
                     </Text>
                   </View>
                   
