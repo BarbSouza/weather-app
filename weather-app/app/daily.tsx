@@ -14,16 +14,31 @@ import { useWeather } from './WeatherContext';
 import { WeatherIcon, formatDate, formatPrecipitation } from './components/WeatherUtils';
 import MonthlyCalendarForecast from './MontlyCalendarForecast'; 
 import { useTheme } from './ThemeContext';
+import { useTemperature } from './TemperatureContext';
 import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 export default function Daily() {
   const { isDarkTheme, toggleTheme } = useTheme();
+  const { unit } = useTemperature();
   const navigation = useNavigation();
   const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
   const styles = getStyles(isDarkTheme); // Dynamic styles
   const { dailyForecastData, monthlyForecastData, isLoading, errorMsg } = useWeather();
   const [showMonthly, setShowMonthly] = useState(false);
+
+  // Convert temperature based on unit
+  const convertTemp = (temp: number): number => {
+    if (unit === 'F') {
+      return Math.round((temp * 9/5) + 32);
+    }
+    return Math.round(temp);
+  };
+
+  // Get temperature unit symbol
+  const getTempUnit = (): string => {
+    return unit;
+  };
 
   // Format date for monthly forecast (could be different from daily format)
   const formatMonthlyDate = (timestamp: number): string => {
@@ -95,11 +110,11 @@ export default function Daily() {
                     <WeatherIcon weatherId={forecast.weather[0].id} />
                     <View style={styles.forecastTempContainer}>
                       <Text style={styles.forecastTemp}>
-                        {Math.round(forecast.main.temp)}°C
+                        {convertTemp(forecast.main.temp)}°{getTempUnit()}
                       </Text>
                       <View style={styles.forecastMinMaxContainer}>
                         <Text style={styles.forecastMinMax}>
-                          H: {Math.round(forecast.main.temp_max)}° L: {Math.round(forecast.main.temp_min)}°
+                          H: {convertTemp(forecast.main.temp_max)}° L: {convertTemp(forecast.main.temp_min)}°
                         </Text>
                       </View>
                     </View>
@@ -129,11 +144,12 @@ export default function Daily() {
             </Text>
             <Text style={styles.forecastInfoText}>
               Precipitation percentage indicates the likelihood of rain or snow during the day.
+              {unit === 'F' ? ' Temperatures are shown in Fahrenheit.' : ' Temperatures are shown in Celsius.'}
             </Text>
           </View>
         </ScrollView>
       ) : showMonthly && monthlyForecastData.length > 0 ? (
-        // Monthly Climate Forecast Display
+        // Monthly Climate Forecast Display - Pass unit prop if component supports it
         <MonthlyCalendarForecast />
       ) : (
         // No Data Available
