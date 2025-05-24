@@ -91,6 +91,16 @@ export default function AppLayout() {
           }}
         />
         <Tabs.Screen
+          name="favorites"
+          options={{
+            title: "Favorite Cities",
+            tabBarLabel: "Favorites",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons name="heart" size={28} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
         name="WeatherMaps"
         options={{
           title: "Weather Map",

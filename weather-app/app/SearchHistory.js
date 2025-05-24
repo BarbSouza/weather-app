@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   StyleSheet
 } from 'react-native';
 import { Feather, FontAwesome } from '@expo/vector-icons';
+import { FavoritesService } from './FavoritesService';
 
 const SearchHistory = ({
   visible,
@@ -17,13 +18,36 @@ const SearchHistory = ({
 }) => {
   const [favorites, setFavorites] = useState([]);
 
-  const toggleFavorite = (city) => {
-    setFavorites((prev) =>
-      prev.includes(city)
-        ? prev.filter((c) => c !== city)
-        : [...prev, city]
-    );
+  // Load favorites from storage
+  const loadFavorites = async () => {
+    try {
+      const favoriteCities = await FavoritesService.getFavorites();
+      setFavorites(favoriteCities);
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+    }
   };
+
+  // Toggle favorite status
+  const toggleFavorite = async (city) => {
+    try {
+      const newStatus = await FavoritesService.toggleFavorite(city);
+      if (newStatus) {
+        setFavorites(prev => [city, ...prev.filter(c => c !== city)]);
+      } else {
+        setFavorites(prev => prev.filter(c => c !== city));
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
+  };
+
+  // Load favorites on mount and when visible changes
+  useEffect(() => {
+    if (visible) {
+      loadFavorites();
+    }
+  }, [visible]);
 
   // Show if visible OR any favorites exist
   if (!visible || (history.length === 0 && favorites.length === 0)) return null;
