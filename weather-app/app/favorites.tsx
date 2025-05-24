@@ -52,7 +52,7 @@ const Favorites: React.FC = () => {
       const data = await searchLocation(city, unitParam);
       
       return {
-        city,
+        city: data.name, // Use the actual city name from API response
         temperature: Math.round(data.main.temp),
         description: data.weather[0].description,
         icon: data.weather[0].icon,
@@ -92,7 +92,8 @@ const Favorites: React.FC = () => {
       for (const city of favorites) {
         const result = await fetchCityWeather(city);
         if (result) {
-          weatherMap[result.city] = result;
+          // Use the original search term as key, but display the API result name
+          weatherMap[city] = result;
         }
         // Small delay between requests to avoid rate limiting
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -200,7 +201,9 @@ const Favorites: React.FC = () => {
     return (
       <View style={styles.favoriteItem}>
         <View style={styles.favoriteLeft}>
-          <Text style={styles.favoriteCityName}>{item}</Text>
+          <Text style={styles.favoriteCityName}>
+            {weather ? weather.city : item}
+          </Text>
           {weather ? (
             <View style={styles.favoriteWeatherInfo}>
               <View style={styles.favoriteMainInfo}>
