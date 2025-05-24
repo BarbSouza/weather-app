@@ -13,15 +13,31 @@ import { getStyles } from './styles';
 import { useWeather } from './WeatherContext';
 import { WeatherIcon, formatHour, formatPrecipitation } from './components/WeatherUtils';
 import { useTheme } from './ThemeContext';
+import { useTemperature } from './TemperatureContext';
 import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 export default function Hourly() {
   const { hourlyForecastData, isLoading, errorMsg } = useWeather();
   const { isDarkTheme, toggleTheme } = useTheme();
+  const { unit } = useTemperature();
   const navigation = useNavigation();
   const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
   const styles = getStyles(isDarkTheme); // Dynamic styles
+
+  // Convert temperature based on unit
+  const convertTemp = (temp: number): number => {
+    if (unit === 'F') {
+      return Math.round((temp * 9/5) + 32);
+    }
+    return Math.round(temp);
+  };
+
+  // Get temperature unit symbol
+  const getTempUnit = (): string => {
+    return unit;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -55,7 +71,9 @@ export default function Hourly() {
                   </Text>
                 </View>
                 <View style={styles.hourlyDetailRight}>
-                  <Text style={styles.hourlyDetailTemp}>{Math.round(hour.temp)}°C</Text>
+                  <Text style={styles.hourlyDetailTemp}>
+                    {convertTemp(hour.temp)}°{getTempUnit()}
+                  </Text>
                   <View style={styles.hourlyDetailPrecip}>
                     <Feather name="droplet" size={14} color="#1E90FF" />
                     <Text style={styles.hourlyDetailPrecipText}>
@@ -72,7 +90,7 @@ export default function Hourly() {
             <Text style={styles.forecastTitle}>About Hourly Forecast</Text>
             <Text style={styles.forecastInfoText}>
               The hourly forecast provides detailed weather predictions for the next 24 hours.
-              Temperature readings are in Celsius and precipitation percentages indicate the 
+              Temperature readings are in {unit === 'F' ? 'Fahrenheit' : 'Celsius'} and precipitation percentages indicate the 
               likelihood of rain during that hour.
             </Text>
             <Text style={styles.forecastInfoText}>
