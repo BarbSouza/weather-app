@@ -31,6 +31,7 @@ export default function Home() {
   const navigation = useNavigation();
 
 const styles = getStyles(isDarkTheme); 
+const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
   const { 
     weatherData, 
     hourlyForecastData, 
@@ -57,7 +58,7 @@ const styles = getStyles(isDarkTheme);
       <WeatherIcon weatherId={item.weather[0].id} size={22} />
       <Text style={styles.hourlyTemp}>{formatTemp(item.temp)}</Text>
       <View style={styles.precipContainer}>
-        <Feather name="droplet" size={12} color="#1E90FF" />
+        <Feather name="droplet" size={15} color="#1E90FF" />
         <Text style={styles.precipText}>{formatPrecipitation(item.pop)}</Text>
       </View>
     </View>
@@ -71,7 +72,7 @@ const styles = getStyles(isDarkTheme);
       <View style={styles.dailyTempContainer}>
         <Text style={styles.dailyTemp}>{formatTemp(item.main.temp)}</Text>
         <View style={styles.precipContainer}>
-          <Feather name="droplet" size={12} color="#1E90FF" />
+          <Feather name="droplet" size={15} color="#1E90FF" />
           <Text style={styles.precipText}>{formatPrecipitation(item.pop)}</Text>
         </View>
       </View>
@@ -98,9 +99,9 @@ const styles = getStyles(isDarkTheme);
 
   return (
     <LinearGradient 
-        colors={isDarkTheme ? ['#1E293B', '#0F172A'] : ['#C2E9FB', '#A1C4FD']}
-       start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
+        colors={isDarkTheme ? ['#277ea5', '#0d0f12'] : ['#7fd7ff', '#fff']}
+       start={{ x: 0.4, y: 0 }}
+        end={{ x: 0.4, y: 1 }}
       style={styles.container} 
     >
       
@@ -186,25 +187,27 @@ const styles = getStyles(isDarkTheme);
                   size="large"
                 />
               </View>
+
               <Text style={styles.weatherDescription}>{weatherData.weather[0].description}</Text>
               <View style={styles.weatherDetailsContainer}>
                 <View style={styles.weatherDetail}>
-                  <Feather name="wind" size={18} color="#555" />
+                  <Feather name="wind" size={20} color={iconColor} />
                   <Text style={styles.weatherDetailText}>{weatherData.wind.speed} m/s</Text>
                 </View>
                 <View style={styles.weatherDetail}>
-                  <Feather name="droplet" size={18} color="#555" />
+                  <Feather name="droplet" size={20} color={iconColor} />
                   <Text style={styles.weatherDetailText}>{weatherData.main.humidity}%</Text>
                 </View>
                 <View style={styles.weatherDetail}>
-                  <MaterialCommunityIcons name="thermometer" size={18} color="#555" />
+                  <MaterialCommunityIcons name="thermometer" size={20} color={iconColor} />
                   <Text style={styles.weatherDetailText}>
                     {formatTemp(weatherData.main.temp_min)}/{formatTemp(weatherData.main.temp_max)}
                   </Text>
                 </View>
               </View>
+
               <View style={styles.feelsLikeContainer}>
-                <MaterialCommunityIcons name="thermometer-lines" size={18} color="#555" />
+                <MaterialCommunityIcons name="thermometer-lines" size={18} color={iconColor} />
                 <Text style={styles.feelsLikeText}>
                   Feels like {formatTemp(weatherData.main.feels_like)}
                 </Text>

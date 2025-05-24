@@ -20,11 +20,10 @@ export const getStyles = (isDarkTheme:boolean) =>{
       flexDirection: 'row',
       marginTop: 10,
     },
-
     searchInput: {
       flex: 1,
       height: 46,
-      backgroundColor: isDarkTheme ? '#1E293B' : 'white',
+      backgroundColor: isDarkTheme ? 'white' : 'white',
       borderRadius: 8,
       paddingHorizontal: 15,
       fontSize: 16,
@@ -63,7 +62,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
     },
     locationButtonText: {
       color: '#fff',
-      fontSize: 14,
+      fontSize: 15,
       fontWeight: '500',
       marginLeft: 8,
     },
@@ -103,16 +102,18 @@ export const getStyles = (isDarkTheme:boolean) =>{
     elevation: 0,
   },
 
+  //DATE/TIME //TOP
     currentDateTime: {
-      fontSize: 16,
-      color: isDarkTheme ? '#F1F5F9' : '#666',
+      fontSize: 18,
+      color: isDarkTheme ? '#F1F5F9' : '1a1919',
       textAlign: 'center',
-      marginBottom: 5,
+      marginBottom: 6,
   },
+  //LOCATION NAME
     locationName: {
-      fontSize: 22,
+      fontSize: 25,
       fontWeight: 'bold',
-      marginBottom: 10,
+      marginBottom: 12,
       color: isDarkTheme ? '#F1F5F9' : '#333',
       textAlign: 'center',
     },
@@ -131,9 +132,10 @@ export const getStyles = (isDarkTheme:boolean) =>{
       color: isDarkTheme ? '#F1F5F9' : '#333',
       marginLeft: 10,
     },
+    //WEATHER DESCRIPTION
     weatherDescription: {
-      fontSize: 18,
-      color: isDarkTheme ? '#F1F5F9' : '#666',
+      fontSize: 19,
+      color: isDarkTheme ? '#F1F5F9' : 'black',
       textTransform: 'capitalize',
       marginBottom: 15,
     },
@@ -150,19 +152,21 @@ export const getStyles = (isDarkTheme:boolean) =>{
     },
     weatherDetailText: {
       fontSize: 14,
-      color: isDarkTheme ? '#F1F5F9' : '#555',
+      color: isDarkTheme ? 'white' : 'black',
       marginLeft: 5,
     },
     feelsLikeContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       marginTop: 15,
+      color: isDarkTheme ? 'white' : 'black',
     },
     feelsLikeText: {
       fontSize: 14,
       color: isDarkTheme ? '#F1F5F9' : '#555',
       marginLeft: 5,
     },
+
     hourlyForecastContainer: {
     backgroundColor: isDarkTheme ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
     borderRadius: 20,
