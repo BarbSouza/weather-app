@@ -20,20 +20,7 @@ export default function Hourly() {
   const { hourlyForecastData, isLoading, errorMsg } = useWeather();
   const { isDarkTheme, toggleTheme } = useTheme();
   const navigation = useNavigation();
-  useLayoutEffect(() => {
-        navigation.setOptions({
-            headerRight: () => (
-                <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 16 }}>
-                <FontAwesome5
-                    name={isDarkTheme ? 'sun' : 'moon'}
-                    size={20}
-                    color="#fff"
-                />
-                </TouchableOpacity>
-        ),
-    });
-  }, [navigation, isDarkTheme]);
-  
+  const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
   const styles = getStyles(isDarkTheme); // Dynamic styles
   return (
     <SafeAreaView style={styles.container}>
