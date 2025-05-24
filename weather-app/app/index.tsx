@@ -22,6 +22,7 @@ import { useTheme } from './ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { TemperatureDisplay } from './components/TemperatureDisplay';
 import { useTemperature } from './TemperatureContext';
+import { WeatherBackground } from './components/WeatherBackground';
 
 
 
@@ -104,6 +105,13 @@ const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
         end={{ x: 0.4, y: 1 }}
       style={styles.container} 
     >
+      {/* Weather Background Effects */}
+      {weatherData && (
+        <WeatherBackground 
+          weatherId={weatherData.weather[0].id} 
+          isDarkTheme={isDarkTheme} 
+        />
+      )}
       
       {/* Other components */}
       <StatusBar barStyle="light-content" />
