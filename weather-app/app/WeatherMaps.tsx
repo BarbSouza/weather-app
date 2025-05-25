@@ -13,6 +13,7 @@ import {
 import { WEATHER_API_KEY } from './api';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useWeather } from './WeatherContext';
+import { useTemperature } from './TemperatureContext'; // Import the temperature context
 import { getStyles } from './styles';
 
 // Screen dimensions for the map
@@ -44,6 +45,7 @@ interface WeatherDataClouds {
 
 const WeatherMaps = () => {
   const { weatherData } = useWeather();
+  const { formatTemp, unit } = useTemperature(); // Use the temperature context
   const [mapType, setMapType] = useState('TA2');
   const [zoom, setZoom] = useState(4);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,13 +56,13 @@ const WeatherMaps = () => {
   const lat = weatherData?.coord?.lat || 0;
   const lon = weatherData?.coord?.lon || 0;
   
-  // Map layer options with corresponding weather data keys
+  // Map layer options with corresponding weather data keys - update temperature unit dynamically
   const mapLayers: MapLayer[] = [
-    { id: 'TA2', name: 'Temperature', icon: 'thermometer', weatherKey: 'temp', unit: '°C' },
+    { id: 'TA2', name: 'Temperature', icon: 'thermometer', weatherKey: 'temp', unit: `°${unit}` },
     { id: 'PR0', name: 'Precipitation', icon: 'cloud-rain', weatherKey: 'rain', unit: 'mm/h' },
     { id: 'WND', name: 'Wind Speed', icon: 'wind', weatherKey: 'wind_speed', unit: 'm/s' },
     { id: 'CL', name: 'Clouds', icon: 'cloud', weatherKey: 'clouds', unit: '%' },
-    { id: 'APM', name: 'Pressure', icon: 'activity', weatherKey: 'pressure', unit: 'hPa' }, // Changed from 'disc' to 'activity'
+    { id: 'APM', name: 'Pressure', icon: 'activity', weatherKey: 'pressure', unit: 'hPa' },
   ];
 
   // Map zoom options
@@ -90,11 +92,13 @@ const WeatherMaps = () => {
     
     switch (mapType) {
       case 'TA2':
+        // Use formatTemp to convert and format temperature according to user preference
+        const tempValue = formatTemp(weatherData.main.temp, 'C', false); // Remove unit from formatTemp since we add it below
         return {
-          value: Math.round(weatherData.main.temp),
+          value: tempValue,
           label: 'Current Temperature',
           icon: 'thermometer',
-          unit: '°C'
+          unit: `${unit}` // Use the current unit from context
         };
       case 'PR0':
         // Safe access to rain data with proper type checking
@@ -134,7 +138,7 @@ const WeatherMaps = () => {
     }
   };
 
-  // Enhanced legend information based on map type
+  // Enhanced legend information based on map type - update temperature ranges based on current unit
   const getLegendInfo = () => {
     switch (mapType) {
       case 'PR0':
@@ -150,17 +154,28 @@ const WeatherMaps = () => {
           ]
         };
       case 'TA2':
+        // Adjust temperature ranges based on current unit
+        const tempRanges = unit === 'C' 
+          ? [
+              { color: '#673AB7', label: '< -10°C', description: 'Very cold' },
+              { color: '#2196F3', label: '-10 to 0°C', description: 'Cold' },
+              { color: '#4CAF50', label: '0 to 10°C', description: 'Cool' },
+              { color: '#FFEB3B', label: '10 to 20°C', description: 'Mild' },
+              { color: '#FF9800', label: '20 to 30°C', description: 'Warm' },
+              { color: '#F44336', label: '30+ °C', description: 'Hot' },
+            ]
+          : [
+              { color: '#673AB7', label: '< 14°F', description: 'Very cold' },
+              { color: '#2196F3', label: '14 to 32°F', description: 'Cold' },
+              { color: '#4CAF50', label: '32 to 50°F', description: 'Cool' },
+              { color: '#FFEB3B', label: '50 to 68°F', description: 'Mild' },
+              { color: '#FF9800', label: '68 to 86°F', description: 'Warm' },
+              { color: '#F44336', label: '86+ °F', description: 'Hot' },
+            ];
         return {
           title: 'Temperature Distribution',
           description: 'Air temperature at 2 meters above ground level',
-          colors: [
-            { color: '#673AB7', label: '< -10°C', description: 'Very cold' },
-            { color: '#2196F3', label: '-10 to 0°C', description: 'Cold' },
-            { color: '#4CAF50', label: '0 to 10°C', description: 'Cool' },
-            { color: '#FFEB3B', label: '10 to 20°C', description: 'Mild' },
-            { color: '#FF9800', label: '20 to 30°C', description: 'Warm' },
-            { color: '#F44336', label: '30+ °C', description: 'Hot' },
-          ]
+          colors: tempRanges
         };
       case 'CL':
         return {
