@@ -37,12 +37,12 @@ export default function AppLayout() {
       <Tabs
         screenOptions={{
           headerRight: () => <HeaderRight />,
-          tabBarActiveTintColor: isDarkTheme ? '#66b3ff' : '#0066cc',
-          tabBarInactiveTintColor: isDarkTheme ? '#666' : '#888',
+          tabBarActiveTintColor: isDarkTheme ? 'white' : 'black',
+          tabBarInactiveTintColor: isDarkTheme ? '#cac8c8' : '#474747',
           tabBarStyle: {
             paddingBottom: 5,
             paddingTop: 5,
-            height: 60,
+            height: 65,
             backgroundColor: isDarkTheme ? '#222' : '#fff',
             borderTopColor: isDarkTheme ? '#333' : '#e0e0e0',
           },
