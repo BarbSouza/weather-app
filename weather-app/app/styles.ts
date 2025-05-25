@@ -196,10 +196,10 @@ export const getStyles = (isDarkTheme:boolean) =>{
     fontWeight: '500',
     fontSize: 14,
   },
-
-
+  
     hourlyForecastList: {
       paddingVertical: 10,
+      
     },
     hourlyItem: {
     backgroundColor: isDarkTheme ? '#1E293B' : '#fff',
@@ -255,7 +255,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
       fontWeight: '500',
     },
     forecastContainer: {
-      backgroundColor: isDarkTheme ? '#1E293B' : '#fff',
+      backgroundColor: isDarkTheme ? '#1e293b57' : '#ffffff59',
       borderRadius: 12,
       padding: 20,
       shadowColor: '#000',
@@ -268,7 +268,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
       fontSize: 18,
       fontWeight: 'bold',
       marginBottom: 15,
-      color: isDarkTheme ? '#F1F5F9' : '#333',
+      color: isDarkTheme ? 'white' : 'black',
     },
     forecastItem: {
       flexDirection: 'row',
@@ -306,15 +306,15 @@ export const getStyles = (isDarkTheme:boolean) =>{
       alignItems: 'center',
     },
     forecastMinMax: {
-      fontSize: 12,
-      color: isDarkTheme ? '#D1D5DB' : '#666',
+      fontSize: 13,
+      color: isDarkTheme ? 'white' : 'black',
     },
     forecastRightColumn: {
       alignItems: 'flex-end',
     },
     forecastDescription: {
       fontSize: 14,
-      color: isDarkTheme ? '#D1D5DB' : '#666',
+      color: isDarkTheme ? 'white' : 'black',
       textTransform: 'capitalize',
       marginBottom: 4,
     },
@@ -336,20 +336,20 @@ export const getStyles = (isDarkTheme:boolean) =>{
       borderBottomColor: isDarkTheme ? '#374151' : '#eee',
     },
     hourlyDetailLeft: {
-      width: '25%',
+      width: '28%',
       flexDirection: 'row',
       alignItems: 'center',
     },
     hourlyDetailTime: {
       marginRight: 8,
       fontSize: 14,
-      color: isDarkTheme ? '#F1F5F9' : '#333',
+      color: isDarkTheme ? 'white' : 'black',
     },
     hourlyDetailCenter: {
       width: '40%',
     },
     hourlyDetailDescription: {
-      fontSize: 14,
+      fontSize: 15,
       color: isDarkTheme ? '#D1D5DB' : '#666',
       textTransform: 'capitalize',
     },
@@ -370,7 +370,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
       alignItems: 'center',
     },
     hourlyDetailPrecipText: {
-      fontSize: 12,
+      fontSize: 14,
       color: '#1E90FF',
       marginLeft: 2,
     },
@@ -390,7 +390,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      padding: 20,
+      padding: 25,
     },
     noDataText: {
       fontSize: 16,
@@ -573,7 +573,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
   },
     dailyForecastList: {
       paddingVertical: 10,
-    paddingHorizontal: 12,
+      paddingHorizontal: 12,
   },
     dailyItem: {
     backgroundColor: isDarkTheme ? '#1E293B' : '#fff',
@@ -632,7 +632,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
   calendarNavButton: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: isDarkTheme ? '#374151' : '#f0f0f0',
+    backgroundColor: isDarkTheme ? '#adabab' : '#b4b4b4',
   },
   calendarWeekdayHeader: {
     flexDirection: 'row',

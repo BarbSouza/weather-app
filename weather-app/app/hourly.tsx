@@ -16,13 +16,14 @@ import { useTheme } from './ThemeContext';
 import { useTemperature } from './TemperatureContext';
 import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function Hourly() {
   const { hourlyForecastData, isLoading, errorMsg } = useWeather();
   const { isDarkTheme, toggleTheme } = useTheme();
   const { unit } = useTemperature();
   const navigation = useNavigation();
-  const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
+  //const iconColor = isDarkTheme ? '#F1F5F9' : 'pink'
   const styles = getStyles(isDarkTheme); // Dynamic styles
 
   // Convert temperature based on unit
@@ -39,8 +40,13 @@ export default function Hourly() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <LinearGradient
+      colors={isDarkTheme ? ['#277ea5', '#0d0f12'] : ['#7fd7ff', '#fff']}
+      start={{ x: 0.4, y: 0 }}
+      end={{ x: 0.4, y: 1 }}
+      style={styles.container}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
@@ -105,5 +111,6 @@ export default function Hourly() {
         </View>
       )}
     </SafeAreaView>
+   </LinearGradient>
   );
 }
