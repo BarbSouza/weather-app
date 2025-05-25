@@ -10,12 +10,10 @@ import {
   ActivityIndicator,
   SafeAreaView,
 } from 'react-native';
+import { WEATHER_API_KEY, MAP_BASE_URL } from './api';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useWeather } from './WeatherContext';
 import { getStyles } from './styles';
-
-const WEATHER_API_KEY = 'ddde560ae7ec6510c8d92298fc9da08f';
-const MAP_BASE_URL = 'https://tile.openweathermap.org/map';
 
 // Screen dimensions for the map
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -56,25 +54,18 @@ const WeatherMaps = () => {
     { level: 9, name: 'Local' },
   ];
   
-  // Generate OpenWeatherMap tile URL for the current settings
+  // Generate OpenWeatherMap tile URL - SIMPLIFIED VERSION
   const generateMapUrl = () => {
-    // Format: https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid={API key}
-    
     // Calculate tile coordinates based on lat/lon and zoom
-    // This is a simplified calculation based on slippy map tile scheme
     const tilesPerSide = Math.pow(2, zoom);
     const x = Math.floor(tilesPerSide * ((lon + 180) / 360));
-    const latRad = lat * Math.PI / 180;
-    const y = Math.floor(tilesPerSide * (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2);
+    const latRad = (lat * Math.PI) / 180;
+    const y = Math.floor(
+      tilesPerSide * (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2
+    );
     
-    // Fetch multiple tiles around the center for a better view
-    // We'll create a 2x2 grid of tiles
-    return [
-      `${MAP_BASE_URL}/${mapType}/${zoom}/${x}/${y}.png?appid=${WEATHER_API_KEY}`,
-      `${MAP_BASE_URL}/${mapType}/${zoom}/${x+1}/${y}.png?appid=${WEATHER_API_KEY}`,
-      `${MAP_BASE_URL}/${mapType}/${zoom}/${x}/${y+1}.png?appid=${WEATHER_API_KEY}`,
-      `${MAP_BASE_URL}/${mapType}/${zoom}/${x+1}/${y+1}.png?appid=${WEATHER_API_KEY}`,
-    ];
+    // Return single tile URL centered on location
+    return `${MAP_BASE_URL}/${mapType}/${zoom}/${x}/${y}.png?appid=${WEATHER_API_KEY}`;
   };
 
   // Legend information based on map type
@@ -149,7 +140,7 @@ const WeatherMaps = () => {
       // Simulate a loading delay to ensure images load properly
       setTimeout(() => {
         setIsLoading(false);
-      }, 500);
+      }, 1000);
     }
   }, [mapType, zoom, weatherData]);
 
@@ -167,7 +158,7 @@ const WeatherMaps = () => {
     );
   }
 
-  const mapUrls = generateMapUrl();
+  const mapUrl = generateMapUrl();
   const legendInfo = getLegendInfo();
 
   return (
@@ -178,9 +169,11 @@ const WeatherMaps = () => {
         contentContainerStyle={mapStyles.scrollContent}
       >
         <View style={mapStyles.headerContainer}>
-          <Text style={mapStyles.headerTitle}>Weather Maps</Text>
-          <Text style={mapStyles.locationText}>
+          <Text style={mapStyles.headerTitle}>
             {weatherData.name}, {weatherData.sys.country}
+          </Text>
+          <Text style={mapStyles.locationText}>
+            Latitude: {lat.toFixed(2)}, Longitude: {lon.toFixed(2)}
           </Text>
         </View>
 
@@ -241,7 +234,7 @@ const WeatherMaps = () => {
           </View>
         </View>
 
-        {/* Map Display */}
+        {/* Map Display - SIMPLIFIED */}
         <View style={mapStyles.mapContainer}>
           {isLoading ? (
             <View style={mapStyles.loadingContainer}>
@@ -249,31 +242,18 @@ const WeatherMaps = () => {
               <Text style={mapStyles.loadingText}>Loading map...</Text>
             </View>
           ) : (
-            <View style={mapStyles.mapTilesContainer}>
-              <View style={mapStyles.mapRow}>
-                <Image 
-                  source={{ uri: mapUrls[0] }} 
-                  style={mapStyles.mapTile}
-                  resizeMode="cover"
-                />
-                <Image 
-                  source={{ uri: mapUrls[1] }} 
-                  style={mapStyles.mapTile}
-                  resizeMode="cover"
-                />
-              </View>
-              <View style={mapStyles.mapRow}>
-                <Image 
-                  source={{ uri: mapUrls[2] }} 
-                  style={mapStyles.mapTile}
-                  resizeMode="cover"
-                />
-                <Image 
-                  source={{ uri: mapUrls[3] }} 
-                  style={mapStyles.mapTile}
-                  resizeMode="cover"
-                />
-              </View>
+            <View style={mapStyles.mapImageContainer}>
+              <Image 
+                source={{ uri: mapUrl }} 
+                style={mapStyles.mapImage}
+                resizeMode="cover"
+                onError={(error) => {
+                  console.log('Map loading error:', error.nativeEvent.error);
+                }}
+                onLoad={() => {
+                  console.log('Map loaded successfully');
+                }}
+              />
               <View style={mapStyles.mapLocationMarker}>
                 <MaterialCommunityIcons name="map-marker" size={24} color="#e91e63" />
               </View>
@@ -299,7 +279,42 @@ const WeatherMaps = () => {
           </View>
         </View>
 
-        {/* Map Type Descriptions */}
+        {/* Current Weather Info */}
+        <View style={mapStyles.weatherInfoContainer}>
+          <Text style={mapStyles.weatherInfoTitle}>Current Weather</Text>
+          <View style={mapStyles.weatherInfoGrid}>
+            <View style={mapStyles.weatherInfoItem}>
+              <MaterialCommunityIcons name="thermometer" size={20} color="#0066cc" />
+              <Text style={mapStyles.weatherInfoLabel}>Temperature</Text>
+              <Text style={mapStyles.weatherInfoValue}>{Math.round(weatherData.main.temp)}°C</Text>
+            </View>
+            <View style={mapStyles.weatherInfoItem}>
+              <MaterialCommunityIcons name="water-percent" size={20} color="#0066cc" />
+              <Text style={mapStyles.weatherInfoLabel}>Humidity</Text>
+              <Text style={mapStyles.weatherInfoValue}>{weatherData.main.humidity}%</Text>
+            </View>
+            <View style={mapStyles.weatherInfoItem}>
+              <MaterialCommunityIcons name="weather-windy" size={20} color="#0066cc" />
+              <Text style={mapStyles.weatherInfoLabel}>Wind Speed</Text>
+              <Text style={mapStyles.weatherInfoValue}>{weatherData.wind?.speed || 0} m/s</Text>
+            </View>
+            <View style={mapStyles.weatherInfoItem}>
+              <MaterialCommunityIcons name="gauge" size={20} color="#0066cc" />
+              <Text style={mapStyles.weatherInfoLabel}>Pressure</Text>
+              <Text style={mapStyles.weatherInfoValue}>{weatherData.main.pressure} hPa</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Debug Info - Remove this after testing */}
+        <View style={mapStyles.debugContainer}>
+          <Text style={mapStyles.debugText}>Debug Info:</Text>
+          <Text style={mapStyles.debugText}>Map URL: {mapUrl}</Text>
+          <Text style={mapStyles.debugText}>Coordinates: {lat}, {lon}</Text>
+          <Text style={mapStyles.debugText}>Zoom: {zoom}</Text>
+        </View>
+
+        {/* Map Description */}
         <View style={mapStyles.descriptionContainer}>
           <Text style={mapStyles.descriptionTitle}>About This Map</Text>
           <Text style={mapStyles.descriptionText}>
@@ -422,19 +437,16 @@ const mapStyles = StyleSheet.create({
     fontSize: 16,
     color: '#555',
   },
-  mapTilesContainer: {
+  // SIMPLIFIED MAP DISPLAY
+  mapImageContainer: {
     height: MAP_HEIGHT,
     position: 'relative',
     overflow: 'hidden',
     borderRadius: 8,
     backgroundColor: '#f0f0f0',
   },
-  mapRow: {
-    flexDirection: 'row',
-    height: MAP_HEIGHT / 2,
-  },
-  mapTile: {
-    width: SCREEN_WIDTH / 2 - 30,
+  mapImage: {
+    width: '100%',
     height: '100%',
   },
   mapLocationMarker: {
@@ -444,6 +456,49 @@ const mapStyles = StyleSheet.create({
     marginLeft: -12,
     marginTop: -24,
     zIndex: 10,
+  },
+  weatherInfoContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 15,
+    marginHorizontal: 15,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  weatherInfoTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 15,
+  },
+  weatherInfoGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  weatherInfoItem: {
+    width: '48%',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  weatherInfoLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 5,
+    textAlign: 'center',
+  },
+  weatherInfoValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginTop: 2,
   },
   legendContainer: {
     marginTop: 15,
@@ -479,6 +534,21 @@ const mapStyles = StyleSheet.create({
   legendLabel: {
     fontSize: 12,
     color: '#666',
+  },
+  // DEBUG CONTAINER - Remove after testing
+  debugContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 15,
+    marginHorizontal: 15,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#ff0000',
+  },
+  debugText: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 5,
   },
   descriptionContainer: {
     backgroundColor: '#fff',
