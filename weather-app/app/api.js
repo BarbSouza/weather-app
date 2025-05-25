@@ -1,7 +1,8 @@
 import axios from 'axios';
-// OpenWeatherMap API key and base URL
-const WEATHER_API_KEY = 'ddde560ae7ec6510c8d92298fc9da08f';
-const WEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5';
+// OpenWeatherMap API key and base URLs
+export const WEATHER_API_KEY = 'ddde560ae7ec6510c8d92298fc9da08f';
+export const WEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5';
+export const MAP_BASE_URL = 'https://tile.openweathermap.org/map';
 
 export const fetchCurrentWeather = async (latitude, longitude, units = 'metric') => {
   try {
