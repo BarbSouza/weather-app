@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   SafeAreaView,
 } from 'react-native';
-import { WEATHER_API_KEY, MAP_BASE_URL } from './api';
+import { WEATHER_API_KEY } from './api';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useWeather } from './WeatherContext';
 import { getStyles } from './styles';
@@ -27,8 +27,8 @@ interface MapLayer {
 
 const WeatherMaps = () => {
   const { weatherData } = useWeather();
-  const [mapType, setMapType] = useState('precipitation_new');
-  const [zoom, setZoom] = useState(5);
+  const [mapType, setMapType] = useState('TA2'); 
+  const [zoom, setZoom] = useState(4);
   const [isLoading, setIsLoading] = useState(false);
   const [isDarkTheme] = useState(false);
   const styles = getStyles(isDarkTheme);
@@ -37,57 +37,79 @@ const WeatherMaps = () => {
   const lat = weatherData?.coord?.lat || 0;
   const lon = weatherData?.coord?.lon || 0;
   
-  // Map layer options
+  // Map layer options - Updated with correct OpenWeatherMap layer names
   const mapLayers: MapLayer[] = [
-    { id: 'precipitation_new', name: 'Precipitation', icon: 'cloud-rain' },
-    { id: 'temp_new', name: 'Temperature', icon: 'thermometer' },
-    { id: 'clouds_new', name: 'Clouds', icon: 'cloud' },
-    { id: 'wind_new', name: 'Wind Speed', icon: 'wind' },
-    { id: 'pressure_new', name: 'Pressure', icon: 'disc' },
+    { id: 'TA2', name: 'Temperature', icon: 'thermometer' },
+    { id: 'PR0', name: 'Precipitation', icon: 'cloud-rain' },
+    { id: 'WND', name: 'Wind Speed', icon: 'wind' },
+    { id: 'CL', name: 'Clouds', icon: 'cloud' },
+    { id: 'APM', name: 'Pressure', icon: 'disc' },
   ];
 
   // Map zoom options
   const zoomLevels = [
-    { level: 3, name: 'Country' },
-    { level: 5, name: 'Region' },
-    { level: 7, name: 'City' },
-    { level: 9, name: 'Local' },
+    { level: 2, name: 'Wide' },
+    { level: 4, name: 'Regional' },
+    { level: 6, name: 'Local' },
+    { level: 8, name: 'Close' },
   ];
   
-  // Generate OpenWeatherMap tile URL - SIMPLIFIED VERSION
+  
   const generateMapUrl = () => {
-    // Calculate tile coordinates based on lat/lon and zoom
-    const tilesPerSide = Math.pow(2, zoom);
-    const x = Math.floor(tilesPerSide * ((lon + 180) / 360));
-    const latRad = (lat * Math.PI) / 180;
-    const y = Math.floor(
-      tilesPerSide * (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2
-    );
     
-    // Return single tile URL centered on location
-    return `${MAP_BASE_URL}/${mapType}/${zoom}/${x}/${y}.png?appid=${WEATHER_API_KEY}`;
+    // Format: http://maps.openweathermap.org/maps/2.0/weather/{layer}/{z}/{x}/{y}?appid={API key}
+    
+    // Convert lat/lon to tile coordinates
+    const tileX = Math.floor((lon + 180) / 360 * Math.pow(2, zoom));
+    const latRad = lat * Math.PI / 180;
+    const tileY = Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * Math.pow(2, zoom));
+    
+    return `http://maps.openweathermap.org/maps/2.0/weather/${mapType}/${zoom}/${tileX}/${tileY}?appid=${WEATHER_API_KEY}`;
+  };
+
+  // Generate a multi-tile view for better coverage
+  const generateTileGrid = () => {
+    const centerTileX = Math.floor((lon + 180) / 360 * Math.pow(2, zoom));
+    const latRad = lat * Math.PI / 180;
+    const centerTileY = Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * Math.pow(2, zoom));
+    
+    // Create a 3x3 grid of tiles centered on the location
+    const tiles = [];
+    for (let x = -1; x <= 1; x++) {
+      for (let y = -1; y <= 1; y++) {
+        const tileX = centerTileX + x;
+        const tileY = centerTileY + y;
+        tiles.push({
+          x: tileX,
+          y: tileY,
+          url: `http://maps.openweathermap.org/maps/2.0/weather/${mapType}/${zoom}/${tileX}/${tileY}?appid=${WEATHER_API_KEY}`,
+          gridX: x + 1,
+          gridY: y + 1
+        });
+      }
+    }
+    return tiles;
   };
 
   // Legend information based on map type
   const getLegendInfo = () => {
     switch (mapType) {
-      case 'precipitation_new':
+      case 'PR0':
         return {
-          title: 'Precipitation (mm)',
+          title: 'Precipitation (mm/h)',
           colors: [
-            { color: '#b3f0ff', label: '0-1' },
-            { color: '#66ccff', label: '1-5' },
-            { color: '#3399ff', label: '5-10' },
-            { color: '#0066ff', label: '10-20' },
-            { color: '#006600', label: '20+' },
+            { color: '#b3f0ff', label: '0-0.1' },
+            { color: '#66ccff', label: '0.1-0.5' },
+            { color: '#3399ff', label: '0.5-2' },
+            { color: '#0066ff', label: '2-8' },
+            { color: '#003399', label: '8+' },
           ]
         };
-      case 'temp_new':
+      case 'TA2':
         return {
           title: 'Temperature (°C)',
           colors: [
-            { color: '#9c70c7', label: '< -20' },
-            { color: '#8b9ff7', label: '-20 to -10' },
+            { color: '#9c70c7', label: '< -10' },
             { color: '#66ccff', label: '-10 to 0' },
             { color: '#99ff99', label: '0 to 10' },
             { color: '#ffff99', label: '10 to 20' },
@@ -95,37 +117,37 @@ const WeatherMaps = () => {
             { color: '#ff8c66', label: '30+' },
           ]
         };
-      case 'clouds_new':
+      case 'CL':
         return {
           title: 'Cloud Cover (%)',
           colors: [
-            { color: '#ffffff', label: '0-10' },
-            { color: '#e6e6e6', label: '10-30' },
-            { color: '#cccccc', label: '30-50' },
-            { color: '#999999', label: '50-70' },
-            { color: '#666666', label: '70-100' },
+            { color: '#ffffff', label: '0-20' },
+            { color: '#e6e6e6', label: '20-40' },
+            { color: '#cccccc', label: '40-60' },
+            { color: '#999999', label: '60-80' },
+            { color: '#666666', label: '80-100' },
           ]
         };
-      case 'wind_new':
+      case 'WND':
         return {
           title: 'Wind Speed (m/s)',
           colors: [
-            { color: '#e6f7ff', label: '0-3' },
-            { color: '#99ddff', label: '3-6' },
-            { color: '#33bbff', label: '6-9' },
-            { color: '#0088cc', label: '9-12' },
-            { color: '#005580', label: '12+' },
+            { color: '#ffffff', label: '0-2' },
+            { color: '#b3f0ff', label: '2-5' },
+            { color: '#66ccff', label: '5-10' },
+            { color: '#3399ff', label: '10-15' },
+            { color: '#0066ff', label: '15+' },
           ]
         };
-      case 'pressure_new':
+      case 'APM':
         return {
           title: 'Pressure (hPa)',
           colors: [
-            { color: '#99ccff', label: '< 980' },
-            { color: '#99ffff', label: '980-1000' },
-            { color: '#99ff99', label: '1000-1020' },
-            { color: '#ffff99', label: '1020-1040' },
-            { color: '#ffcc99', label: '1040+' },
+            { color: '#9c70c7', label: 'Low' },
+            { color: '#66ccff', label: 'Below Avg' },
+            { color: '#99ff99', label: 'Average' },
+            { color: '#ffff99', label: 'Above Avg' },
+            { color: '#ff8c66', label: 'High' },
           ]
         };
       default:
@@ -137,10 +159,10 @@ const WeatherMaps = () => {
   useEffect(() => {
     if (weatherData?.coord) {
       setIsLoading(true);
-      // Simulate a loading delay to ensure images load properly
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setIsLoading(false);
-      }, 1000);
+      }, 1500);
+      return () => clearTimeout(timer);
     }
   }, [mapType, zoom, weatherData]);
 
@@ -159,6 +181,7 @@ const WeatherMaps = () => {
   }
 
   const mapUrl = generateMapUrl();
+  const tileGrid = generateTileGrid();
   const legendInfo = getLegendInfo();
 
   return (
@@ -173,7 +196,7 @@ const WeatherMaps = () => {
             {weatherData.name}, {weatherData.sys.country}
           </Text>
           <Text style={mapStyles.locationText}>
-            Latitude: {lat.toFixed(2)}, Longitude: {lon.toFixed(2)}
+            Lat: {lat.toFixed(2)}°, Lon: {lon.toFixed(2)}°
           </Text>
         </View>
 
@@ -234,7 +257,7 @@ const WeatherMaps = () => {
           </View>
         </View>
 
-        {/* Map Display - SIMPLIFIED */}
+        {/* Map Display */}
         <View style={mapStyles.mapContainer}>
           {isLoading ? (
             <View style={mapStyles.loadingContainer}>
@@ -243,17 +266,21 @@ const WeatherMaps = () => {
             </View>
           ) : (
             <View style={mapStyles.mapImageContainer}>
+              {/* Single tile approach */}
               <Image 
                 source={{ uri: mapUrl }} 
                 style={mapStyles.mapImage}
                 resizeMode="cover"
                 onError={(error) => {
                   console.log('Map loading error:', error.nativeEvent.error);
+                  console.log('Attempted URL:', mapUrl);
                 }}
                 onLoad={() => {
                   console.log('Map loaded successfully');
+                  console.log('Loaded URL:', mapUrl);
                 }}
               />
+
               <View style={mapStyles.mapLocationMarker}>
                 <MaterialCommunityIcons name="map-marker" size={24} color="#e91e63" />
               </View>
@@ -261,22 +288,24 @@ const WeatherMaps = () => {
           )}
 
           {/* Map Legend */}
-          <View style={mapStyles.legendContainer}>
-            <Text style={mapStyles.legendTitle}>{legendInfo.title}</Text>
-            <View style={mapStyles.legendColors}>
-              {legendInfo.colors.map((item, index) => (
-                <View key={index} style={mapStyles.legendItem}>
-                  <View 
-                    style={[
-                      mapStyles.legendColorBox, 
-                      { backgroundColor: item.color }
-                    ]} 
-                  />
-                  <Text style={mapStyles.legendLabel}>{item.label}</Text>
-                </View>
-              ))}
+          {legendInfo.colors.length > 0 && (
+            <View style={mapStyles.legendContainer}>
+              <Text style={mapStyles.legendTitle}>{legendInfo.title}</Text>
+              <View style={mapStyles.legendColors}>
+                {legendInfo.colors.map((item, index) => (
+                  <View key={index} style={mapStyles.legendItem}>
+                    <View 
+                      style={[
+                        mapStyles.legendColorBox, 
+                        { backgroundColor: item.color }
+                      ]} 
+                    />
+                    <Text style={mapStyles.legendLabel}>{item.label}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
-          </View>
+          )}
         </View>
 
         {/* Current Weather Info */}
@@ -306,28 +335,23 @@ const WeatherMaps = () => {
           </View>
         </View>
 
-        {/* Debug Info - Remove this after testing */}
-        <View style={mapStyles.debugContainer}>
-          <Text style={mapStyles.debugText}>Debug Info:</Text>
-          <Text style={mapStyles.debugText}>Map URL: {mapUrl}</Text>
-          <Text style={mapStyles.debugText}>Coordinates: {lat}, {lon}</Text>
-          <Text style={mapStyles.debugText}>Zoom: {zoom}</Text>
-        </View>
-
         {/* Map Description */}
         <View style={mapStyles.descriptionContainer}>
           <Text style={mapStyles.descriptionTitle}>About This Map</Text>
           <Text style={mapStyles.descriptionText}>
-            {mapType === 'precipitation_new' && 
-              'This map shows precipitation levels over the area. Darker blue indicates heavier rainfall.'}
-            {mapType === 'temp_new' && 
-              'This map shows temperature distribution. Blue tones indicate cooler temperatures while red/orange indicate warmer areas.'}
-            {mapType === 'clouds_new' && 
-              'This map shows cloud coverage. Darker areas indicate more cloud cover in percentage.'}
-            {mapType === 'wind_new' && 
-              'This map shows wind speed. Darker blue indicates higher wind speeds in meters per second.'}
-            {mapType === 'pressure_new' && 
-              'This map shows atmospheric pressure. Color range indicates different pressure levels in hectopascals.'}
+            {mapType === 'PR0' && 
+              'Shows current precipitation levels. Blue areas indicate rainfall intensity.'}
+            {mapType === 'TA2' && 
+              'Shows temperature distribution at 2 meters height. Colors range from cold (blue/purple) to hot (red/orange).'}
+            {mapType === 'CL' && 
+              'Shows cloud coverage percentage. Darker areas have more cloud cover.'}
+            {mapType === 'WND' && 
+              'Shows wind speed patterns across the region.'}
+            {mapType === 'APM' && 
+              'Shows atmospheric pressure variations in the area.'}
+          </Text>
+          <Text style={mapStyles.debugText}>
+            Map URL: {mapUrl}
           </Text>
           <Text style={mapStyles.mapCreditText}>
             Maps provided by OpenWeatherMap
@@ -437,7 +461,6 @@ const mapStyles = StyleSheet.create({
     fontSize: 16,
     color: '#555',
   },
-  // SIMPLIFIED MAP DISPLAY
   mapImageContainer: {
     height: MAP_HEIGHT,
     position: 'relative',
@@ -448,6 +471,16 @@ const mapStyles = StyleSheet.create({
   mapImage: {
     width: '100%',
     height: '100%',
+  },
+  tileGrid: {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+  },
+  tileImage: {
+    position: 'absolute',
+    width: (SCREEN_WIDTH - 60) / 3,
+    height: MAP_HEIGHT / 3,
   },
   mapLocationMarker: {
     position: 'absolute',
@@ -535,21 +568,6 @@ const mapStyles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
   },
-  // DEBUG CONTAINER - Remove after testing
-  debugContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 15,
-    marginHorizontal: 15,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#ff0000',
-  },
-  debugText: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 5,
-  },
   descriptionContainer: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -572,6 +590,12 @@ const mapStyles = StyleSheet.create({
     fontSize: 14,
     color: '#555',
     lineHeight: 20,
+    marginBottom: 10,
+  },
+  debugText: {
+    fontSize: 10,
+    color: '#999',
+    fontFamily: 'monospace',
     marginBottom: 10,
   },
   mapCreditText: {
