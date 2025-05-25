@@ -6,7 +6,8 @@ import {
   fetchForecast,
   fetchHourlyForecast,
   fetchMonthlyForecast,
-  searchLocation as apiSearchLocation
+  searchLocation as apiSearchLocation,
+  fetchCitySuggestions
 } from './api';
 import { SearchHistoryService } from './SearchHistoryService';
 import { useTemperature } from './TemperatureContext';
@@ -111,6 +112,11 @@ interface WeatherContextType {
   handleSelectHistoryItem: (query: string) => Promise<void>;
   handleClearSearchHistory: () => Promise<void>;
   lastUpdated: Date | null;
+  citySuggestions: CitySearchSuggestion[];
+  isLoadingSuggestions: boolean;
+  showSuggestions: boolean;
+  handleSearchInputChange: (text: string) => Promise<void>;
+  handleSelectSuggestion: (suggestion: CitySearchSuggestion) => Promise<void>;
 }
 
 const WeatherContext = createContext<WeatherContextType | undefined>(undefined);
@@ -127,6 +133,9 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [showSearchHistory, setShowSearchHistory] = useState<boolean>(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [citySuggestions, setCitySuggestions] = useState<CitySearchSuggestion[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState<boolean>(false);
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const { unit } = useTemperature();
 
   // Load search history on initial mount
@@ -411,7 +420,7 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-    const processMonthlyData = (monthlyList: any[]): MonthlyForecastItem[] => {
+  const processMonthlyData = (monthlyList: any[]): MonthlyForecastItem[] => {
     if (!monthlyList || !Array.isArray(monthlyList)) {
       return [];
     }
@@ -435,6 +444,53 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
     })).slice(0, 30); // Ensure we only return 30 days
   };
 
+  const handleSearchInputChange = async (text: string) => {
+    setSearchQuery(text);
+    
+    if (text.length >= 3) {
+      setShowSuggestions(true);
+      setShowSearchHistory(true);
+      setIsLoadingSuggestions(true);
+      
+      try {
+        const suggestions = await fetchCitySuggestions(text);
+        setCitySuggestions(suggestions);
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+        setCitySuggestions([]);
+      } finally {
+        setIsLoadingSuggestions(false);
+      }
+    } else {
+      setShowSuggestions(false);
+      setCitySuggestions([]);
+      if (text.length === 0) {
+        setShowSearchHistory(false);
+      }
+    }
+  };
+
+  const handleSelectSuggestion = async (suggestion: CitySearchSuggestion) => {
+    setSearchQuery(suggestion.displayName);
+    setShowSearchHistory(false);
+    setShowSuggestions(false);
+    
+    try {
+      setIsLoading(true);
+      setErrorMsg(null);
+      
+      await fetchWeatherData(suggestion.lat, suggestion.lon);
+      await SearchHistoryService.saveSearchQuery(suggestion.name);
+      const updatedHistory = await SearchHistoryService.getSearchHistory();
+      setSearchHistory(updatedHistory);
+    } catch (error) {
+      setErrorMsg('Failed to fetch weather data for selected city');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <WeatherContext.Provider
       value={{
@@ -454,6 +510,11 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
         handleSelectHistoryItem,
         handleClearSearchHistory,
         lastUpdated,
+        citySuggestions,
+        isLoadingSuggestions,
+        showSuggestions,
+        handleSearchInputChange,
+        handleSelectSuggestion,
       }}
     >
       {children}
@@ -468,3 +529,12 @@ export const useWeather = () => {
   }
   return context;
 };
+
+// Add near the other interfaces at the top
+interface CitySearchSuggestion {
+  name: string;
+  displayName: string;
+  lat: number;
+  lon: number;
+  country: string;
+}

@@ -24,15 +24,14 @@ import { TemperatureDisplay } from './components/TemperatureDisplay';
 import { useTemperature } from './TemperatureContext';
 import { WeatherBackground } from './components/WeatherBackground';
 
-
-
 export default function Home() {
   const { isDarkTheme, toggleTheme } = useTheme();
   const { unit, toggleUnit, formatTemp } = useTemperature();
   const navigation = useNavigation();
 
-const styles = getStyles(isDarkTheme); 
-const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
+  const styles = getStyles(isDarkTheme); 
+  const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
+  
   const { 
     weatherData, 
     hourlyForecastData, 
@@ -48,10 +47,13 @@ const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
     setShowSearchHistory,
     handleSelectHistoryItem,
     handleClearSearchHistory,
-    lastUpdated
+    lastUpdated,
+    citySuggestions,
+    isLoadingSuggestions,
+    showSuggestions,
+    handleSearchInputChange,
+    handleSelectSuggestion
   } = useWeather();
-
- 
 
   const renderHourlyItem = ({ item }: { item: any }) => (
     <View style={styles.hourlyItem}>
@@ -65,7 +67,6 @@ const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
     </View>
   );
 
-  
   const renderDailyItem = ({ item }: { item: any }) => (
     <View style={styles.dailyItem}>
       <Text style={styles.dailyDay}>{formatDate(item.dt)}</Text>
@@ -97,7 +98,6 @@ const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
     return `Updated ${hours} hours ago`;
   };
 
-
   return (
     <LinearGradient 
         colors={isDarkTheme ? ['#277ea5', '#0d0f12'] : ['#7fd7ff', '#fff']}
@@ -122,10 +122,16 @@ const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
           style={styles.searchInput}
           placeholder="Search for a city"
           value={searchQuery}
-          onChangeText={setSearchQuery}
+          onChangeText={handleSearchInputChange} // Changed this line
           placeholderTextColor="#888"
           onSubmitEditing={handleSearchLocation}
-          onFocus={() => setShowSearchHistory(true)}
+          onFocus={() => {
+            if (searchQuery.length >= 3) {
+              setShowSearchHistory(true);
+            } else if (searchHistory.length > 0) {
+              setShowSearchHistory(true);
+            }
+          }}
         />
         <TouchableOpacity 
           style={styles.searchButton} 
@@ -135,11 +141,15 @@ const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
         </TouchableOpacity>
       </View>
       
-      {/* Search History Popup */}
+      {/* Search History/Suggestions Popup */}
       <SearchHistory
         visible={showSearchHistory}
         history={searchHistory}
+        suggestions={citySuggestions}
+        isLoadingSuggestions={isLoadingSuggestions}
+        showSuggestions={showSuggestions}
         onSelectItem={handleSelectHistoryItem}
+        onSelectSuggestion={handleSelectSuggestion}
         onClearHistory={handleClearSearchHistory}
         onDismiss={() => setShowSearchHistory(false)}
       />
@@ -175,7 +185,7 @@ const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
           contentContainerStyle={styles.scrollViewContent}
           onScrollBeginDrag={Keyboard.dismiss}
         >
-                    {/* Current Weather */}
+          {/* Current Weather */}
           <View style={styles.currentWeatherContainer}>
             <Text style={styles.currentDateTime}>
               {new Date().toLocaleDateString('en-US', { 

@@ -77,3 +77,27 @@ export const searchLocation = async (query, units = 'metric') => {
     throw error;
   }
 };
+
+// New function for city suggestions using Geocoding API
+export const fetchCitySuggestions = async (query) => {
+  try {
+    if (query.length < 3) return [];
+    
+    const response = await axios.get(
+      `http://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${WEATHER_API_KEY}`
+    );
+    
+    // Format the suggestions to include city, state, and country
+    return response.data.map(city => ({
+      name: city.name,
+      country: city.country,
+      state: city.state || '',
+      displayName: `${city.name}${city.state ? ', ' + city.state : ''}, ${city.country}`,
+      lat: city.lat,
+      lon: city.lon
+    }));
+  } catch (error) {
+    console.error('Error fetching city suggestions:', error);
+    return [];
+  }
+};
