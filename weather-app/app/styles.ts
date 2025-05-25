@@ -16,6 +16,17 @@ export const getStyles = (isDarkTheme:boolean) =>{
           marginRight: 'auto'         
         }),
     },
+        locationHeaderContainer: {
+      alignItems: 'center',
+      marginBottom: 16,
+      paddingTop: 8,
+    },
+    locationHeaderText: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: isDarkTheme ? '#F1F5F9' : '#333',
+      textAlign: 'center',
+    },
     searchContainer: {
       flexDirection: 'row',
       marginTop: 10,

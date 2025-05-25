@@ -24,7 +24,7 @@ export default function Daily() {
   const navigation = useNavigation();
   const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
   const styles = getStyles(isDarkTheme); // Dynamic styles
-  const { dailyForecastData, monthlyForecastData, isLoading, errorMsg } = useWeather();
+  const { dailyForecastData, monthlyForecastData, isLoading, errorMsg, weatherData } = useWeather();
   const [showMonthly, setShowMonthly] = useState(false);
 
   // Convert temperature based on unit
@@ -54,6 +54,15 @@ export default function Daily() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
+
+      {/* Location Name Header */}
+      {weatherData && (
+        <View style={styles.locationHeaderContainer}>
+          <Text style={styles.locationHeaderText}>
+            {weatherData.name}, {weatherData.sys.country}
+          </Text>
+        </View>
+      )}
 
       {/* Toggle Button for Forecast Type */}
       <View style={styles.toggleContainer}>

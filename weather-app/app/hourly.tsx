@@ -18,12 +18,12 @@ import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 export default function Hourly() {
-  const { hourlyForecastData, isLoading, errorMsg } = useWeather();
+  const { hourlyForecastData, weatherData, isLoading, errorMsg } = useWeather();
   const { isDarkTheme, toggleTheme } = useTheme();
   const { unit } = useTemperature();
   const navigation = useNavigation();
   const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
-  const styles = getStyles(isDarkTheme); // Dynamic styles
+  const styles = getStyles(isDarkTheme); 
 
   // Convert temperature based on unit
   const convertTemp = (temp: number): number => {
@@ -41,6 +41,15 @@ export default function Hourly() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
+
+      {/* Location Name Header */}
+      {weatherData && (
+        <View style={styles.locationHeaderContainer}>
+          <Text style={styles.locationHeaderText}>
+            {weatherData.name}, {weatherData.sys.country}
+          </Text>
+        </View>
+      )}
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
