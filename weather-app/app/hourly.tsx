@@ -19,7 +19,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function Hourly() {
-  const { hourlyForecastData, isLoading, errorMsg } = useWeather();
+  const { hourlyForecastData, isLoading, errorMsg, weatherData } = useWeather();
   const { isDarkTheme, toggleTheme } = useTheme();
   const { unit } = useTemperature();
   const navigation = useNavigation();
@@ -47,6 +47,15 @@ export default function Hourly() {
       style={styles.container}
     >
       <SafeAreaView style={{ flex: 1 }}>
+
+      {/* Location Name Header */}
+      {weatherData && (
+        <View style={styles.locationHeaderContainer}>
+          <Text style={styles.locationHeaderText}>
+            {weatherData.name}, {weatherData.sys.country}
+          </Text>
+        </View>
+      )}
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
