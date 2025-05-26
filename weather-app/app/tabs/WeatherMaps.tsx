@@ -10,11 +10,11 @@ import {
   ActivityIndicator,
   SafeAreaView,
 } from 'react-native';
-import { WEATHER_API_KEY } from './api';
+import { WEATHER_API_KEY } from '../services/api';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useWeather } from './WeatherContext';
-import { useTemperature } from './TemperatureContext'; // Import the temperature context
-import { getStyles } from './styles';
+import { useWeather } from '../contexts/WeatherContext';
+import { useTemperature } from '../contexts/TemperatureContext'; // Import the temperature context
+import { getStyles } from '../styles/styles';
 
 // Screen dimensions for the map
 const SCREEN_WIDTH = Dimensions.get('window').width;

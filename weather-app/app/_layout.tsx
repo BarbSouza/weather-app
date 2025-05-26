@@ -2,9 +2,9 @@ import { Tabs } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Platform, View, TouchableOpacity, Text } from 'react-native'; 
 import { FontAwesome5 } from '@expo/vector-icons';
-import { WeatherProvider } from './WeatherContext';
-import { TemperatureProvider, useTemperature } from './TemperatureContext';
-import { ThemeProvider, useTheme } from './ThemeContext'; 
+import { WeatherProvider } from './contexts/WeatherContext';
+import { TemperatureProvider, useTemperature } from './contexts/TemperatureContext';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext'; 
 
 
 export default function AppLayout() {
@@ -71,7 +71,7 @@ export default function AppLayout() {
           }}
         />
         <Tabs.Screen
-          name="daily"
+          name="tabs/daily"
           options={{
             title: "Daily Forecast",
             tabBarLabel: "Daily",
@@ -81,7 +81,7 @@ export default function AppLayout() {
           }}
         />
         <Tabs.Screen
-          name="hourly"
+          name="tabs/hourly"
           options={{
             title: "Hourly Forecast",
             tabBarLabel: "Hourly",
@@ -91,7 +91,7 @@ export default function AppLayout() {
           }}
         />
         <Tabs.Screen
-          name="favorites"
+          name="tabs/favorites"
           options={{
             title: "Favorite Cities",
             tabBarLabel: "Favorites",
@@ -101,7 +101,7 @@ export default function AppLayout() {
           }}
         />
         <Tabs.Screen
-        name="WeatherMaps"
+        name="tabs/WeatherMaps"
         options={{
           title: "Weather Maps",
           tabBarLabel: "Maps",
@@ -111,13 +111,13 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
-        name="SearchHistory"
+        name="components/SearchHistory"
         options={{
           href: null, 
         }}
       />
             <Tabs.Screen
-        name="MontlyCalendarForecast"
+        name="tabs/MontlyCalendarForecast"
         options={{
           href: null, 
         }}

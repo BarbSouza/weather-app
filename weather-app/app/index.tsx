@@ -12,16 +12,16 @@ import {
   FlatList
 } from 'react-native';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
-import { getStyles } from './styles';
-import { useWeather } from './WeatherContext';
+import { getStyles } from './styles/styles';
+import { useWeather } from './contexts/WeatherContext';
 import { WeatherIcon, formatHour, formatDate, formatPrecipitation } from './components/WeatherUtils';
-import SearchHistory from './SearchHistory';
+import SearchHistory from './components/SearchHistory';
 import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import { useTheme } from './ThemeContext'; 
+import { useTheme } from './contexts/ThemeContext'; 
 import { LinearGradient } from 'expo-linear-gradient';
 import { TemperatureDisplay } from './components/TemperatureDisplay';
-import { useTemperature } from './TemperatureContext';
+import { useTemperature } from './contexts/TemperatureContext';
 import { WeatherBackground } from './components/WeatherBackground';
 
 export default function Home() {

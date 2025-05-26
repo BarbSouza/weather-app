@@ -9,11 +9,11 @@ import {
   StatusBar,
 } from 'react-native';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
-import { getStyles } from './styles';
-import { useWeather } from './WeatherContext';
-import { WeatherIcon, formatPrecipitation } from './components/WeatherUtils';
-import { useTheme } from './ThemeContext';
-import { useTemperature } from './TemperatureContext';
+import { getStyles } from '../styles/styles';
+import { useWeather } from '../contexts/WeatherContext';
+import { WeatherIcon, formatPrecipitation } from '../components/WeatherUtils';
+import { useTheme } from '../contexts/ThemeContext';
+import { useTemperature } from '../contexts/TemperatureContext';
 import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 

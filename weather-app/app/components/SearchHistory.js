@@ -8,7 +8,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { Feather, FontAwesome } from '@expo/vector-icons';
-import { FavoritesService } from './FavoritesService';
+import { FavoritesService } from '../services/FavoritesService';
 
 const SearchHistory = ({
   visible,

@@ -10,12 +10,12 @@ import {
   StyleSheet,
 } from 'react-native';
 import { MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
-import { FavoritesService } from './FavoritesService';
-import { searchLocation } from './api';
+import { FavoritesService } from '../services/FavoritesService';
+import { searchLocation } from '../services/api';
 import { useFocusEffect } from '@react-navigation/native';
-import { useTemperature } from './TemperatureContext';
+import { useTemperature } from '../contexts/TemperatureContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTheme } from './ThemeContext'; 
+import { useTheme } from '../contexts/ThemeContext'; 
 
 interface WeatherData {
   city: string;

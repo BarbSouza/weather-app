@@ -8,8 +8,8 @@ import {
   fetchMonthlyForecast,
   searchLocation as apiSearchLocation,
   fetchCitySuggestions
-} from './api';
-import { SearchHistoryService } from './SearchHistoryService';
+} from '../services/api';
+import { SearchHistoryService } from '../services/SearchHistoryService';
 import { useTemperature } from './TemperatureContext';
 
 
