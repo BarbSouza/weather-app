@@ -14,30 +14,32 @@ import { useWeather } from './WeatherContext';
 import { WeatherIcon, formatDate, formatPrecipitation } from './components/WeatherUtils';
 import MonthlyCalendarForecast from './MontlyCalendarForecast'; 
 import { useTheme } from './ThemeContext';
+import { useTemperature } from './TemperatureContext';
 import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function Daily() {
   const { isDarkTheme, toggleTheme } = useTheme();
+  const { unit } = useTemperature();
   const navigation = useNavigation();
-  useLayoutEffect(() => {
-        navigation.setOptions({
-            headerRight: () => (
-                <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 16 }}>
-                <FontAwesome5
-                    name={isDarkTheme ? 'sun' : 'moon'}
-                    size={20}
-                    color="#fff"
-                />
-                </TouchableOpacity>
-        ),
-    });
-  }, [navigation, isDarkTheme]);
-  
+  const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
   const styles = getStyles(isDarkTheme); // Dynamic styles
-  const { dailyForecastData, monthlyForecastData, isLoading, errorMsg } = useWeather();
+  const { dailyForecastData, monthlyForecastData, isLoading, errorMsg, weatherData } = useWeather();
   const [showMonthly, setShowMonthly] = useState(false);
-  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list'); // Add this state variable
+
+  // Convert temperature based on unit
+  const convertTemp = (temp: number): number => {
+    if (unit === 'F') {
+      return Math.round((temp * 9/5) + 32);
+    }
+    return Math.round(temp);
+  };
+
+  // Get temperature unit symbol
+  const getTempUnit = (): string => {
+    return unit;
+  };
 
   // Format date for monthly forecast (could be different from daily format)
   const formatMonthlyDate = (timestamp: number): string => {
@@ -48,188 +50,97 @@ export default function Daily() {
 
   const toggleForecastType = () => {
     setShowMonthly(!showMonthly);
-    // Reset to list view when switching forecast types
-    setViewMode('list');
-  };
-
-  // Toggle between list and calendar views for monthly forecast
-  const toggleMonthlyViewMode = () => {
-    setViewMode(viewMode === 'list' ? 'calendar' : 'list');
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+    <LinearGradient
+      colors={isDarkTheme ? ['#277ea5', '#0d0f12'] : ['#7fd7ff', '#fff']}
+      start={{ x: 0.4, y: 0 }}
+      end={{ x: 0.4, y: 1 }}
+      style={styles.container}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar barStyle="light-content" />
+      {/* Location Name Header */}
+      {weatherData && (
+        <View style={styles.locationHeaderContainer}>
+          <Text style={styles.locationHeaderText}>
+            {weatherData.name}, {weatherData.sys.country}
+          </Text>
+        </View>
+      )}
 
-      {/* Toggle Button for Forecast Type */}
-      <View style={styles.toggleContainer}>
-        <TouchableOpacity
-          style={[
-            styles.toggleButton,
-            !showMonthly && styles.toggleButtonActive,
-            { borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }
-          ]}
-          onPress={() => setShowMonthly(false)}
-        >
-          <Text style={[
-            styles.toggleButtonText,
-            !showMonthly && styles.toggleButtonTextActive
-          ]}>5-Day Forecast</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.toggleButton,
-            showMonthly && styles.toggleButtonActive,
-            { borderTopRightRadius: 8, borderBottomRightRadius: 8 }
-          ]}
-          onPress={() => setShowMonthly(true)}
-        >
-          <Text style={[
-            styles.toggleButtonText,
-            showMonthly && styles.toggleButtonTextActive
-          ]}>30-Day Climate</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Show View Toggle Button only for Monthly Forecast */}
-      {showMonthly && monthlyForecastData.length > 0 && (
         <View style={styles.toggleContainer}>
           <TouchableOpacity
             style={[
               styles.toggleButton,
-              viewMode === 'list' && styles.toggleButtonActive,
+              !showMonthly && styles.toggleButtonActive,
               { borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }
             ]}
-            onPress={() => setViewMode('list')}
+            onPress={() => setShowMonthly(false)}
           >
             <Text style={[
               styles.toggleButtonText,
-              viewMode === 'list' && styles.toggleButtonTextActive
-            ]}>List View</Text>
+              !showMonthly && styles.toggleButtonTextActive
+            ]}>5-Day Forecast</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={[
               styles.toggleButton,
-              viewMode === 'calendar' && styles.toggleButtonActive,
+              showMonthly && styles.toggleButtonActive,
               { borderTopRightRadius: 8, borderBottomRightRadius: 8 }
             ]}
-            onPress={() => setViewMode('calendar')}
+            onPress={() => setShowMonthly(true)}
           >
             <Text style={[
               styles.toggleButtonText,
-              viewMode === 'calendar' && styles.toggleButtonTextActive
-            ]}>Calendar View</Text>
+              showMonthly && styles.toggleButtonTextActive
+            ]}>30-Day Climate</Text>
           </TouchableOpacity>
         </View>
-      )}
 
-      {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0066cc" />
-          <Text style={styles.loadingText}>Loading forecast data...</Text>
-        </View>
-      ) : errorMsg ? (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{errorMsg}</Text>
-        </View>
-      ) : !showMonthly && dailyForecastData.length > 0 ? (
-        // 5-Day Forecast Display
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollViewContent}
-        >
-          <View style={styles.forecastContainer}>
-            <Text style={styles.forecastTitle}>5-Day Forecast</Text>
-            {dailyForecastData.map((forecast, index) => (
-              <View key={index} style={styles.forecastItem}>
-                <Text style={styles.forecastDay}>{formatDate(forecast.dt)}</Text>
-                <View style={styles.forecastDetails}>
-                  <View style={styles.forecastIconTemp}>
-                    <WeatherIcon weatherId={forecast.weather[0].id} />
-                    <View style={styles.forecastTempContainer}>
-                      <Text style={styles.forecastTemp}>
-                        {Math.round(forecast.main.temp)}°C
-                      </Text>
-                      <View style={styles.forecastMinMaxContainer}>
-                        <Text style={styles.forecastMinMax}>
-                          H: {Math.round(forecast.main.temp_max)}° L: {Math.round(forecast.main.temp_min)}°
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                  <View style={styles.forecastRightColumn}>
-                    <Text style={styles.forecastDescription}>
-                      {forecast.weather[0].description}
-                    </Text>
-                    <View style={styles.forecastPrecipitation}>
-                      <Feather name="droplet" size={14} color="#1E90FF" />
-                      <Text style={styles.forecastPrecipitationText}>
-                        {formatPrecipitation(forecast.pop)}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            ))}
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#0066cc" />
+            <Text style={styles.loadingText}>Loading forecast data...</Text>
           </View>
-          
-          {/* Additional Forecast Information */}
-          <View style={[styles.forecastContainer, { marginTop: 16 }]}>
-            <Text style={styles.forecastTitle}>What to Expect</Text>
-            <Text style={styles.forecastInfoText}>
-              This 5-day forecast provides a daily summary of expected weather conditions. 
-              The temperature shown is the average daily temperature, with highs and lows indicated.
-            </Text>
-            <Text style={styles.forecastInfoText}>
-              Precipitation percentage indicates the likelihood of rain or snow during the day.
-            </Text>
+        ) : errorMsg ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{errorMsg}</Text>
           </View>
-        </ScrollView>
-      ) : showMonthly && monthlyForecastData.length > 0 ? (
-        // Monthly Climate Forecast Display
-        viewMode === 'calendar' ? (
-          // Calendar View
-          <MonthlyCalendarForecast />
-        ) : (
-          // List View (original display)
+        ) : !showMonthly && dailyForecastData.length > 0 ? (
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollViewContent}
           >
             <View style={styles.forecastContainer}>
-              <Text style={styles.forecastTitle}>30-Day Climate Forecast</Text>
-              
-              {monthlyForecastData.map((forecast, index) => (
+              <Text style={styles.forecastTitle}>Daily Forecast</Text>
+              {dailyForecastData.map((forecast, index) => (
                 <View key={index} style={styles.forecastItem}>
-                  <Text style={styles.forecastDay}>{formatMonthlyDate(forecast.dt)}</Text>
+                  <Text style={styles.forecastDay}>{formatDate(forecast.dt)}</Text>
                   <View style={styles.forecastDetails}>
                     <View style={styles.forecastIconTemp}>
-                      {forecast.weather && forecast.weather[0]?.id ? (
-                        <WeatherIcon weatherId={forecast.weather[0].id} />
-                      ) : (
-                        <MaterialCommunityIcons name="calendar-month" size={42} color="#D3D3D3" />
-                      )}
+                      <WeatherIcon weatherId={forecast.weather[0].id} size={35} />
                       <View style={styles.forecastTempContainer}>
                         <Text style={styles.forecastTemp}>
-                          {Math.round(forecast.temp.average)}°C
+                          {convertTemp(forecast.main.temp)}°{getTempUnit()}
                         </Text>
                         <View style={styles.forecastMinMaxContainer}>
                           <Text style={styles.forecastMinMax}>
-                            H: {Math.round(forecast.temp.max)}° L: {Math.round(forecast.temp.min)}°
+                            H: {convertTemp(forecast.main.temp_max)}° L: {convertTemp(forecast.main.temp_min)}°
                           </Text>
                         </View>
                       </View>
                     </View>
                     <View style={styles.forecastRightColumn}>
                       <Text style={styles.forecastDescription}>
-                        {forecast.weather && forecast.weather[0]?.description ? 
-                          forecast.weather[0].description : 'Climate prediction'}
+                        {forecast.weather[0].description}
                       </Text>
-
                       <View style={styles.forecastPrecipitation}>
-                        <MaterialCommunityIcons name="water-percent" size={14} color="#1E90FF" />
-                        <Text style={[styles.forecastPrecipitationText, {color: '#1E90FF'}]}>
-                          {forecast.humidity}%
+                        <Feather name="droplet" size={15} color="#1E90FF" />
+                        <Text style={styles.forecastPrecipitationText}>
+                          {formatPrecipitation(forecast.pop)}
                         </Text>
                       </View>
                     </View>
@@ -237,31 +148,31 @@ export default function Daily() {
                 </View>
               ))}
             </View>
-            
-            {/* Additional Monthly Forecast Information */}
+
             <View style={[styles.forecastContainer, { marginTop: 16 }]}>
-              <Text style={styles.forecastTitle}>About Monthly Climate</Text>
+              <Text style={styles.forecastTitle}>What to Expect</Text>
               <Text style={styles.forecastInfoText}>
-                The 30-day climate forecast provides expected average temperatures and precipitation over a longer period.
-                This forecast represents climate trends rather than specific daily weather events.
+                This 5-day forecast provides a daily summary of expected weather conditions. 
+                The temperature shown is the average daily temperature, with highs and lows indicated.
               </Text>
               <Text style={styles.forecastInfoText}>
-                Monthly forecasts are best used for general planning and understanding seasonal climate patterns.
-                Accuracy tends to decrease for predictions further into the future.
+                Precipitation percentage indicates the likelihood of rain or snow during the day.
+                {unit === 'F' ? ' Temperatures are shown in Fahrenheit.' : ' Temperatures are shown in Celsius.'}
               </Text>
             </View>
           </ScrollView>
-        )
-      ) : (
-        // No Data Available
-        <View style={styles.noDataContainer}>
-          <Text style={styles.noDataText}>
-            {showMonthly ? 
-              "30-day climate forecast data is not available. This may require a premium API subscription." : 
-              "No forecast data available"}
-          </Text>
-        </View>
-      )}
-    </SafeAreaView>
+        ) : showMonthly && monthlyForecastData.length > 0 ? (
+          <MonthlyCalendarForecast />
+        ) : (
+          <View style={styles.noDataContainer}>
+            <Text style={styles.noDataText}>
+              {showMonthly 
+                ? "30-day climate forecast data is not available. This may require a premium API subscription." 
+                : "No forecast data available"}
+            </Text>
+          </View>
+        )}
+      </SafeAreaView>
+    </LinearGradient>
   );
 }

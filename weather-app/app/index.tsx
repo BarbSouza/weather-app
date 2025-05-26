@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import {
   Text,
   View,
@@ -18,16 +18,19 @@ import { WeatherIcon, formatHour, formatDate, formatPrecipitation } from './comp
 import SearchHistory from './SearchHistory';
 import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import { useTheme } from './ThemeContext';
+import { useTheme } from './ThemeContext'; 
+import { LinearGradient } from 'expo-linear-gradient';
 import { TemperatureDisplay } from './components/TemperatureDisplay';
 import { useTemperature } from './TemperatureContext';
+import { WeatherBackground } from './components/WeatherBackground';
 
 export default function Home() {
   const { isDarkTheme, toggleTheme } = useTheme();
   const { unit, toggleUnit, formatTemp } = useTemperature();
   const navigation = useNavigation();
+  const styles = getStyles(isDarkTheme); 
+  const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
 
-  const styles = getStyles(isDarkTheme);
   const { 
     weatherData, 
     hourlyForecastData, 
@@ -43,23 +46,27 @@ export default function Home() {
     setShowSearchHistory,
     handleSelectHistoryItem,
     handleClearSearchHistory,
-    lastUpdated
+    lastUpdated,
+    citySuggestions,
+    isLoadingSuggestions,
+    showSuggestions,
+    handleSearchInputChange,
+    handleSelectSuggestion
   } = useWeather();
 
-  // Updated renderHourlyItem with temperature formatting
   const renderHourlyItem = ({ item }: { item: any }) => (
     <View style={styles.hourlyItem}>
       <Text style={styles.hourlyTime}>{formatHour(item.dt)}</Text>
       <WeatherIcon weatherId={item.weather[0].id} size={22} />
       <Text style={styles.hourlyTemp}>{formatTemp(item.temp)}</Text>
       <View style={styles.precipContainer}>
-        <Feather name="droplet" size={12} color="#1E90FF" />
+        <Feather name="droplet" size={15} color="#1E90FF" />
         <Text style={styles.precipText}>{formatPrecipitation(item.pop)}</Text>
       </View>
     </View>
   );
 
-  // Updated renderDailyItem with temperature formatting
+  
   const renderDailyItem = ({ item }: { item: any }) => (
     <View style={styles.dailyItem}>
       <Text style={styles.dailyDay}>{formatDate(item.dt)}</Text>
@@ -67,7 +74,7 @@ export default function Home() {
       <View style={styles.dailyTempContainer}>
         <Text style={styles.dailyTemp}>{formatTemp(item.main.temp)}</Text>
         <View style={styles.precipContainer}>
-          <Feather name="droplet" size={12} color="#1E90FF" />
+          <Feather name="droplet" size={15} color="#1E90FF" />
           <Text style={styles.precipText}>{formatPrecipitation(item.pop)}</Text>
         </View>
       </View>
@@ -91,8 +98,23 @@ export default function Home() {
     return `Updated ${hours} hours ago`;
   };
 
+
   return (
-    <SafeAreaView style={styles.container}>
+    <LinearGradient 
+        colors={isDarkTheme ? ['#277ea5', '#0d0f12'] : ['#7fd7ff', '#fff']}
+       start={{ x: 0.4, y: 0 }}
+        end={{ x: 0.4, y: 1 }}
+      style={styles.container} 
+    >
+      {/* Weather Background Effects */}
+      {weatherData && (
+        <WeatherBackground 
+          weatherId={weatherData.weather[0].id} 
+          isDarkTheme={isDarkTheme} 
+        />
+      )}
+      
+      {/* Other components */}
       <StatusBar barStyle="light-content" />
       
       {/* Search Bar */}
@@ -101,10 +123,16 @@ export default function Home() {
           style={styles.searchInput}
           placeholder="Search for a city"
           value={searchQuery}
-          onChangeText={setSearchQuery}
+          onChangeText={handleSearchInputChange}
           placeholderTextColor="#888"
           onSubmitEditing={handleSearchLocation}
-          onFocus={() => setShowSearchHistory(true)}
+          onFocus={() => {
+            if (searchQuery.length >= 3) {
+              setShowSearchHistory(true);
+            } else if (searchHistory.length > 0) {
+              setShowSearchHistory(true);
+            }
+          }}
         />
         <TouchableOpacity 
           style={styles.searchButton} 
@@ -114,11 +142,15 @@ export default function Home() {
         </TouchableOpacity>
       </View>
       
-      {/* Search History Popup */}
+      {/* Search History/Suggestions Popup */}
       <SearchHistory
         visible={showSearchHistory}
         history={searchHistory}
+        suggestions={citySuggestions}
+        isLoadingSuggestions={isLoadingSuggestions}
+        showSuggestions={showSuggestions}
         onSelectItem={handleSelectHistoryItem}
+        onSelectSuggestion={handleSelectSuggestion}
         onClearHistory={handleClearSearchHistory}
         onDismiss={() => setShowSearchHistory(false)}
       />
@@ -174,25 +206,27 @@ export default function Home() {
                   size="large"
                 />
               </View>
+
               <Text style={styles.weatherDescription}>{weatherData.weather[0].description}</Text>
               <View style={styles.weatherDetailsContainer}>
                 <View style={styles.weatherDetail}>
-                  <Feather name="wind" size={18} color="#555" />
+                  <Feather name="wind" size={20} color={iconColor} />
                   <Text style={styles.weatherDetailText}>{weatherData.wind.speed} m/s</Text>
                 </View>
                 <View style={styles.weatherDetail}>
-                  <Feather name="droplet" size={18} color="#555" />
+                  <Feather name="droplet" size={20} color={iconColor} />
                   <Text style={styles.weatherDetailText}>{weatherData.main.humidity}%</Text>
                 </View>
                 <View style={styles.weatherDetail}>
-                  <MaterialCommunityIcons name="thermometer" size={18} color="#555" />
+                  <MaterialCommunityIcons name="thermometer" size={20} color={iconColor} />
                   <Text style={styles.weatherDetailText}>
                     {formatTemp(weatherData.main.temp_min)}/{formatTemp(weatherData.main.temp_max)}
                   </Text>
                 </View>
               </View>
+
               <View style={styles.feelsLikeContainer}>
-                <MaterialCommunityIcons name="thermometer-lines" size={18} color="#555" />
+                <MaterialCommunityIcons name="thermometer-lines" size={18} color={iconColor} />
                 <Text style={styles.feelsLikeText}>
                   Feels like {formatTemp(weatherData.main.feels_like)}
                 </Text>
@@ -249,6 +283,6 @@ export default function Home() {
           </Text>
         </View>
       )}
-    </SafeAreaView>
+    </LinearGradient>
   );
 }

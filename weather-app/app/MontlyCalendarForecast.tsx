@@ -13,6 +13,7 @@ import { getStyles } from './styles';
 import { useWeather } from './WeatherContext';
 import { WeatherIcon, formatPrecipitation } from './components/WeatherUtils';
 import { useTheme } from './ThemeContext';
+import { useTemperature } from './TemperatureContext';
 import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
@@ -22,6 +23,44 @@ const MONTHS = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
+const getTemperatureValue = (forecast: any, type: 'high' | 'low' | 'average') => {
+  // Try different possible data structures
+  if (forecast.temp) {
+    if (type === 'high' && forecast.temp.max !== undefined) {
+      return forecast.temp.max;
+    }
+    if (type === 'low' && forecast.temp.min !== undefined) {
+      return forecast.temp.min;
+    }
+    if (type === 'average' && forecast.temp.average !== undefined) {
+      return forecast.temp.average;
+    }
+  }
+  
+  // Check main object (daily forecast structure)
+  if (forecast.main) {
+    if (type === 'high' && forecast.main.temp_max !== undefined) {
+      return forecast.main.temp_max;
+    }
+    if (type === 'low' && forecast.main.temp_min !== undefined) {
+      return forecast.main.temp_min;
+    }
+    if (type === 'average' && forecast.main.temp !== undefined) {
+      return forecast.main.temp;
+    }
+  }
+  
+  // Fallback estimates based on average temperature
+  if (forecast.temp?.average !== undefined) {
+    const avg = forecast.temp.average;
+    if (type === 'high') return avg + 3; // Estimate high as average + 3°
+    if (type === 'low') return avg - 3;  // Estimate low as average - 3°
+    if (type === 'average') return avg;
+  }
+  
+  return null;
+};
+
 export default function MonthlyCalendarForecast() {
   const { monthlyForecastData, isLoading, errorMsg } = useWeather();
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
@@ -29,23 +68,12 @@ export default function MonthlyCalendarForecast() {
   const [calendarDays, setCalendarDays] = useState<Array<any>>([]);
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
   const [selectedForecast, setSelectedForecast] = useState<any>(null);
-    const { isDarkTheme, toggleTheme } = useTheme();
-    const navigation = useNavigation();
-    useLayoutEffect(() => {
-          navigation.setOptions({
-              headerRight: () => (
-                  <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 16 }}>
-                  <FontAwesome5
-                      name={isDarkTheme ? 'sun' : 'moon'}
-                      size={20}
-                      color="#fff"
-                  />
-                  </TouchableOpacity>
-          ),
-      });
-    }, [navigation, isDarkTheme]);
+  const { isDarkTheme, toggleTheme } = useTheme();
+  const { unit, toggleUnit, formatTemp } = useTemperature();
+  const navigation = useNavigation();
     
-    const styles = getStyles(isDarkTheme); // Dynamic styles
+  const styles = getStyles(isDarkTheme); // Dynamic styles
+
   // Create calendar grid for month view
   useEffect(() => {
     const firstDayOfMonth = new Date(selectedYear, selectedMonth, 1).getDay();
@@ -145,7 +173,7 @@ export default function MonthlyCalendarForecast() {
         {hasForecast && (
           <>
             <Text style={styles.calendarDayTemp}>
-              {Math.round(day.forecast.temp.average)}°
+              {formatTemp(day.forecast.temp.average, 'C', false)}
             </Text>
             {day.forecast.weather && day.forecast.weather[0]?.id && (
               <View style={styles.calendarDayIcon}>
@@ -243,7 +271,7 @@ export default function MonthlyCalendarForecast() {
                   
                   <View style={styles.selectedForecastTemp}>
                     <Text style={styles.selectedForecastTempValue}>
-                      {Math.round(selectedForecast.temp.average)}°C
+                      {formatTemp(selectedForecast.temp.average)}
                     </Text>
                     <Text style={styles.selectedForecastDescription}>
                       {selectedForecast.weather && selectedForecast.weather[0]?.description ? 
@@ -257,15 +285,21 @@ export default function MonthlyCalendarForecast() {
                     <MaterialCommunityIcons name="thermometer" size={18} color="#FF9800" />
                     <Text style={styles.forecastDetailLabel}>High</Text>
                     <Text style={styles.forecastDetailValue}>
-                      {Math.round(selectedForecast.temp.max)}°C
+                      {(() => {
+                        const highTemp = getTemperatureValue(selectedForecast, 'high');
+                        return highTemp !== null ? formatTemp(highTemp) : 'N/A';
+                      })()}
                     </Text>
                   </View>
-                  
+
                   <View style={styles.forecastDetailItem}>
                     <MaterialCommunityIcons name="thermometer-low" size={18} color="#2196F3" />
                     <Text style={styles.forecastDetailLabel}>Low</Text>
                     <Text style={styles.forecastDetailValue}>
-                      {Math.round(selectedForecast.temp.min)}°C
+                      {(() => {
+                        const lowTemp = getTemperatureValue(selectedForecast, 'low');
+                        return lowTemp !== null ? formatTemp(lowTemp) : 'N/A';
+                      })()}
                     </Text>
                   </View>
                   
@@ -299,6 +333,7 @@ export default function MonthlyCalendarForecast() {
             <Text style={styles.forecastInfoText}>
               Select a day to view detailed forecast information for that date. Climate forecasts 
               are most accurate for the near future and become less reliable for dates further ahead.
+              {unit === 'F' ? ' Temperatures are shown in Fahrenheit.' : ' Temperatures are shown in Celsius.'}
             </Text>
           </View>
         </ScrollView>

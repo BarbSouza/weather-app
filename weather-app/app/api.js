@@ -1,7 +1,8 @@
 import axios from 'axios';
-// OpenWeatherMap API key and base URL
-const WEATHER_API_KEY = 'ddde560ae7ec6510c8d92298fc9da08f';
-const WEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5';
+// OpenWeatherMap API key and base URLs
+export const WEATHER_API_KEY = 'ddde560ae7ec6510c8d92298fc9da08f';
+export const WEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5';
+export const MAP_BASE_URL = 'https://tile.openweathermap.org/map';
 
 export const fetchCurrentWeather = async (latitude, longitude, units = 'metric') => {
   try {
@@ -74,5 +75,28 @@ export const searchLocation = async (query, units = 'metric') => {
   } catch (error) {
     console.error('Error searching location:', error);
     throw error;
+  }
+};
+
+export const fetchCitySuggestions = async (query) => {
+  try {
+    if (query.length < 1) return [];
+    
+    const response = await axios.get(
+      `http://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${WEATHER_API_KEY}`
+    );
+    
+    // Format the suggestions to include city, state, and country
+    return response.data.map(city => ({
+      name: city.name,
+      country: city.country,
+      state: city.state || '',
+      displayName: `${city.name}${city.state ? ', ' + city.state : ''}, ${city.country}`,
+      lat: city.lat,
+      lon: city.lon
+    }));
+  } catch (error) {
+    console.error('Error fetching city suggestions:', error);
+    return [];
   }
 };
