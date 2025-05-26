@@ -4,18 +4,57 @@ A cross-platform weather application built with Expo and React Native, providing
 
 ## Features
 
+### Core Features
 - Real-time weather data from OpenWeatherMap API
-- Current weather conditions with temperature, humidity, and wind speed
-- Hourly forecast for the next 24 hours
-- Daily forecast with temperature ranges and precipitation probability
-- Weather maps with different layers (temperature, precipitation, wind, pressure)
-- Search history and favorite locations
+- Location-based weather information
+- Search functionality with city suggestions
+- Search history with recent locations
+- Favorite locations management
 - Dark/Light theme support
 - Temperature unit conversion (Celsius/Fahrenheit)
-- Animated weather backgrounds based on conditions
+
+### Weather Information
+- Current weather conditions:
+  - Temperature and "feels like" temperature
+  - Weather description with icons
+  - Humidity percentage
+  - Wind speed and direction
+  - Atmospheric pressure
+  - Visibility
+  - Min/Max temperatures
+  - Last updated timestamp
+
+### Forecasts
+- Hourly forecast for the next 24 hours showing:
+  - Temperature
+  - Weather conditions
+  - Precipitation probability
+- Daily forecast with:
+  - Temperature ranges
+  - Weather conditions
+  - Precipitation probability
+  - Wind speed
 - Monthly calendar forecast view
 
-## Getting Started
+### Maps & Visualization
+- Interactive weather maps with multiple layers:
+  - Temperature distribution
+  - Precipitation intensity
+  - Wind speeds
+  - Atmospheric pressure
+- Animated weather backgrounds based on current conditions
+- Responsive design for all screen sizes
+
+## Prerequisites
+
+Before installing, make sure you have the following:
+- Node.js (v14 or higher)
+- npm or yarn package manager
+- Expo CLI (`npm install -g expo-cli`)
+- For iOS development: macOS with Xcode installed
+- For Android development: Android Studio with SDK installed
+
+## Installation
 
 1. Clone the repository:
    ```bash
@@ -28,82 +67,103 @@ A cross-platform weather application built with Expo and React Native, providing
    npm install
    ```
 
-3. Set up environment variables:
-   - Create a `.env` file in the root directory
+3. Install required Expo packages:
+   ```bash
+   npx expo install expo-location
+   npx expo install @react-native-async-storage/async-storage
+   npx expo install expo-linear-gradient
+   npx expo install react-native-maps
+   ```
+
+4. Set up environment variables:
    - Add your OpenWeatherMap API key:
      ```
      WEATHER_API_KEY=your_api_key_here
      ```
 
-4. Start the development server:
+## Running the App
+
+1. Start the development server:
    ```bash
    npx expo start
    ```
 
-## Running the App
-
-You can run the app on:
-- iOS Simulator
-- Android Emulator
-- Physical device using Expo Go app
-- Web browser
-
-Choose your platform when the development server starts:
-- Press `i` for iOS
-- Press `a` for Android
-- Press `w` for web
+2. Choose your platform:
+   - Press `i` for iOS Simulator
+   - Press `a` for Android Emulator
+   - Press `w` for web browser
+   - Scan QR code with Expo Go app for physical devices
 
 ## Project Structure
 
 ```
 app/
 ├── components/         # Reusable UI components
+│   ├── WeatherBackground.tsx
+│   ├── TemperatureDisplay.tsx
+│   ├── SearchHistory.js
+│   └── WeatherUtils.tsx
 ├── contexts/          # React Context providers
+│   ├── TemperatureContext.tsx
+│   ├── ThemeContext.js
+│   └── WeatherContext.tsx
 ├── services/          # API and data services
+│   ├── api.js
+│   ├── FavoritesService.js
+│   └── SearchHistoryService.js
 ├── styles/           # Global styles
 └── tabs/             # Tab-based navigation screens
 ```
 
 ## Technologies Used
 
-- Expo
-- React Native
-- TypeScript
-- OpenWeatherMap API
-- React Navigation
-- Expo Router
-- Linear Gradient
-- React Native Vector Icons
+- **Core**:
+  - Expo
+  - React Native
+  - TypeScript
+  - OpenWeatherMap API
 
-## Features in Detail
+- **Navigation & Routing**:
+  - React Navigation 6
+  - Expo Router
 
-### Weather Information
-- Current temperature and conditions
-- Feels like temperature
-- Humidity and wind speed
-- Precipitation probability
-- Min/Max temperatures
+- **UI Components**:
+  - React Native Vector Icons
+  - Expo Linear Gradient
+  - React Native Maps
 
-### Maps
-- Interactive weather maps
-- Multiple layer options:
-  - Temperature
-  - Precipitation
-  - Wind speed
-  - Atmospheric pressure
-- Customizable zoom levels
+- **Storage**:
+  - AsyncStorage for persistent data
 
-### Favorites
-- Save favorite locations
-- Quick access to weather data
-- Remove favorites with confirmation
+## Development Features
+
+- File-based routing with Expo Router
+- TypeScript support
+- Environment variable management
+- Cross-platform compatibility
+- Responsive design principles
+- Context-based state management
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests.
-
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## Acknowledgments
 
 - Weather data provided by OpenWeatherMap
 - Icons by Feather Icons and Material Community Icons
+- Expo team for the development platform
+- React Native community for components and inspiration
+
+
+## Authors
+
+-Barbara Souza
+[GitHub](https://github.com/BarbSouza)
+
+-Heloisa Eugenio
+[GitHub](https://github.com/Heloeugenio)
