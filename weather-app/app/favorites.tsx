@@ -14,6 +14,8 @@ import { FavoritesService } from './FavoritesService';
 import { searchLocation } from './api';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTemperature } from './TemperatureContext';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useTheme } from './ThemeContext'; 
 
 interface WeatherData {
   city: string;
@@ -30,8 +32,10 @@ const Favorites: React.FC = () => {
   const [weatherData, setWeatherData] = useState<Record<string, WeatherData>>({});
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [isDarkTheme] = useState(false); // Simplified theme
-  const { unit } = useTemperature(); // Use the temperature context
+  const { isDarkTheme } = useTheme();
+  
+
+  const { unit } = useTemperature();
 
   // Load favorites from storage
   const loadFavorites = useCallback(async () => {
@@ -53,7 +57,7 @@ const Favorites: React.FC = () => {
       const data = await searchLocation(city, unitParam);
       
       return {
-        city: data.name, // Use the actual city name from API response
+        city: data.name,
         temperature: Math.round(data.main.temp),
         description: data.weather[0].description,
         icon: data.weather[0].icon,
@@ -82,8 +86,7 @@ const Favorites: React.FC = () => {
       setWeatherData({});
       return;
     }
-    
-    console.log('Fetching weather for all favorites:', favorites);
+
     setLoading(true);
     
     try {
@@ -111,32 +114,26 @@ const Favorites: React.FC = () => {
 
   // Remove from favorites
   const removeFavorite = async (city: string) => {
-    Alert.alert(
-      'Remove Favorite',
-      `Remove ${city} from favorites?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await FavoritesService.removeFavorite(city);
-              // Update local state immediately
-              setFavorites(prev => prev.filter(fav => fav !== city));
-              setWeatherData(prev => {
-                const newData = { ...prev };
-                delete newData[city];
-                return newData;
-              });
-            } catch (error) {
-              console.error('Error removing favorite:', error);
-              Alert.alert('Error', 'Failed to remove favorite');
-            }
+    Alert.alert('Remove Favorite', `Remove ${city} from favorites?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await FavoritesService.removeFavorite(city);
+            setFavorites(prev => prev.filter(fav => fav !== city));
+            setWeatherData(prev => {
+              const newData = { ...prev };
+              delete newData[city];
+              return newData;
+            });
+          } catch (error) {
+            Alert.alert('Error', 'Failed to remove favorite');
           }
-        }
-      ]
-    );
+        },
+      },
+    ]);
   };
 
   // Get weather icon name
@@ -252,20 +249,32 @@ const Favorites: React.FC = () => {
     );
   };
 
-  // Loading state
+  const GradientWrapper = ({ children }: { children: React.ReactNode }) => (
+    <LinearGradient
+      colors={isDarkTheme ? ['#277ea5', '#0d0f12'] : ['#7fd7ff', '#fff']}
+      start={{ x: 0.4, y: 0 }}
+      end={{ x: 0.4, y: 1 }}
+      style={styles.container}
+    >
+      {children}
+    </LinearGradient>
+  );
+
   if (loading && favorites.length > 0 && Object.keys(weatherData).length === 0) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0066cc" />
-        <Text style={styles.loadingText}>Loading favorite cities...</Text>
-      </View>
+      <GradientWrapper>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0066cc" />
+          <Text style={styles.loadingText}>Loading favorite cities...</Text>
+        </View>
+      </GradientWrapper>
     );
   }
 
   // Empty state
   if (favorites.length === 0) {
     return (
-      <View style={styles.container}>
+      <GradientWrapper>
         <View style={styles.emptyStateContainer}>
           <MaterialCommunityIcons
             name="heart-outline"
@@ -278,13 +287,13 @@ const Favorites: React.FC = () => {
             Add cities to your favorites from search history to see their weather here
           </Text>
         </View>
-      </View>
+      </GradientWrapper>
     );
   }
 
   // Main render
   return (
-    <View style={styles.container}>
+    <GradientWrapper>
       <FlatList
         data={favorites}
         renderItem={renderFavoriteItem}
@@ -300,25 +309,25 @@ const Favorites: React.FC = () => {
         contentContainerStyle={styles.favoritesList}
         showsVerticalScrollIndicator={false}
       />
-    </View>
+    </GradientWrapper>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    // backgroundColor removed for gradient
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    //backgroundColor: '#f5f5f5',
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#333',
+    //color: isDarkTheme ? '#F1F5F9' : '#333',
   },
   emptyStateContainer: {
     flex: 1,
@@ -332,7 +341,7 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    //color: isDarkTheme ? '#F1F5F9' : '#333',
     marginBottom: 8,
     textAlign: 'center',
   },

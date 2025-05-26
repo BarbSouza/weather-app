@@ -38,7 +38,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
       borderRadius: 8,
       paddingHorizontal: 15,
       fontSize: 16,
-      color: isDarkTheme ? '#F1F5F9' : '#333',
+      color: isDarkTheme ? 'black' : '#333',
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.1,
@@ -57,7 +57,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
     },
     locationButton: {
       flexDirection: 'row',
-      backgroundColor: '#4CAF50',
+      backgroundColor: '#063f9eed',
       borderRadius: 8,
       paddingVertical: 8,
       paddingHorizontal: 15,
@@ -255,11 +255,11 @@ export const getStyles = (isDarkTheme:boolean) =>{
       borderColor: isDarkTheme ? '#4B5563' : '#ccc',
     },
     toggleButtonActive: {
-      backgroundColor: '#0066cc',
+      backgroundColor: '#063f9eed',
     },
     toggleButtonText: {
       fontSize: 16,
-      color: isDarkTheme ? '#F1F5F9' : '#333',
+      color: isDarkTheme ? 'white' : 'black',
     },
     toggleButtonTextActive: {
       color: '#fff',
@@ -285,6 +285,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
+      flexWrap: 'wrap',
       paddingVertical: 12,
       borderBottomWidth: 1,
       borderBottomColor: isDarkTheme ? '#374151' : '#eee',
@@ -317,7 +318,8 @@ export const getStyles = (isDarkTheme:boolean) =>{
       alignItems: 'center',
     },
     forecastMinMax: {
-      fontSize: 13,
+      //making responsive
+      fontSize: 11,
       color: isDarkTheme ? 'white' : 'black',
     },
     forecastRightColumn: {
@@ -654,7 +656,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
     width: '14.28%',
     textAlign: 'center',
     fontWeight: '500',
-    color: isDarkTheme ? '#D1D5DB' : '#666',
+    color: isDarkTheme ? 'white' : 'black',
     fontSize: 14,
   },
   calendarGrid: {
@@ -667,7 +669,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 6,
-    backgroundColor: isDarkTheme ? '#374151' : '#E1F5FE',
+    backgroundColor: isDarkTheme ? '#475469' : '#c2e7f8',
     borderRadius: 8,
     padding: 4,
   },
@@ -678,10 +680,10 @@ export const getStyles = (isDarkTheme:boolean) =>{
   },
   calendarTodayText: {
     fontWeight: 'bold',
-    color: isDarkTheme ? '#F1F5F9' : '#0288D1',
+    color: isDarkTheme ? 'white' : 'black',
   },
   calendarSelectedDay: {
-    backgroundColor: '#0066cc',
+    backgroundColor: '#063f9ecf',
     elevation: 2,
   },
   calendarSelectedDayText: {

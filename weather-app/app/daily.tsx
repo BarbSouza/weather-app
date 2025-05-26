@@ -121,7 +121,7 @@ export default function Daily() {
                   <Text style={styles.forecastDay}>{formatDate(forecast.dt)}</Text>
                   <View style={styles.forecastDetails}>
                     <View style={styles.forecastIconTemp}>
-                      <WeatherIcon weatherId={forecast.weather[0].id} />
+                      <WeatherIcon weatherId={forecast.weather[0].id} size={35} />
                       <View style={styles.forecastTempContainer}>
                         <Text style={styles.forecastTemp}>
                           {convertTemp(forecast.main.temp)}°{getTempUnit()}
@@ -138,7 +138,7 @@ export default function Daily() {
                         {forecast.weather[0].description}
                       </Text>
                       <View style={styles.forecastPrecipitation}>
-                        <Feather name="droplet" size={14} color="#1E90FF" />
+                        <Feather name="droplet" size={15} color="#1E90FF" />
                         <Text style={styles.forecastPrecipitationText}>
                           {formatPrecipitation(forecast.pop)}
                         </Text>
