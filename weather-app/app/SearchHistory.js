@@ -4,7 +4,8 @@ import {
   Text,
   TouchableOpacity,
   FlatList,
-  StyleSheet
+  StyleSheet,
+  ActivityIndicator
 } from 'react-native';
 import { Feather, FontAwesome } from '@expo/vector-icons';
 import { FavoritesService } from './FavoritesService';
@@ -12,7 +13,11 @@ import { FavoritesService } from './FavoritesService';
 const SearchHistory = ({
   visible,
   history,
+  suggestions,
+  isLoadingSuggestions,
+  showSuggestions,
   onSelectItem,
+  onSelectSuggestion,
   onClearHistory,
   onDismiss
 }) => {
@@ -49,9 +54,70 @@ const SearchHistory = ({
     }
   }, [visible]);
 
-  // Show if visible OR any favorites exist
-  if (!visible || (history.length === 0 && favorites.length === 0)) return null;
+    if (!visible) return null;
 
+  // If showing suggestions
+  if (showSuggestions) {
+    if (isLoadingSuggestions) {
+      return (
+        <View style={styles.overlay}>
+          <View style={styles.container}>
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color="#0066cc" />
+              <Text style={styles.loadingText}>Searching cities...</Text>
+            </View>
+          </View>
+        </View>
+      );
+    }
+
+    if (suggestions.length === 0) {
+      return (
+        <View style={styles.overlay}>
+          <View style={styles.container}>
+            <View style={styles.noResultsContainer}>
+              <Text style={styles.noResultsText}>No cities found</Text>
+            </View>
+          </View>
+        </View>
+      );
+    }
+
+    return (
+      <View style={styles.overlay}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.title}>City Suggestions</Text>
+            <TouchableOpacity onPress={onDismiss} style={styles.closeButton}>
+              <Feather name="x" size={20} color="#666" />
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={suggestions}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.suggestionItem}
+                onPress={() => onSelectSuggestion(item)}
+              >
+                <Feather name="map-pin" size={16} color="#666" />
+                <View style={styles.suggestionTextContainer}>
+                  <Text style={styles.suggestionName}>{item.name}</Text>
+                  <Text style={styles.suggestionLocation}>
+                    {item.state ? `${item.state}, ` : ''}{item.country}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item, index) => `${item.lat}-${item.lon}-${index}`}
+            style={styles.list}
+          />
+        </View>
+      </View>
+    );
+  }
+
+  // Show history if no suggestions and we have history or favorites
+  if (history.length === 0 && favorites.length === 0) return null;
   // Combine history and favorites (de-duplicate)
   const combinedList = [...new Set([...history, ...favorites])];
 
@@ -75,29 +141,31 @@ const SearchHistory = ({
   );
 
   return (
-    <View style={styles.overlay}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Recent Searches</Text>
-          <View style={styles.actions}>
-            <TouchableOpacity
-              onPress={onClearHistory}
-              style={styles.clearButton}
-            >
-              <Text style={styles.clearButtonText}>Clear All</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={onDismiss} style={styles.closeButton}>
-              <Feather name="x" size={20} color="#666" />
-            </TouchableOpacity>
+    <View style={styles.searchHistoryContainer}>
+      <View style={styles.overlay}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Recent Searches</Text>
+            <View style={styles.actions}>
+              <TouchableOpacity
+                onPress={onClearHistory}
+                style={styles.clearButton}
+              >
+                <Text style={styles.clearButtonText}>Clear All</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={onDismiss} style={styles.closeButton}>
+                <Feather name="x" size={20} color="#666" />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
 
-        <FlatList
-          data={combinedList}
-          renderItem={renderHistoryItem}
-          keyExtractor={(item, index) => index.toString()}
-          style={styles.list}
-        />
+          <FlatList
+            data={combinedList}
+            renderItem={renderHistoryItem}
+            keyExtractor={(item, index) => index.toString()}
+            style={styles.list}
+          />
+        </View>
       </View>
     </View>
   );
@@ -172,6 +240,49 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 16,
     color: '#333',
+  },
+  suggestionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  suggestionTextContainer: {
+    marginLeft: 10,
+    flex: 1,
+  },
+  suggestionName: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
+  },
+  suggestionLocation: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 2,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginLeft: 10,
+    color: '#666',
+  },
+  noResultsContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  noResultsText: {
+    color: '#666',
+    fontSize: 16,
+  },
+  searchHistoryContainer: {
+    // Add any additional styles for the wrapper here
   },
 });
 
