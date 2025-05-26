@@ -80,7 +80,7 @@ export const searchLocation = async (query, units = 'metric') => {
 
 export const fetchCitySuggestions = async (query) => {
   try {
-    if (query.length < 3) return [];
+    if (query.length < 1) return [];
     
     const response = await axios.get(
       `http://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${WEATHER_API_KEY}`

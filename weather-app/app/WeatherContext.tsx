@@ -455,7 +455,7 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const handleSearchInputChange = async (text: string) => {
     setSearchQuery(text);
     
-    if (text.length >= 3) {
+    if (text.length >= 1) {
       setShowSuggestions(true);
       setShowSearchHistory(true);
       setIsLoadingSuggestions(true);

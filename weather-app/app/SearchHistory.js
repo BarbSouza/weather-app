@@ -141,31 +141,29 @@ const SearchHistory = ({
   );
 
   return (
-    <View style={styles.searchHistoryContainer}>
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Recent Searches</Text>
-            <View style={styles.actions}>
-              <TouchableOpacity
-                onPress={onClearHistory}
-                style={styles.clearButton}
-              >
-                <Text style={styles.clearButtonText}>Clear All</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={onDismiss} style={styles.closeButton}>
-                <Feather name="x" size={20} color="#666" />
-              </TouchableOpacity>
-            </View>
+    <View style={styles.overlay}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Recent Searches</Text>
+          <View style={styles.actions}>
+            <TouchableOpacity
+              onPress={onClearHistory}
+              style={styles.clearButton}
+            >
+              <Text style={styles.clearButtonText}>Clear All</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={onDismiss} style={styles.closeButton}>
+              <Feather name="x" size={20} color="#666" />
+            </TouchableOpacity>
           </View>
-
-          <FlatList
-            data={combinedList}
-            renderItem={renderHistoryItem}
-            keyExtractor={(item, index) => index.toString()}
-            style={styles.list}
-          />
         </View>
+
+        <FlatList
+          data={combinedList}
+          renderItem={renderHistoryItem}
+          keyExtractor={(item, index) => index.toString()}
+          style={styles.list}
+        />
       </View>
     </View>
   );
@@ -280,9 +278,6 @@ const styles = StyleSheet.create({
   noResultsText: {
     color: '#666',
     fontSize: 16,
-  },
-  searchHistoryContainer: {
-    // Add any additional styles for the wrapper here
   },
 });
 
