@@ -255,7 +255,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
       borderColor: isDarkTheme ? '#4B5563' : '#ccc',
     },
     toggleButtonActive: {
-      backgroundColor: '#063f9eed',
+      backgroundColor: isDarkTheme ? '#0e1114' :'#2e6a8a',
     },
     toggleButtonText: {
       fontSize: 16,

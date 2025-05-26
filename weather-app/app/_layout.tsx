@@ -98,7 +98,7 @@ export default function AppLayout() {
               screenOptions={{
                 headerRight: () => <HeaderRight />,
                 tabBarActiveTintColor: 'white',
-                tabBarInactiveTintColor: isDarkTheme ? 'grey' : 'black',
+                tabBarInactiveTintColor: isDarkTheme ? 'grey' : 'light-grey',
                 tabBarStyle: {
                   paddingBottom: 5,
                   paddingTop: 5,
