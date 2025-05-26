@@ -172,7 +172,7 @@ const SearchHistory = ({
 const styles = StyleSheet.create({
   overlay: {
     position: 'absolute',
-    top: 56,
+    top: 80,
     left: 16,
     right: 16,
     zIndex: 100,

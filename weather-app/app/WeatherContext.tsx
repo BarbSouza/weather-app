@@ -182,9 +182,9 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
     try {
       setIsLoading(true);
       
-      // Use API functions to fetch data
-      const weatherResponse = await fetchCurrentWeather(latitude, longitude, unit === 'F' ? 'imperial' : 'metric');
-      const forecastResponse = await fetchForecast(latitude, longitude);
+      // Always fetch data in metric units from API - we'll handle conversion in the UI
+      const weatherResponse = await fetchCurrentWeather(latitude, longitude, 'metric');
+      const forecastResponse = await fetchForecast(latitude, longitude, 'metric');
       
       setWeatherData(weatherResponse);
       
@@ -212,7 +212,7 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       // Fetch monthly climate forecast (30 days)
       try {
-        const monthlyResponse = await fetchMonthlyForecast(latitude, longitude);
+        const monthlyResponse = await fetchMonthlyForecast(latitude, longitude, 'metric');
         if (monthlyResponse && monthlyResponse.list) {
           const processedMonthlyData = processMonthlyData(monthlyResponse.list);
           setMonthlyForecastData(processedMonthlyData);
@@ -320,8 +320,8 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setIsLoading(true);
       setShowSearchHistory(false);
       
-      // Use API function
-      const response = await apiSearchLocation(searchQuery);
+      // Always use metric units for API calls
+      const response = await apiSearchLocation(searchQuery, 'metric');
       
       const { lat, lon } = response.coord;
       await fetchWeatherData(lat, lon);
@@ -386,8 +386,8 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
     try {
       setIsLoading(true);
       
-      // Use API function
-      const response = await apiSearchLocation(query);
+      // Always use metric units for API calls
+      const response = await apiSearchLocation(query, 'metric');
       
       const { lat, lon } = response.coord;
       await fetchWeatherData(lat, lon);
