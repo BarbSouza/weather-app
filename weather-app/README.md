@@ -1,50 +1,169 @@
-# Welcome to your Expo app 👋
+# Weather App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A cross-platform weather application built with Expo and React Native, providing detailed weather information with a clean, modern interface.
 
-## Get started
+## Features
 
-1. Install dependencies
+### Core Features
+- Real-time weather data from OpenWeatherMap API
+- Location-based weather information
+- Search functionality with city suggestions
+- Search history with recent locations
+- Favorite locations management
+- Dark/Light theme support
+- Temperature unit conversion (Celsius/Fahrenheit)
 
+### Weather Information
+- Current weather conditions:
+  - Temperature and "feels like" temperature
+  - Weather description with icons
+  - Humidity percentage
+  - Wind speed and direction
+  - Atmospheric pressure
+  - Visibility
+  - Min/Max temperatures
+  - Last updated timestamp
+
+### Forecasts
+- Hourly forecast for the next 24 hours showing:
+  - Temperature
+  - Weather conditions
+  - Precipitation probability
+- Daily forecast with:
+  - Temperature ranges
+  - Weather conditions
+  - Precipitation probability
+  - Wind speed
+- Monthly calendar forecast view
+
+### Maps & Visualization
+- Interactive weather maps with multiple layers:
+  - Temperature distribution
+  - Precipitation intensity
+  - Wind speeds
+  - Atmospheric pressure
+- Animated weather backgrounds based on current conditions
+- Responsive design for all screen sizes
+
+## Prerequisites
+
+Before installing, make sure you have the following:
+- Node.js (v14 or higher)
+- npm or yarn package manager
+- Expo CLI (`npm install -g expo-cli`)
+- For iOS development: macOS with Xcode installed
+- For Android development: Android Studio with SDK installed
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone [https://github.com/BarbSouza/weather-app.git]
+   cd weather-app
+   ```
+
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Start the app
+3. Install required Expo packages:
+   ```bash
+   npx expo install expo-location
+   npx expo install @react-native-async-storage/async-storage
+   npx expo install expo-linear-gradient
+   npx expo install react-native-maps
+   ```
 
+4. Set up environment variables:
+   - Add your OpenWeatherMap API key:
+     ```
+     WEATHER_API_KEY=your_api_key_here
+     ```
+
+## Running the App
+
+1. Start the development server:
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+2. Choose your platform:
+   - Press `i` for iOS Simulator
+   - Press `a` for Android Emulator
+   - Press `w` for web browser
+   - Scan QR code with Expo Go app for physical devices
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Project Structure
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+app/
+├── components/         # Reusable UI components
+│   ├── WeatherBackground.tsx
+│   ├── TemperatureDisplay.tsx
+│   ├── SearchHistory.js
+│   └── WeatherUtils.tsx
+├── contexts/          # React Context providers
+│   ├── TemperatureContext.tsx
+│   ├── ThemeContext.js
+│   └── WeatherContext.tsx
+├── services/          # API and data services
+│   ├── api.js
+│   ├── FavoritesService.js
+│   └── SearchHistoryService.js
+├── styles/           # Global styles
+└── tabs/             # Tab-based navigation screens
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Technologies Used
 
-## Learn more
+- **Core**:
+  - Expo
+  - React Native
+  - TypeScript
+  - OpenWeatherMap API
 
-To learn more about developing your project with Expo, look at the following resources:
+- **Navigation & Routing**:
+  - React Navigation 6
+  - Expo Router
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- **UI Components**:
+  - React Native Vector Icons
+  - Expo Linear Gradient
+  - React Native Maps
 
-## Join the community
+- **Storage**:
+  - AsyncStorage for persistent data
 
-Join our community of developers creating universal apps.
+## Development Features
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- File-based routing with Expo Router
+- TypeScript support
+- Environment variable management
+- Cross-platform compatibility
+- Responsive design principles
+- Context-based state management
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## Acknowledgments
+
+- Weather data provided by OpenWeatherMap
+- Icons by Feather Icons and Material Community Icons
+- Expo team for the development platform
+- React Native community for components and inspiration
+
+
+## Authors
+
+-Barbara Souza
+[GitHub](https://github.com/BarbSouza)
+
+-Heloisa Eugenio
+[GitHub](https://github.com/Heloeugenio)

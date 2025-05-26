@@ -10,7 +10,23 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useOrientation } from './components/OrientationHandler';
 
+type TabRoute = {
+  name: string;
+  route: string;
+};
+
+/**
+ * Root layout component for the weather application.
+ * Provides theme, temperature, and weather context providers.
+ * Implements tab-based navigation with gesture support.
+ */
 export default function AppLayout() {
+  /**
+   * Renders the header right component containing app controls
+   * - Temperature unit toggle (°C/°F)
+   * - Theme toggle (light/dark)
+   * - Orientation toggle (portrait/landscape)
+   */
   const HeaderRight = () => {
     const { unit, toggleUnit } = useTemperature();
     const { isDarkTheme, toggleTheme } = useTheme();
@@ -30,9 +46,7 @@ export default function AppLayout() {
             color="#fff"
           />
         </TouchableOpacity>
-        <TouchableOpacity 
-          onPress={toggleOrientation}
-        >
+        <TouchableOpacity onPress={toggleOrientation}>
           <MaterialCommunityIcons
             name={isLandscape ? "phone-rotate-portrait" : "phone-rotate-landscape"}
             size={20}
@@ -43,13 +57,17 @@ export default function AppLayout() {
     );
   };
 
+  /**
+   * Main tab navigation component with gesture-based navigation support
+   * Handles tab switching, screen options, and responsive layout
+   */
   const TabNavigator = () => {
     const { isDarkTheme } = useTheme();
     const { isLandscape } = useOrientation();
     const router = useRouter();
     const [currentTabIndex, setCurrentTabIndex] = useState(0);
     
-    const tabs = [
+    const tabs: TabRoute[] = [
       { name: 'index', route: '/' },
       { name: 'tabs/daily', route: '/tabs/daily' },
       { name: 'tabs/hourly', route: '/tabs/hourly' },
@@ -57,29 +75,25 @@ export default function AppLayout() {
       { name: 'tabs/WeatherMaps', route: '/tabs/WeatherMaps' }
     ];
 
+    /**
+     * Handles horizontal swipe gestures for tab navigation
+     * Requires minimum distance and velocity thresholds
+     */
     const handleSwipe = ({ nativeEvent }: any) => {
       if (nativeEvent.state === State.END) {
         const { translationX, velocityX } = nativeEvent;
-        
-        // Minimum swipe distance and velocity thresholds
-        const minSwipeDistance = 100; // Increased threshold to avoid accidental triggers
-        const minVelocity = 800; // Increased velocity threshold
+        const minSwipeDistance = 100;
+        const minVelocity = 800;
         
         if (Math.abs(translationX) > minSwipeDistance && Math.abs(velocityX) > minVelocity) {
-          if (translationX > 0 && velocityX > 0) {
-            // Swipe right - go to previous tab
-            if (currentTabIndex > 0) {
-              const newIndex = currentTabIndex - 1;
-              setCurrentTabIndex(newIndex);
-              router.push(tabs[newIndex].route);
-            }
-          } else if (translationX < 0 && velocityX < 0) {
-            // Swipe left - go to next tab
-            if (currentTabIndex < tabs.length - 1) {
-              const newIndex = currentTabIndex + 1;
-              setCurrentTabIndex(newIndex);
-              router.push(tabs[newIndex].route);
-            }
+          if (translationX > 0 && velocityX > 0 && currentTabIndex > 0) {
+            const newIndex = currentTabIndex - 1;
+            setCurrentTabIndex(newIndex);
+            router.push(tabs[newIndex].route);
+          } else if (translationX < 0 && velocityX < 0 && currentTabIndex < tabs.length - 1) {
+            const newIndex = currentTabIndex + 1;
+            setCurrentTabIndex(newIndex);
+            router.push(tabs[newIndex].route);
           }
         }
       }
@@ -89,52 +103,48 @@ export default function AppLayout() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <PanGestureHandler 
           onHandlerStateChange={handleSwipe}
-          activeOffsetX={[-50, 50]} // Only activate for significant horizontal movement
-          failOffsetY={[-20, 20]}   // Fail if vertical movement is detected first
+          activeOffsetX={[-50, 50]}
+          failOffsetY={[-20, 20]}
           shouldCancelWhenOutside={true}
         >
           <View style={{ flex: 1 }}>
-            <Tabs
-              screenOptions={{
-                headerRight: () => <HeaderRight />,
-                tabBarActiveTintColor: 'white',
-                tabBarInactiveTintColor: isDarkTheme ? 'grey' : 'light-grey',
-                tabBarStyle: {
-                  paddingBottom: 5,
-                  paddingTop: 5,
-                  height: isLandscape ? 50 : 65, // Smaller tab bar in landscape
-                  backgroundColor: isDarkTheme ? '#0e1114' :'#2e6a8a',
-                  borderTopColor: isDarkTheme ? '#0e1114' :'#2e6a8a',
-                },
-                headerStyle: {
-                  backgroundColor: isDarkTheme ? '#0e1114' :'#2e6a8a',
-                  height: Platform.select({
-                    ios: isLandscape ? 70 : 100,
-                    android: isLandscape ? 60 : 80,
-                    default: isLandscape ? 40 : 50,
-                  }),
-                },
-                headerTintColor: '#fff',
-                headerTitleStyle: {
-                  fontWeight: 'bold',
-                  fontSize: isLandscape ? 16 : 18, // Smaller header text in landscape
-                }
-              }}
-            >
-              <Tabs.Screen
-                name="index"
-                options={{
-                  title: "Current Weather",
-                  tabBarLabel: "Current",
-                  tabBarIcon: ({ color }) => (
-                    <MaterialCommunityIcons 
-                      name="weather-partly-cloudy" 
-                      size={isLandscape ? 24 : 28} 
-                      color={color} 
-                    />
-                  )
-                }}
-              />
+            <Tabs screenOptions={{
+              headerRight: () => <HeaderRight />,
+              tabBarActiveTintColor: 'white',
+              tabBarInactiveTintColor: isDarkTheme ? 'grey' : 'light-grey',
+              tabBarStyle: {
+                paddingVertical: 5,
+                height: isLandscape ? 50 : 65,
+                backgroundColor: isDarkTheme ? '#0e1114' : '#2e6a8a',
+                borderTopColor: isDarkTheme ? '#0e1114' : '#2e6a8a',
+              },
+              headerStyle: {
+                backgroundColor: isDarkTheme ? '#0e1114' : '#2e6a8a',
+                height: Platform.select({
+                  ios: isLandscape ? 70 : 100,
+                  android: isLandscape ? 60 : 80,
+                  default: isLandscape ? 40 : 50,
+                }),
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+                fontSize: isLandscape ? 16 : 18,
+              }
+            }}>
+              {/* Main navigation tabs */}
+              <Tabs.Screen name="index" options={{
+                title: "Current Weather",
+                tabBarLabel: "Current",
+                tabBarIcon: ({ color }) => (
+                  <MaterialCommunityIcons 
+                    name="weather-partly-cloudy" 
+                    size={isLandscape ? 24 : 28} 
+                    color={color} 
+                  />
+                )
+              }}/>
+              
               <Tabs.Screen
                 name="tabs/daily"
                 options={{
@@ -191,18 +201,10 @@ export default function AppLayout() {
                   ),
                 }}
               />
-              <Tabs.Screen
-                name="components/SearchHistory"
-                options={{
-                  href: null, 
-                }}
-              />
-              <Tabs.Screen
-                name="tabs/MontlyCalendarForecast"
-                options={{
-                  href: null, 
-                }}
-              />
+              
+              {/* Hidden utility screens */}
+              <Tabs.Screen name="components/SearchHistory" options={{ href: null }}/>
+              <Tabs.Screen name="tabs/MontlyCalendarForecast" options={{ href: null }}/>
             </Tabs>
           </View>
         </PanGestureHandler>

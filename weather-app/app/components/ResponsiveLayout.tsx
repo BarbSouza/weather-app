@@ -6,38 +6,42 @@ interface ResponsiveLayoutProps {
   children: React.ReactNode;
   style?: any;
   scrollable?: boolean;
+  // Add option to disable scrolling when you know you'll have FlatLists
+  avoidNestedScrolling?: boolean;
 }
 
 export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ 
   children, 
   style, 
-  scrollable = true 
+  scrollable = true,
+  avoidNestedScrolling = false
 }) => {
   const { isLandscape } = useOrientation();
 
-  if (scrollable) {
+  // If avoiding nested scrolling, always return a View
+  if (avoidNestedScrolling || !scrollable) {
     return (
-      <ScrollView 
-        style={[{ flex: 1 }, style]}
-        contentContainerStyle={[
-          styles.scrollContent,
-          isLandscape ? styles.landscapeContent : styles.portraitContent
-        ]}
-        showsVerticalScrollIndicator={false}
-      >
+      <View style={[
+        { flex: 1 }, 
+        style,
+        isLandscape ? styles.landscapeContent : styles.portraitContent
+      ]}>
         {children}
-      </ScrollView>
+      </View>
     );
   }
 
   return (
-    <View style={[
-      { flex: 1 }, 
-      style,
-      isLandscape ? styles.landscapeContent : styles.portraitContent
-    ]}>
+    <ScrollView 
+      style={[{ flex: 1 }, style]}
+      contentContainerStyle={[
+        styles.scrollContent,
+        isLandscape ? styles.landscapeContent : styles.portraitContent
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
       {children}
-    </View>
+    </ScrollView>
   );
 };
 
