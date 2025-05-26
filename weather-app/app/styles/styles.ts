@@ -48,7 +48,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
     searchButton: {
       width: 46,
       height: 46,
-      backgroundColor: isDarkTheme ? '#0066cc' :'#0066cc',
+      backgroundColor: isDarkTheme ? '#1b3848' :'#2e6a8a',
       borderRadius: 8,
       marginLeft: 10,
       justifyContent: 'center',
@@ -57,7 +57,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
     },
     locationButton: {
       flexDirection: 'row',
-      backgroundColor: '#063f9eed',
+      backgroundColor: isDarkTheme ? '#1b3848' :'#2e6a8a',
       borderRadius: 8,
       paddingVertical: 8,
       paddingHorizontal: 15,
@@ -543,7 +543,7 @@ export const getStyles = (isDarkTheme:boolean) =>{
       backgroundColor: isDarkTheme ? '#374151' : 'transparent',
     },
     unitToggleButtonActive: {
-      backgroundColor: '#0066cc',
+      backgroundColor: isDarkTheme ? '#1b3848' : '#2e6a8a',
     },
     unitToggleText: {
       fontSize: 14,

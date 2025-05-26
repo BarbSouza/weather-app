@@ -37,20 +37,20 @@ export default function AppLayout() {
       <Tabs
         screenOptions={{
           headerRight: () => <HeaderRight />,
-          tabBarActiveTintColor: isDarkTheme ? 'white' : 'black',
-          tabBarInactiveTintColor: isDarkTheme ? '#cac8c8' : '#474747',
+          tabBarActiveTintColor: 'white',
+          tabBarInactiveTintColor: isDarkTheme ? 'grey' : 'black',
           tabBarStyle: {
             paddingBottom: 5,
             paddingTop: 5,
             height: 65,
-            backgroundColor: isDarkTheme ? '#222' : '#fff',
-            borderTopColor: isDarkTheme ? '#333' : '#e0e0e0',
+            backgroundColor: isDarkTheme ? '#0e1114' :'#2e6a8a',
+            borderTopColor: isDarkTheme ? '#0e1114' :'#2e6a8a',
           },
           headerStyle: {
-            backgroundColor: isDarkTheme ? '#333' : '#0066cc',
+            backgroundColor: isDarkTheme ? '#0e1114' :'#2e6a8a',
             height: Platform.select({
               ios: 100,
-              android: 60,
+              android: 80,
               default: 50,
             }),
           },

@@ -55,11 +55,11 @@ export const TemperatureDisplay: React.FC<TemperatureDisplayProps> = ({
       paddingHorizontal: 6,
       paddingVertical: 2,
       borderRadius: 12,
-      backgroundColor: isDarkTheme ? '#444' : '#f0f0f0',
+      backgroundColor: isDarkTheme ? 'light-grey' : 'white',
       marginVertical: 1,
     },
     activeUnit: {
-      backgroundColor: '#0066cc',
+      backgroundColor: isDarkTheme ? '#0e1114' :'#275772',
     },
     unitText: {
       fontSize: size === 'large' ? 16 : size === 'medium' ? 14 : 12,
