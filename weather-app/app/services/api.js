@@ -1,9 +1,16 @@
 import axios from 'axios';
-// OpenWeatherMap API key and base URLs
+
+/** @constant OpenWeatherMap API configuration */
 export const WEATHER_API_KEY = 'ddde560ae7ec6510c8d92298fc9da08f';
 export const WEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5';
 export const MAP_BASE_URL = 'https://tile.openweathermap.org/map';
 
+/**
+ * Fetches current weather data for given coordinates
+ * @param {number} latitude - Location latitude
+ * @param {number} longitude - Location longitude
+ * @param {string} units - Units of measurement ('metric' or 'imperial')
+ */
 export const fetchCurrentWeather = async (latitude, longitude, units = 'metric') => {
   try {
     const response = await axios.get(
@@ -16,6 +23,12 @@ export const fetchCurrentWeather = async (latitude, longitude, units = 'metric')
   }
 };
 
+/**
+ * Fetches 5-day weather forecast for given coordinates
+ * @param {number} latitude - Location latitude
+ * @param {number} longitude - Location longitude
+ * @param {string} units - Units of measurement ('metric' or 'imperial')
+ */
 export const fetchForecast = async (latitude, longitude, units = 'metric') => {
   try {
     const response = await axios.get(
@@ -28,9 +41,14 @@ export const fetchForecast = async (latitude, longitude, units = 'metric') => {
   }
 };
 
+/**
+ * Fetches hourly weather forecast using OneCall API
+ * @param {number} latitude - Location latitude
+ * @param {number} longitude - Location longitude
+ * @param {string} units - Units of measurement ('metric' or 'imperial')
+ */
 export const fetchHourlyForecast = async (latitude, longitude, units = 'metric') => {
   try {
-    // OpenWeatherMap's OneCall API provides hourly forecasts
     const response = await axios.get(
       `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&exclude=minutely&units=${units}&appid=${WEATHER_API_KEY}`
     );
@@ -41,6 +59,11 @@ export const fetchHourlyForecast = async (latitude, longitude, units = 'metric')
   }
 };
 
+/**
+ * Fetches air pollution data for given coordinates
+ * @param {number} latitude - Location latitude
+ * @param {number} longitude - Location longitude
+ */
 export const fetchAirPollution = async (latitude, longitude) => {
   try {
     const response = await axios.get(
@@ -53,9 +76,14 @@ export const fetchAirPollution = async (latitude, longitude) => {
   }
 };
 
+/**
+ * Fetches monthly climate forecast (requires subscription)
+ * @param {number} latitude - Location latitude
+ * @param {number} longitude - Location longitude
+ * @param {string} units - Units of measurement ('metric' or 'imperial')
+ */
 export const fetchMonthlyForecast = async (latitude, longitude, units = 'metric') => {
   try {
-    // This uses the Climate Forecast API (requires subscription)
     const response = await axios.get(
       `https://api.openweathermap.org/data/2.5/climate/month?lat=${latitude}&lon=${longitude}&units=${units}&appid=${WEATHER_API_KEY}`
     );
@@ -66,6 +94,11 @@ export const fetchMonthlyForecast = async (latitude, longitude, units = 'metric'
   }
 };
 
+/**
+ * Searches weather data for a location by name
+ * @param {string} query - Location name to search
+ * @param {string} units - Units of measurement ('metric' or 'imperial')
+ */
 export const searchLocation = async (query, units = 'metric') => {
   try {
     const response = await axios.get(
@@ -78,6 +111,10 @@ export const searchLocation = async (query, units = 'metric') => {
   }
 };
 
+/**
+ * Fetches city suggestions based on search query
+ * @param {string} query - Search query for city name
+ */
 export const fetchCitySuggestions = async (query) => {
   try {
     if (query.length < 1) return [];
@@ -86,7 +123,6 @@ export const fetchCitySuggestions = async (query) => {
       `http://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${WEATHER_API_KEY}`
     );
     
-    // Format the suggestions to include city, state, and country
     return response.data.map(city => ({
       name: city.name,
       country: city.country,
