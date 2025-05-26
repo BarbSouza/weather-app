@@ -184,7 +184,7 @@ export default function Home() {
         <ResponsiveLayout scrollable={true}>
           {/* Current Weather - Takes full width in portrait, left half in landscape */}
           <ResponsiveSection 
-            landscapeWidth={isLandscape ? '45%' : '100%'}
+            
             style={styles.currentWeatherContainer}
           >
             <Text style={styles.currentDateTime}>
@@ -238,7 +238,7 @@ export default function Home() {
 
           {/* Weather Details Section - Right side in landscape */}
           <ResponsiveSection 
-            landscapeWidth={isLandscape ? '50%' : '100%'}
+            
           >
             {/* Hourly Forecast */}
             <View style={styles.hourlyForecastContainer}>
@@ -260,7 +260,7 @@ export default function Home() {
                 data={dailyForecastData.slice(0, 5)}
                 renderItem={renderDailyItem}
                 keyExtractor={(item) => item.dt.toString()}
-                horizontal={!isLandscape} // Vertical list in landscape for better space usage
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.dailyForecastList}
