@@ -23,10 +23,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { TemperatureDisplay } from './components/TemperatureDisplay';
 import { useTemperature } from './contexts/TemperatureContext';
 import { WeatherBackground } from './components/WeatherBackground';
+import { ResponsiveLayout, ResponsiveSection } from './components/ResponsiveLayout';
+import { useOrientation } from './components/OrientationHandler';
 
 export default function Home() {
   const { isDarkTheme, toggleTheme } = useTheme();
   const { unit, toggleUnit, formatTemp } = useTemperature();
+  const { isLandscape, isPortrait } = useOrientation();
   const navigation = useNavigation();
   const styles = getStyles(isDarkTheme); 
   const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
@@ -55,7 +58,7 @@ export default function Home() {
   } = useWeather();
 
   const renderHourlyItem = ({ item }: { item: any }) => (
-    <View style={styles.hourlyItem}>
+    <View style={[styles.hourlyItem, isLandscape && { width: 80 }]}>
       <Text style={styles.hourlyTime}>{formatHour(item.dt)}</Text>
       <WeatherIcon weatherId={item.weather[0].id} size={22} />
       <Text style={styles.hourlyTemp}>{formatTemp(item.temp)}</Text>
@@ -66,9 +69,8 @@ export default function Home() {
     </View>
   );
 
-  
   const renderDailyItem = ({ item }: { item: any }) => (
-    <View style={styles.dailyItem}>
+    <View style={[styles.dailyItem, isLandscape && { width: 120 }]}>
       <Text style={styles.dailyDay}>{formatDate(item.dt)}</Text>
       <WeatherIcon weatherId={item.weather[0].id} size={22} />
       <View style={styles.dailyTempContainer}>
@@ -98,7 +100,6 @@ export default function Home() {
     return `Updated ${hours} hours ago`;
   };
 
-
   return (
     <LinearGradient 
         colors={isDarkTheme ? ['#277ea5', '#0d0f12'] : ['#7fd7ff', '#fff']}
@@ -114,11 +115,10 @@ export default function Home() {
         />
       )}
       
-      {/* Other components */}
       <StatusBar barStyle="light-content" />
       
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
+      {/* Search Bar - Always at top */}
+      <View style={[styles.searchContainer, isLandscape && { marginVertical: 10 }]}>
         <TextInput
           style={styles.searchInput}
           placeholder="Search for a city"
@@ -156,7 +156,7 @@ export default function Home() {
       />
       
       <TouchableOpacity 
-        style={styles.locationButton} 
+        style={[styles.locationButton, isLandscape && { marginVertical: 5 }]} 
         onPress={handleGetCurrentLocation}
       >
         <Feather name="map-pin" size={18} color="#fff" />
@@ -181,13 +181,12 @@ export default function Home() {
           </TouchableOpacity>
         </View>
       ) : weatherData ? (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollViewContent}
-          onScrollBeginDrag={Keyboard.dismiss}
-        >
-          {/* Current Weather */}
-          <View style={styles.currentWeatherContainer}>
+        <ResponsiveLayout scrollable={true}>
+          {/* Current Weather - Takes full width in portrait, left half in landscape */}
+          <ResponsiveSection 
+            landscapeWidth={isLandscape ? '45%' : '100%'}
+            style={styles.currentWeatherContainer}
+          >
             <Text style={styles.currentDateTime}>
               {new Date().toLocaleDateString('en-US', { 
               weekday: 'long',
@@ -235,45 +234,51 @@ export default function Home() {
                 <Text style={styles.lastUpdatedText}>{formatLastUpdated()}</Text>
               )}
             </View>
-          </View>
+          </ResponsiveSection>
 
-          {/* Hourly Forecast Preview */}
-          <View style={styles.hourlyForecastContainer}>
-            <Text style={styles.forecastTitle}>Hourly Forecast</Text>
-            <FlatList
-              data={hourlyForecastData.slice(0, 8)}
-              renderItem={renderHourlyItem}
-              keyExtractor={(item) => item.dt.toString()}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.hourlyForecastList}
-            />
-          </View>
-
-          {/* Daily Forecast Preview */}
-          <View style={styles.dailyForecastContainer}>
-            <Text style={styles.forecastTitle}>5-Day Forecast</Text>
-            <FlatList
-              data={dailyForecastData.slice(0, 5)}
-              renderItem={renderDailyItem}
-              keyExtractor={(item) => item.dt.toString()}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.dailyForecastList}
-            />
-          </View>
-          
-          {/* Refresh button at the bottom */}
-          <TouchableOpacity 
-            style={styles.refreshContainer}
-            onPress={() => {
-              weatherData && handleSelectHistoryItem(weatherData.name);
-            }}
+          {/* Weather Details Section - Right side in landscape */}
+          <ResponsiveSection 
+            landscapeWidth={isLandscape ? '50%' : '100%'}
           >
-            <Feather name="refresh-cw" size={16} color="#0066cc" />
-            <Text style={styles.refreshText}>Refresh Weather</Text>
-          </TouchableOpacity>
-        </ScrollView>
+            {/* Hourly Forecast */}
+            <View style={styles.hourlyForecastContainer}>
+              <Text style={styles.forecastTitle}>Hourly Forecast</Text>
+              <FlatList
+                data={hourlyForecastData.slice(0, isLandscape ? 6 : 8)}
+                renderItem={renderHourlyItem}
+                keyExtractor={(item) => item.dt.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.hourlyForecastList}
+              />
+            </View>
+
+            {/* Daily Forecast */}
+            <View style={styles.dailyForecastContainer}>
+              <Text style={styles.forecastTitle}>5-Day Forecast</Text>
+              <FlatList
+                data={dailyForecastData.slice(0, 5)}
+                renderItem={renderDailyItem}
+                keyExtractor={(item) => item.dt.toString()}
+                horizontal={!isLandscape} // Vertical list in landscape for better space usage
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.dailyForecastList}
+              />
+            </View>
+            
+            {/* Refresh button */}
+            <TouchableOpacity 
+              style={styles.refreshContainer}
+              onPress={() => {
+                weatherData && handleSelectHistoryItem(weatherData.name);
+              }}
+            >
+              <Feather name="refresh-cw" size={16} color="#0066cc" />
+              <Text style={styles.refreshText}>Refresh Weather</Text>
+            </TouchableOpacity>
+          </ResponsiveSection>
+        </ResponsiveLayout>
       ) : (
         <View style={styles.emptyStateContainer}>
           <MaterialCommunityIcons name="weather-cloudy" size={80} color="#888" style={styles.emptyStateIcon} />
