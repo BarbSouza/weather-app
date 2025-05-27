@@ -2,32 +2,40 @@ import React, { useState, useEffect } from 'react';
 import { Dimensions } from 'react-native';
 import * as ScreenOrientation from 'expo-screen-orientation';
 
+type OrientationType = 'portrait' | 'landscape';
+type ScreenDimensions = { width: number; height: number };
+
+/**
+ * Custom hook for handling screen orientation in React Native
+ * Provides methods to control and monitor device orientation
+ * @returns Object containing orientation state and control methods
+ */
 export const useOrientation = () => {
-  const [orientation, setOrientation] = useState('portrait');
-  const [screenData, setScreenData] = useState(Dimensions.get('window'));
+  const [orientation, setOrientation] = useState<OrientationType>('portrait');
+  const [screenData, setScreenData] = useState<ScreenDimensions>(Dimensions.get('window'));
 
   useEffect(() => {
-    const onChange = (result: any) => {
+    /**
+     * Handles dimension changes and updates orientation state
+     * @param result - Dimension change event result
+     */
+    const onChange = (result: { window: ScreenDimensions }) => {
       setScreenData(result.window);
-      // Determine orientation based on dimensions
-      if (result.window.width > result.window.height) {
-        setOrientation('landscape');
-      } else {
-        setOrientation('portrait');
-      }
+      setOrientation(result.window.width > result.window.height ? 'landscape' : 'portrait');
     };
 
     const subscription = Dimensions.addEventListener('change', onChange);
     
-    // Initial orientation check
+    // Set initial orientation
     const { width, height } = Dimensions.get('window');
-    if (width > height) {
-      setOrientation('landscape');
-    }
+    if (width > height) setOrientation('landscape');
 
     return () => subscription?.remove();
   }, []);
 
+  /**
+   * Toggles between portrait and landscape orientation
+   */
   const toggleOrientation = async () => {
     if (orientation === 'portrait') {
       await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
@@ -36,14 +44,23 @@ export const useOrientation = () => {
     }
   };
 
+  /**
+   * Forces device into portrait orientation
+   */
   const lockPortrait = async () => {
     await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
   };
 
+  /**
+   * Forces device into landscape orientation
+   */
   const lockLandscape = async () => {
     await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
   };
 
+  /**
+   * Removes orientation lock, allowing free rotation
+   */
   const unlockOrientation = async () => {
     await ScreenOrientation.unlockAsync();
   };
