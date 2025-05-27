@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useState } from 'react';
 import {
   Text, View, TextInput, TouchableOpacity, ActivityIndicator,
-  ScrollView, SafeAreaView, StatusBar, Keyboard, FlatList
+  ScrollView, SafeAreaView, StatusBar, Keyboard, FlatList, Platform
 } from 'react-native';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { getStyles } from './styles/styles';
@@ -134,9 +134,23 @@ export default function Home() {
       
       {/* Main content sections */}
       {/* Search interface */}
-      <View style={[styles.searchContainer, isLandscape && { marginVertical: 10 }]}>
+      <View style={[
+        styles.searchContainer, 
+        isLandscape && Platform.OS !== 'web' && { 
+          marginVertical: 5,
+          maxWidth: 1000,
+          alignSelf: 'center'
+        }
+      ]}>
         <TextInput
-          style={styles.searchInput}
+          style={[
+            styles.searchInput,
+            isLandscape && Platform.OS !== 'web' && {
+              marginVertical: -15,
+              height: 25,
+              fontSize: 14
+            }
+          ]}
           placeholder="Search for a city"
           value={searchQuery}
           onChangeText={handleSearchInputChange}
@@ -151,13 +165,20 @@ export default function Home() {
           }}
         />
         <TouchableOpacity 
-          style={styles.searchButton} 
+          style={[
+            styles.searchButton,
+            isLandscape && Platform.OS !== 'web' && {
+              marginVertical: -15,
+              width: 25,
+              height: 25
+            }
+          ]} 
           onPress={handleSearchLocation}
         >
-          <Feather name="search" size={22} color="#fff" />
+          <Feather name="search" size={isLandscape && Platform.OS !== 'web' ? 18 : 22} color="#fff" />
         </TouchableOpacity>
       </View>
-      
+
       {/* Search History/Suggestions Popup */}
       <SearchHistory
         visible={showSearchHistory}
@@ -172,11 +193,25 @@ export default function Home() {
       />
       
       <TouchableOpacity 
-        style={[styles.locationButton, isLandscape && { marginVertical: 5 }]} 
+        style={[
+          styles.locationButton, 
+          isLandscape && Platform.OS !== 'web' && { 
+            marginVertical: 5,
+            paddingVertical: 6,
+            maxWidth: 300,
+            alignSelf: 'center',
+            height: 28
+          }
+        ]} 
         onPress={handleGetCurrentLocation}
       >
-        <Feather name="map-pin" size={18} color="#fff" />
-        <Text style={styles.locationButtonText}>Current Location</Text>
+        <Feather name="map-pin" size={isLandscape && Platform.OS !== 'web' ? 16 : 18} color="#fff" />
+        <Text style={[
+          styles.locationButtonText,
+          isLandscape && Platform.OS !== 'web' && {
+            fontSize: 13
+          }
+        ]}>Current Location</Text>
       </TouchableOpacity>
 
       {isLoading ? (

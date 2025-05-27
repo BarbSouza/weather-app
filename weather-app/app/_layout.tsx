@@ -114,7 +114,7 @@ export default function AppLayout() {
               tabBarInactiveTintColor: isDarkTheme ? 'grey' : 'light-grey',
               tabBarStyle: {
                 paddingVertical: 5,
-                height: isLandscape ? 50 : 65,
+                height: isLandscape ? 37 : 65,
                 backgroundColor: isDarkTheme ? '#0e1114' : '#2e6a8a',
                 borderTopColor: isDarkTheme ? '#0e1114' : '#2e6a8a',
               },

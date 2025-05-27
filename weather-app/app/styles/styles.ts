@@ -179,7 +179,7 @@ export const getStyles = (isDarkTheme: boolean) => {
       backgroundColor: 'transparent',
       padding: 0,
       marginBottom: 0,
-      ...(Platform.OS === 'web' && width >= 850 && {
+      ...(Platform.OS === 'web' && width >= 1070 && {
         padding: 100,
       }),
     },
@@ -266,8 +266,8 @@ export const getStyles = (isDarkTheme: boolean) => {
         width: '100%', 
         maxWidth: 800, 
         alignSelf: 'center',
-        ...(Platform.OS === 'web' && width >= 800 && {
-        padding: 50,
+        ...(Platform.OS === 'web' && width >= 1070 && {
+        padding: 40,
       }),
       }),
     },
@@ -283,10 +283,10 @@ export const getStyles = (isDarkTheme: boolean) => {
         width: '100%', 
         maxWidth: 800, 
         alignSelf: 'center',
-        padding: 50,
+        padding: 30,
       }),
-      ...(Platform.OS === 'web' && width >= 800 && {
-        padding: 50,
+      ...(Platform.OS === 'web' && width >= 1070 && {
+        padding: 40,
       }),
     },
 
@@ -607,6 +607,10 @@ export const getStyles = (isDarkTheme: boolean) => {
       alignItems: 'center',
       justifyContent: 'center',
       paddingVertical: 10,
+      ...(Platform.OS === 'web' && width >= 1070 &&{
+        
+        justifyContent: 'flex-end',
+      }),
     },
     
     refreshText: {
