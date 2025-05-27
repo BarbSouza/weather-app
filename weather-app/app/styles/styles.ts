@@ -30,7 +30,7 @@ export const getStyles = (isDarkTheme: boolean) => {
       backgroundColor: colors.background,
       padding: 16,
       ...(isDesktop && {
-        width: '60%',
+        width: '100%',
         marginLeft: 'auto',
         marginRight: 'auto'
       }),
@@ -179,6 +179,9 @@ export const getStyles = (isDarkTheme: boolean) => {
       backgroundColor: 'transparent',
       padding: 0,
       marginBottom: 0,
+      ...(Platform.OS === 'web' && width >= 850 && {
+        padding: 100,
+      }),
     },
     
     currentDateTime: {
@@ -260,9 +263,12 @@ export const getStyles = (isDarkTheme: boolean) => {
       marginBottom: Platform.select({ web: 20, default: 16 }),
       alignItems: 'center',
       ...(Platform.OS === 'web' && {
-        width: '160%',
-        maxWidth: 1000,
+        width: '100%', 
+        maxWidth: 800, 
         alignSelf: 'center',
+        ...(Platform.OS === 'web' && width >= 800 && {
+        padding: 50,
+      }),
       }),
     },
 
@@ -274,9 +280,13 @@ export const getStyles = (isDarkTheme: boolean) => {
       marginTop: Platform.select({ web: 20, default: 10 }),
       alignItems: 'center',
       ...(Platform.OS === 'web' && {
-        width: '160%',
-        maxWidth: 900,
+        width: '100%', 
+        maxWidth: 800, 
         alignSelf: 'center',
+        padding: 50,
+      }),
+      ...(Platform.OS === 'web' && width >= 800 && {
+        padding: 50,
       }),
     },
 
