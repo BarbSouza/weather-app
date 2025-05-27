@@ -17,6 +17,7 @@ import { useTemperature } from './contexts/TemperatureContext';
 import { WeatherBackground } from './components/WeatherBackground';
 import { ResponsiveLayout, ResponsiveSection } from './components/ResponsiveLayout';
 import { useOrientation } from './components/OrientationHandler';
+import { useAnimations } from './_layout'; // Import the animations context
 
  /**
  * Main weather application component that displays current weather,
@@ -30,11 +31,13 @@ import { useOrientation } from './components/OrientationHandler';
  * - Responsive layout for portrait/landscape
  * - Dark/light theme support
  * - Temperature unit toggle
+ * - Animation toggle support
  */
 export default function Home() {
   const { isDarkTheme, toggleTheme } = useTheme();
   const { unit, toggleUnit, formatTemp } = useTemperature();
   const { isLandscape, isPortrait } = useOrientation();
+  const { animationsEnabled } = useAnimations(); // Get animation state
   const navigation = useNavigation();
   const styles = getStyles(isDarkTheme);
   const iconColor = isDarkTheme ? '#F1F5F9' : '#333';
@@ -124,11 +127,12 @@ export default function Home() {
       end={{ x: 0.4, y: 1 }}
       style={styles.container} 
     >
-      {/* Background weather effects */}
+      {/* Background weather effects with animation toggle */}
       {weatherData && (
         <WeatherBackground 
           weatherId={weatherData.weather[0].id} 
           isDarkTheme={isDarkTheme} 
+          animationsEnabled={animationsEnabled} // Pass animation state
         />
       )}
       

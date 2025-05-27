@@ -7,7 +7,7 @@ import { TemperatureProvider, useTemperature } from './contexts/TemperatureConte
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useState, createContext, useContext } from 'react';
 import { useOrientation } from './components/OrientationHandler';
 
 type TabRoute = {
@@ -15,9 +15,39 @@ type TabRoute = {
   route: string;
 };
 
+// Create Animation Context
+interface AnimationContextType {
+  animationsEnabled: boolean;
+  toggleAnimations: () => void;
+}
+
+const AnimationContext = createContext<AnimationContextType | undefined>(undefined);
+
+export const useAnimations = () => {
+  const context = useContext(AnimationContext);
+  if (!context) {
+    throw new Error('useAnimations must be used within an AnimationProvider');
+  }
+  return context;
+};
+
+const AnimationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [animationsEnabled, setAnimationsEnabled] = useState(true);
+
+  const toggleAnimations = () => {
+    setAnimationsEnabled(prev => !prev);
+  };
+
+  return (
+    <AnimationContext.Provider value={{ animationsEnabled, toggleAnimations }}>
+      {children}
+    </AnimationContext.Provider>
+  );
+};
+
 /**
  * Root layout component for the weather application.
- * Provides theme, temperature, and weather context providers.
+ * Provides theme, temperature, weather context providers, and animation toggle.
  * Implements tab-based navigation with gesture support.
  */
 export default function AppLayout() {
@@ -25,11 +55,13 @@ export default function AppLayout() {
    * Renders the header right component containing app controls
    * - Temperature unit toggle (°C/°F)
    * - Theme toggle (light/dark)
+   * - Animation toggle (on/off)
    * - Orientation toggle (portrait/landscape)
    */
   const HeaderRight = () => {
     const { unit, toggleUnit } = useTemperature();
     const { isDarkTheme, toggleTheme } = useTheme();
+    const { animationsEnabled, toggleAnimations } = useAnimations();
     const { toggleOrientation, isLandscape } = useOrientation();
     
     return (
@@ -42,6 +74,13 @@ export default function AppLayout() {
         <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 12 }}>
           <FontAwesome5
             name={isDarkTheme ? 'sun' : 'moon'}
+            size={20}
+            color="#fff"
+          />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={toggleAnimations} style={{ marginRight: 12 }}>
+          <MaterialCommunityIcons
+            name={animationsEnabled ? 'weather-lightning-rainy' : 'weather-cloudy'}
             size={20}
             color="#fff"
           />
@@ -215,9 +254,11 @@ export default function AppLayout() {
   return (
     <ThemeProvider>
       <TemperatureProvider>
-        <WeatherProvider>
-          <TabNavigator />
-        </WeatherProvider>
+        <AnimationProvider>
+          <WeatherProvider>
+            <TabNavigator />
+          </WeatherProvider>
+        </AnimationProvider>
       </TemperatureProvider>
     </ThemeProvider>
   );
