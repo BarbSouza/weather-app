@@ -12,11 +12,12 @@ import {
 import { SearchHistoryService } from '../services/SearchHistoryService';
 import { useTemperature } from './TemperatureContext';
 
-
-// TypeScript interfaces
+/**
+ * Core weather data structure from OpenWeather API
+ */
 export interface WeatherData {
   name: string;
-    coord: {
+  coord: {
     lat: number;
     lon: number;
   };
@@ -43,6 +44,9 @@ export interface WeatherData {
   };
 }
 
+/**
+ * City suggestion data structure for search functionality
+ */
 interface CitySearchSuggestion {
   name: string;
   displayName: string;
@@ -51,6 +55,9 @@ interface CitySearchSuggestion {
   country: string;
 }
 
+/**
+ * API error response structure
+ */
 interface ApiError {
   response?: {
     status: number;
@@ -59,6 +66,9 @@ interface ApiError {
   isAxiosError?: boolean;
 }
 
+/**
+ * Daily forecast data structure
+ */
 export interface ForecastItem {
   dt: number;
   main: {
@@ -73,9 +83,12 @@ export interface ForecastItem {
     description: string;
     icon: string;
   }[];
-  pop?: number; // probability of precipitation
+  pop?: number;
 }
 
+/**
+ * Hourly forecast data structure
+ */
 export interface HourlyForecastItem {
   dt: number;
   temp: number;
@@ -84,9 +97,12 @@ export interface HourlyForecastItem {
     description: string;
     icon: string;
   }[];
-  pop: number; // probability of precipitation
+  pop: number;
 }
 
+/**
+ * Monthly forecast data structure
+ */
 export interface MonthlyForecastItem {
   dt: number;
   temp: {
@@ -103,6 +119,9 @@ export interface MonthlyForecastItem {
   }[];
 }
 
+/**
+ * Weather context interface defining available weather data and operations
+ */
 interface WeatherContextType {
   weatherData: WeatherData | null;
   dailyForecastData: ForecastItem[];
@@ -127,8 +146,15 @@ interface WeatherContextType {
   handleSelectSuggestion: (suggestion: CitySearchSuggestion) => Promise<void>;
 }
 
+/**
+ * Weather context for managing weather data state
+ */
 const WeatherContext = createContext<WeatherContextType | undefined>(undefined);
 
+/**
+ * Weather Provider Component
+ * Manages weather data fetching, search functionality, and location services
+ */
 export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [dailyForecastData, setDailyForecastData] = useState<ForecastItem[]>([]);
@@ -530,6 +556,11 @@ export const WeatherProvider: React.FC<{ children: React.ReactNode }> = ({ child
   );
 };
 
+/**
+ * Custom hook for accessing weather context
+ * Must be used within a WeatherProvider component
+ * @throws Error if used outside of WeatherProvider
+ */
 export const useWeather = () => {
   const context = useContext(WeatherContext);
   if (context === undefined) {
