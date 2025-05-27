@@ -699,6 +699,11 @@ export const getStyles = (isDarkTheme: boolean) => {
       shadowOpacity: 0.1,
       shadowRadius: 4,
       elevation: 3,
+            ...(Platform.OS === 'web' && {
+        width: '50%', 
+        maxWidth: 500,
+        alignSelf: 'center',
+      }),
     },
     
     calendarHeader: {
