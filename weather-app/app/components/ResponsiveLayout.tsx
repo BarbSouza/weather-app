@@ -2,14 +2,21 @@ import React from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { useOrientation } from './OrientationHandler';
 
+/**
+ * Props for the ResponsiveLayout component
+ */
 interface ResponsiveLayoutProps {
   children: React.ReactNode;
   style?: any;
   scrollable?: boolean;
-  // Add option to disable scrolling when you know you'll have FlatLists
   avoidNestedScrolling?: boolean;
 }
 
+/**
+ * A responsive layout container that adapts to screen orientation
+ * Handles both scrollable and non-scrollable content
+ * Supports landscape and portrait modes with different layouts
+ */
 export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ 
   children, 
   style, 
@@ -18,7 +25,6 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
 }) => {
   const { isLandscape } = useOrientation();
 
-  // If avoiding nested scrolling, always return a View
   if (avoidNestedScrolling || !scrollable) {
     return (
       <View style={[
@@ -45,6 +51,43 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
   );
 };
 
+/**
+ * Props for the ResponsiveSection component
+ */
+interface ResponsiveSectionProps {
+  children: React.ReactNode;
+  landscapeWidth?: string | number;
+  style?: any;
+}
+
+/**
+ * A responsive section component that adjusts its width based on orientation
+ * Used within ResponsiveLayout to create responsive grid layouts
+ */
+export const ResponsiveSection: React.FC<ResponsiveSectionProps> = ({ 
+  children, 
+  landscapeWidth = '48%', 
+  style 
+}) => {
+  const { isLandscape } = useOrientation();
+
+  return (
+    <View style={[
+      style,
+      isLandscape && { 
+        width: landscapeWidth, 
+        marginBottom: 20,
+        marginHorizontal: 10 
+      }
+    ]}>
+      {children}
+    </View>
+  );
+};
+
+/**
+ * Styles for responsive layout components
+ */
 const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
@@ -62,25 +105,3 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
 });
-
-// Responsive components for different sections
-export const ResponsiveSection: React.FC<{
-  children: React.ReactNode;
-  landscapeWidth?: string | number;
-  style?: any;
-}> = ({ children, landscapeWidth = '48%', style }) => {
-  const { isLandscape } = useOrientation();
-
-  return (
-    <View style={[
-      style,
-      isLandscape && { 
-        width: landscapeWidth, 
-        marginBottom: 20,
-        marginHorizontal: 10 
-      }
-    ]}>
-      {children}
-    </View>
-  );
-};
