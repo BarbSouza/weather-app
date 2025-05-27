@@ -122,7 +122,7 @@ export default function AppLayout() {
                 backgroundColor: isDarkTheme ? '#0e1114' : '#2e6a8a',
                 height: Platform.select({
                   ios: isLandscape ? 70 : 100,
-                  android: isLandscape ? 60 : 80,
+                  android: isLandscape ? 60 : 90,
                   default: isLandscape ? 40 : 50,
                 }),
               },

@@ -255,19 +255,29 @@ export const getStyles = (isDarkTheme: boolean) => {
     hourlyForecastContainer: {
       backgroundColor: isDarkTheme ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
       borderRadius: 20,
-      padding: 12,
-      marginTop: 16,
-      marginBottom: 16,
+      padding: Platform.select({ web: 20, default: 12 }),
+      marginTop: Platform.select({ web: 20, default: 16 }),
+      marginBottom: Platform.select({ web: 20, default: 16 }),
       alignItems: 'center',
+      ...(Platform.OS === 'web' && {
+        width: '160%',
+        maxWidth: 1000,
+        alignSelf: 'center',
+      }),
     },
 
     dailyForecastContainer: {
       backgroundColor: isDarkTheme ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-      padding: 12,
-      marginBottom: 6,
+      padding: Platform.select({ web: 20, default: 12 }),
+      marginBottom: Platform.select({ web: 20, default: 6 }),
       borderRadius: 20,
-      marginTop: 10,
+      marginTop: Platform.select({ web: 20, default: 10 }),
       alignItems: 'center',
+      ...(Platform.OS === 'web' && {
+        width: '160%',
+        maxWidth: 900,
+        alignSelf: 'center',
+      }),
     },
 
     forecastContainer: {
@@ -291,6 +301,11 @@ export const getStyles = (isDarkTheme: boolean) => {
     // Hourly Forecast Styles
     hourlyForecastList: {
       paddingVertical: 10,
+      ...(Platform.OS === 'web' && {
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        flexDirection: 'row',
+      }),
     },
     
     hourlyItem: {
@@ -299,7 +314,8 @@ export const getStyles = (isDarkTheme: boolean) => {
       padding: 10,
       alignItems: 'center',
       marginHorizontal: 6,
-      width: 70,
+      marginVertical: Platform.OS === 'web' ? 6 : 0,
+      width: 80,
     },
     
     hourlyTime: {
@@ -320,6 +336,11 @@ export const getStyles = (isDarkTheme: boolean) => {
     dailyForecastList: {
       paddingVertical: 10,
       paddingHorizontal: 12,
+      ...(Platform.OS === 'web' && {
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        flexDirection: 'row',
+      }),
     },
     
     dailyItem: {
@@ -328,6 +349,7 @@ export const getStyles = (isDarkTheme: boolean) => {
       padding: 12,
       alignItems: 'center',
       marginHorizontal: 6,
+      marginVertical: Platform.OS === 'web' ? 6 : 0,
       width: 80,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
