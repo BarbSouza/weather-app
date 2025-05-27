@@ -1,131 +1,124 @@
 # Weather App Documentation
-**Assignment Documentation for Cross-Platform Development**  
+**Cross-Platform Development Assignment**  
 **Authors:** Barbara Souza & Heloisa Eugenio
 
 ## Project Overview
-A cross-platform weather application developed using Expo and React Native that provides comprehensive weather information through a modern, user-friendly interface. The app integrates with OpenWeatherMap API to deliver real-time weather data and forecasts.
+A comprehensive cross-platform weather application built with Expo and React Native, featuring real-time weather data, interactive maps, and customizable user experience.
 
-## Key Features
+## ✨ Key Features
 
-### 1. Core Functionality
-- **Real-time Weather Updates:**
-  - Current temperature and conditions
-  - "Feels like" temperature
+### 🎯 Core Features
+- Real-time weather data via OpenWeatherMap API
+- Location-based weather tracking
+- Smart city search with suggestions
+- Recent locations history
+- Favorites management system
+- Dark/Light theme toggle
+- Temperature unit switching (°C/°F)
+- Animated weather effects
+- Cross-platform support (iOS, Android, Web)
+
+### 🌡️ Weather Information
+- Current conditions:
+  - Real and "feels like" temperatures
+  - Dynamic weather icons and descriptions
   - Humidity levels
   - Wind speed and direction
-  - Atmospheric pressure
-  - Visibility conditions
+  - Atmospheric pressure readings
+  - Visibility range
+  - Temperature extremes (min/max)
+  - Auto-updating timestamps
+  - Air quality index
 
-- **Location Services:**
-  - Current location detection
-  - City search with autocomplete
-  - Search history tracking
-  - Favorite locations management
-
-- **User Preferences:**
-  - Temperature unit toggle (°C/°F)
-  - Dark/Light theme options
-  - Customizable display settings
-
-### 2. Weather Forecasts
-- **Hourly Forecast:**
-  - 24-hour prediction
+### 📊 Forecast Types
+- Hourly Forecast (24h):
   - Temperature trends
+  - Weather conditions
   - Precipitation probability
-  - Weather condition icons
-
-- **Daily Forecast:**
-  - 5-day weather outlook
+  - Wind patterns
+- Daily Forecast (5 days):
   - High/low temperatures
+  - Weather descriptions
   - Precipitation chances
   - Wind conditions
-
-- **Monthly Calendar:**
-  - Extended forecast view
+- Monthly Calendar View:
+  - Interactive calendar interface
+  - Daily weather overview
   - Temperature trends
-  - Historical data access
+  - Precipitation forecasts
 
-### 3. Interactive Maps
-- **Weather Layer Visualization:**
+### 🗺️ Weather Maps
+- Multiple visualization layers:
   - Temperature distribution
-  - Precipitation patterns
-  - Wind speed variations
-  - Pressure systems
+  - Precipitation intensity
+  - Wind speeds
+  - Atmospheric pressure
+- Interactive controls:
+  - Layer toggling
+  - Zoom levels
+  - Region selection
+- Real-time updates
+- Legend information
 
-## Technical Implementation
+### 🎨 Visual Features
+- Dynamic weather backgrounds
+- Animated weather effects:
+  - Rain animation
+  - Snow effects
+  - Cloud movements
+- Responsive layouts:
+  - Portrait/landscape adaptation
+  - Tablet optimization
+  - Desktop support
+- Accessibility features
 
-### Architecture
-```
-app/
-├── components/         # UI Components
-├── contexts/          # State Management
-├── services/          # API Services
-├── styles/           # Styling
-└── tabs/             # Navigation
-```
+### ⚙️ Technical Improvements
+- Enhanced performance
+- Offline capability
+- Data caching
+- Error handling
+- Loading states
+- Pull-to-refresh
+- Gesture navigation
+- Search optimization
 
-### Core Technologies
-- **Frontend Framework:**
-  - Expo
-  - React Native
-  - TypeScript
+## 🚀 Getting Started
 
-- **State Management:**
-  - React Context API
-  - AsyncStorage
+### Prerequisites
+- Node.js (v14+)
+- npm/yarn
+- Expo CLI
+- iOS: macOS + Xcode
+- Android: Android Studio + SDK
 
-- **UI Components:**
-  - React Native Vector Icons
-  - Expo Linear Gradient
-  - React Native Maps
+### Installation
 
-### API Integration
-```javascript
-const fetchCurrentWeather = async (latitude, longitude, units = 'metric') => {
-  try {
-    const response = await axios.get(
-      `${WEATHER_BASE_URL}/weather?lat=${latitude}&lon=${longitude}&units=${units}&appid=${WEATHER_API_KEY}`
-    );
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching weather:', error);
-    throw error;
-  }
-};
-```
-
-## Setup Instructions
-
-1. **Prerequisites:**
+1. Clone the repository:
 ```bash
-# Install Node.js (v14+)
-# Install Expo CLI
-npm install -g expo-cli
-```
-
-2. **Installation:**
-```bash
-# Clone repository
-git clone [repository-url]
+git clone https://github.com/BarbSouza/weather-app.git
 cd weather-app
+```
 
-# Install dependencies
+2. Install dependencies:
+```bash
 npm install
+```
 
-# Install Expo packages
+3. Install Expo packages:
+```bash
 npx expo install expo-location
 npx expo install @react-native-async-storage/async-storage
 npx expo install expo-linear-gradient
 npx expo install react-native-maps
 ```
 
-3. **Configuration:**
+4. Configuration:
 ```bash
 # Change to your API Key on api.js
 WEATHER_API_KEY=your_api_key_here
 ```
 
-4. **Running the App:**
+5. Running the App:
 ```bash
 # Start development server
 npx expo start
