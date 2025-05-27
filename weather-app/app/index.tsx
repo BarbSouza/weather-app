@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useState } from 'react';
 import {
   Text, View, TextInput, TouchableOpacity, ActivityIndicator,
-  ScrollView, SafeAreaView, StatusBar, Keyboard, FlatList
+  ScrollView, SafeAreaView, StatusBar, Keyboard, FlatList, Platform
 } from 'react-native';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { getStyles } from './styles/styles';
@@ -17,6 +17,7 @@ import { useTemperature } from './contexts/TemperatureContext';
 import { WeatherBackground } from './components/WeatherBackground';
 import { ResponsiveLayout, ResponsiveSection } from './components/ResponsiveLayout';
 import { useOrientation } from './components/OrientationHandler';
+import { useAnimations } from './_layout'; // Import the animations context
 
  /**
  * Main weather application component that displays current weather,
@@ -30,11 +31,13 @@ import { useOrientation } from './components/OrientationHandler';
  * - Responsive layout for portrait/landscape
  * - Dark/light theme support
  * - Temperature unit toggle
+ * - Animation toggle support
  */
 export default function Home() {
   const { isDarkTheme, toggleTheme } = useTheme();
   const { unit, toggleUnit, formatTemp } = useTemperature();
   const { isLandscape, isPortrait } = useOrientation();
+  const { animationsEnabled } = useAnimations(); // Get animation state
   const navigation = useNavigation();
   const styles = getStyles(isDarkTheme);
   const iconColor = isDarkTheme ? '#F1F5F9' : '#333';
@@ -124,19 +127,34 @@ export default function Home() {
       end={{ x: 0.4, y: 1 }}
       style={styles.container} 
     >
-      {/* Background weather effects */}
+      {/* Background weather effects with animation toggle */}
       {weatherData && (
         <WeatherBackground 
           weatherId={weatherData.weather[0].id} 
           isDarkTheme={isDarkTheme} 
+          animationsEnabled={animationsEnabled} // Pass animation state
         />
       )}
       
       {/* Main content sections */}
       {/* Search interface */}
-      <View style={[styles.searchContainer, isLandscape && { marginVertical: 10 }]}>
+      <View style={[
+        styles.searchContainer, 
+        isLandscape && Platform.OS !== 'web' && { 
+          marginVertical: 5,
+          maxWidth: 1000,
+          alignSelf: 'center'
+        }
+      ]}>
         <TextInput
-          style={styles.searchInput}
+          style={[
+            styles.searchInput,
+            isLandscape && Platform.OS !== 'web' && {
+              marginVertical: -15,
+              height: 25,
+              fontSize: 14
+            }
+          ]}
           placeholder="Search for a city"
           value={searchQuery}
           onChangeText={handleSearchInputChange}
@@ -151,13 +169,20 @@ export default function Home() {
           }}
         />
         <TouchableOpacity 
-          style={styles.searchButton} 
+          style={[
+            styles.searchButton,
+            isLandscape && Platform.OS !== 'web' && {
+              marginVertical: -15,
+              width: 25,
+              height: 25
+            }
+          ]} 
           onPress={handleSearchLocation}
         >
-          <Feather name="search" size={22} color="#fff" />
+          <Feather name="search" size={isLandscape && Platform.OS !== 'web' ? 18 : 22} color="#fff" />
         </TouchableOpacity>
       </View>
-      
+
       {/* Search History/Suggestions Popup */}
       <SearchHistory
         visible={showSearchHistory}
@@ -172,11 +197,25 @@ export default function Home() {
       />
       
       <TouchableOpacity 
-        style={[styles.locationButton, isLandscape && { marginVertical: 5 }]} 
+        style={[
+          styles.locationButton, 
+          isLandscape && Platform.OS !== 'web' && { 
+            marginVertical: 5,
+            paddingVertical: 6,
+            maxWidth: 300,
+            alignSelf: 'center',
+            height: 28
+          }
+        ]} 
         onPress={handleGetCurrentLocation}
       >
-        <Feather name="map-pin" size={18} color="#fff" />
-        <Text style={styles.locationButtonText}>Current Location</Text>
+        <Feather name="map-pin" size={isLandscape && Platform.OS !== 'web' ? 16 : 18} color="#fff" />
+        <Text style={[
+          styles.locationButtonText,
+          isLandscape && Platform.OS !== 'web' && {
+            fontSize: 13
+          }
+        ]}>Current Location</Text>
       </TouchableOpacity>
 
       {isLoading ? (

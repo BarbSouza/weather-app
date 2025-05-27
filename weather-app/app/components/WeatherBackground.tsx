@@ -4,11 +4,16 @@ import { View, Animated, StyleSheet, Dimensions } from 'react-native';
 interface WeatherBackgroundProps {
   weatherId: number;
   isDarkTheme: boolean;
+  animationsEnabled: boolean; // New prop to control animations
 }
 
 const { width, height } = Dimensions.get('window');
 
-export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId, isDarkTheme }) => {
+export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ 
+  weatherId, 
+  isDarkTheme, 
+  animationsEnabled 
+}) => {
   const raindrops = useRef(Array.from({ length: 15 }, () => new Animated.Value(0))).current;
   const snowflakes = useRef(Array.from({ length: 12 }, () => new Animated.Value(0))).current;
   const clouds = useRef(Array.from({ length: 3 }, () => new Animated.Value(0))).current;
@@ -33,7 +38,7 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId,
       return Animated.loop(
         Animated.timing(drop, {
           toValue: 1,
-          duration: 2000 + Math.random() * 1500, // Longer duration
+          duration: 2000 + Math.random() * 1500,
           useNativeDriver: true,
         }),
         { resetBeforeIteration: true }
@@ -49,7 +54,7 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId,
       return Animated.loop(
         Animated.timing(flake, {
           toValue: 1,
-          duration: 4000 + Math.random() * 3000, // Much longer duration
+          duration: 4000 + Math.random() * 3000,
           useNativeDriver: true,
         }),
         { resetBeforeIteration: true }
@@ -65,7 +70,7 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId,
       return Animated.loop(
         Animated.timing(cloud, {
           toValue: 1,
-          duration: 15000 + index * 3000, // Much longer duration
+          duration: 15000 + index * 3000,
           useNativeDriver: true,
         })
       );
@@ -78,6 +83,9 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId,
     // Stop and reset all animations first
     stopAllAnimations();
     resetAllAnimations();
+
+    // Only start animations if they are enabled
+    if (!animationsEnabled) return;
 
     // Small delay to ensure animations are properly reset
     const timer = setTimeout(() => {
@@ -99,10 +107,10 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId,
       clearTimeout(timer);
       stopAllAnimations();
     };
-  }, [weatherId]);
+  }, [weatherId, animationsEnabled]); // Added animationsEnabled to dependency array
 
   const renderRaindrops = () => {
-    if (weatherId < 200 || weatherId >= 600) return null;
+    if (!animationsEnabled || weatherId < 200 || weatherId >= 600) return null;
 
     return raindrops.map((drop, index) => (
       <Animated.View
@@ -130,7 +138,7 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId,
   };
 
   const renderSnowflakes = () => {
-    if (weatherId < 600 || weatherId >= 700) return null;
+    if (!animationsEnabled || weatherId < 600 || weatherId >= 700) return null;
 
     return snowflakes.map((flake, index) => (
       <Animated.View
@@ -164,7 +172,7 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId,
   };
 
   const renderClouds = () => {
-    if (weatherId < 801 || weatherId >= 900) return null;
+    if (!animationsEnabled || weatherId < 801 || weatherId >= 900) return null;
 
     return clouds.map((cloud, index) => (
       <Animated.View
