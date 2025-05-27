@@ -1,15 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  StyleSheet,
-  ActivityIndicator
+  View, Text, TouchableOpacity, FlatList,
+  StyleSheet, ActivityIndicator
 } from 'react-native';
 import { Feather, FontAwesome } from '@expo/vector-icons';
 import { FavoritesService } from '../services/FavoritesService';
 
+/**
+ * SearchHistory Component
+ * Displays a searchable list of cities with recent searches and favorites
+ * 
+ * @component
+ * @param {Object} props - Component properties
+ * @param {boolean} props.visible - Controls component visibility
+ * @param {string[]} props.history - Array of recent search history
+ * @param {Object[]} props.suggestions - Array of city suggestions
+ * @param {boolean} props.isLoadingSuggestions - Loading state for suggestions
+ * @param {boolean} props.showSuggestions - Controls suggestions visibility
+ * @param {Function} props.onSelectItem - Callback when history item is selected
+ * @param {Function} props.onSelectSuggestion - Callback when suggestion is selected
+ * @param {Function} props.onClearHistory - Callback to clear search history
+ * @param {Function} props.onDismiss - Callback to dismiss the component
+ */
 const SearchHistory = ({
   visible,
   history,
@@ -21,9 +33,13 @@ const SearchHistory = ({
   onClearHistory,
   onDismiss
 }) => {
+  /** @state {string[]} favorites - List of favorite cities */
   const [favorites, setFavorites] = useState([]);
 
-  // Load favorites from storage
+  /**
+   * Loads favorite cities from persistent storage
+   * @async
+   */
   const loadFavorites = async () => {
     try {
       const favoriteCities = await FavoritesService.getFavorites();
@@ -33,7 +49,11 @@ const SearchHistory = ({
     }
   };
 
-  // Toggle favorite status
+  /**
+   * Toggles favorite status for a city
+   * @async
+   * @param {string} city - City name to toggle
+   */
   const toggleFavorite = async (city) => {
     try {
       const newStatus = await FavoritesService.toggleFavorite(city);
@@ -47,14 +67,14 @@ const SearchHistory = ({
     }
   };
 
-  // Load favorites on mount and when visible changes
+  /** Load favorites when component becomes visible */
   useEffect(() => {
     if (visible) {
       loadFavorites();
     }
   }, [visible]);
 
-    if (!visible) return null;
+  if (!visible) return null;
 
   // If showing suggestions
   if (showSuggestions) {
@@ -121,6 +141,11 @@ const SearchHistory = ({
   // Combine history and favorites (de-duplicate)
   const combinedList = [...new Set([...history, ...favorites])];
 
+  /**
+   * Renders an individual history item
+   * @param {Object} params - Render item parameters
+   * @param {string} params.item - City name to render
+   */
   const renderHistoryItem = ({ item }) => (
     <View style={styles.historyItem}>
       <TouchableOpacity
@@ -169,7 +194,15 @@ const SearchHistory = ({
   );
 };
 
+/**
+ * Component styles
+ * Defines appearance for search history and suggestions
+ */
 const styles = StyleSheet.create({
+  /**
+   * Overlay container
+   * Positions the component above other content
+   */
   overlay: {
     position: 'absolute',
     top: 80,
@@ -179,6 +212,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
     borderRadius: 8,
   },
+
+  /**
+   * Main container
+   * Holds the list and header components
+   */
   container: {
     backgroundColor: '#fff',
     borderRadius: 8,
