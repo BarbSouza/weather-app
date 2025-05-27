@@ -18,15 +18,27 @@ import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { LinearGradient } from 'expo-linear-gradient';
 
+/**
+ * Hourly Forecast Screen
+ * Displays detailed weather predictions for the next 24 hours
+ * Features:
+ * - Hour-by-hour temperature
+ * - Precipitation probability
+ * - Weather conditions
+ * - Theme-aware styling
+ */
 export default function Hourly() {
   const { hourlyForecastData, isLoading, errorMsg, weatherData } = useWeather();
-  const { isDarkTheme, toggleTheme } = useTheme();
+  const { isDarkTheme } = useTheme();
   const { unit } = useTemperature();
   const navigation = useNavigation();
-  //const iconColor = isDarkTheme ? '#F1F5F9' : 'pink'
-  const styles = getStyles(isDarkTheme); // Dynamic styles
+  const styles = getStyles(isDarkTheme);
 
-  // Convert temperature based on unit
+  /**
+   * Converts temperature to selected unit
+   * @param temp Temperature in Celsius
+   * @returns Converted and rounded temperature
+   */
   const convertTemp = (temp: number): number => {
     if (unit === 'F') {
       return Math.round((temp * 9/5) + 32);
@@ -34,13 +46,13 @@ export default function Hourly() {
     return Math.round(temp);
   };
 
-  // Get temperature unit symbol
-  const getTempUnit = (): string => {
-    return unit;
-  };
+  /**
+   * Gets current temperature unit symbol
+   */
+  const getTempUnit = (): string => unit;
 
   return (
-      <LinearGradient
+    <LinearGradient
       colors={isDarkTheme ? ['#277ea5', '#0d0f12'] : ['#7fd7ff', '#fff']}
       start={{ x: 0.4, y: 0 }}
       end={{ x: 0.4, y: 1 }}
@@ -48,7 +60,7 @@ export default function Hourly() {
     >
       <SafeAreaView style={{ flex: 1 }}>
 
-      {/* Location Name Header */}
+      {/* Location Header */}
       {weatherData && (
         <View style={styles.locationHeaderContainer}>
           <Text style={styles.locationHeaderText}>
@@ -57,6 +69,7 @@ export default function Hourly() {
         </View>
       )}
 
+      {/* Content States */}
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#0066cc" />
@@ -71,6 +84,7 @@ export default function Hourly() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollViewContent}
         >
+          {/* Hourly Forecast List */}
           <View style={styles.forecastContainer}>
             <Text style={styles.forecastTitle}>Hourly Forecast</Text>
             
@@ -100,7 +114,7 @@ export default function Hourly() {
             ))}
           </View>
           
-          {/* Additional Information */}
+          {/* Forecast Information */}
           <View style={[styles.forecastContainer, { marginTop: 16 }]}>
             <Text style={styles.forecastTitle}>About Hourly Forecast</Text>
             <Text style={styles.forecastInfoText}>
