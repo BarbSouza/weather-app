@@ -85,6 +85,7 @@ export default function AppLayout() {
             color="#fff"
           />
         </TouchableOpacity>
+        {Platform.OS !== 'web' && (
         <TouchableOpacity onPress={toggleOrientation}>
           <MaterialCommunityIcons
             name={isLandscape ? "phone-rotate-portrait" : "phone-rotate-landscape"}
@@ -92,6 +93,7 @@ export default function AppLayout() {
             color="#fff"
           />
         </TouchableOpacity>
+        )}
       </View>
     );
   };
