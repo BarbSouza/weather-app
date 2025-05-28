@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-  ActivityIndicator,
-  SafeAreaView,
+  View, Text, StyleSheet, Image, ScrollView,
+  TouchableOpacity, Dimensions, ActivityIndicator, SafeAreaView,
 } from 'react-native';
 import { WEATHER_API_KEY } from '../services/api';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -17,10 +10,11 @@ import { useWeather } from '../contexts/WeatherContext';
 import { useTemperature } from '../contexts/TemperatureContext';
 import { useTheme } from '../contexts/ThemeContext';
 
-// Screen dimensions for the map
+/** Screen dimensions configuration */
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const MAP_HEIGHT = 280;
 
+/** Map layer configuration interface */
 interface MapLayer {
   id: string;
   name: string;
@@ -29,7 +23,7 @@ interface MapLayer {
   unit: string;
 }
 
-// Add interface for weather data structure to handle optional properties
+/** Weather data structure interfaces */
 interface WeatherDataRain {
   '1h'?: number;
   '3h'?: number;
@@ -44,6 +38,16 @@ interface WeatherDataClouds {
   all?: number;
 }
 
+/**
+ * WeatherMaps Component
+ * Displays interactive weather maps with different layers and zoom levels
+ * Features:
+ * - Multiple weather layer types (temperature, precipitation, wind, etc.)
+ * - Adjustable zoom levels
+ * - Current weather value display
+ * - Detailed map legend
+ * - Theme-aware styling
+ */
 const WeatherMaps = () => {
   const { weatherData } = useWeather();
   const { formatTemp, unit } = useTemperature();
@@ -51,12 +55,12 @@ const WeatherMaps = () => {
   const [mapType, setMapType] = useState('TA2');
   const [zoom, setZoom] = useState(4);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // City coordinates from weather data
+
+  /** Location coordinates from weather data */
   const lat = weatherData?.coord?.lat || 0;
   const lon = weatherData?.coord?.lon || 0;
-  
-  // Map layer options with corresponding weather data keys
+
+  /** Available map layer configurations */
   const mapLayers: MapLayer[] = [
     { id: 'TA2', name: 'Temperature', icon: 'thermometer', weatherKey: 'temp', unit: `°${unit}` },
     { id: 'PR0', name: 'Precipitation', icon: 'cloud-rain', weatherKey: 'rain', unit: 'mm/h' },
@@ -65,17 +69,19 @@ const WeatherMaps = () => {
     { id: 'APM', name: 'Pressure', icon: 'activity', weatherKey: 'pressure', unit: 'hPa' },
   ];
 
-  // Map zoom options
+  /** Zoom level options */
   const zoomLevels = [
     { level: 2, name: 'Wide' },
     { level: 4, name: 'Regional' },
     { level: 6, name: 'Local' },
     { level: 8, name: 'Close' },
   ];
-  
-  // Generate correct OpenWeatherMap URL using Maps API 2.0
+
+  /**
+   * Generates OpenWeatherMap URL for current map settings
+   * Converts coordinates to tile system
+   */
   const generateMapUrl = () => {
-    // Convert lat/lon to tile coordinates
     const tileX = Math.floor((lon + 180) / 360 * Math.pow(2, zoom));
     const latRad = lat * Math.PI / 180;
     const tileY = Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * Math.pow(2, zoom));
@@ -83,7 +89,10 @@ const WeatherMaps = () => {
     return `http://maps.openweathermap.org/maps/2.0/weather/${mapType}/${zoom}/${tileX}/${tileY}?appid=${WEATHER_API_KEY}`;
   };
 
-  // Get current weather value for selected map type
+  /**
+   * Gets current weather value based on selected map type
+   * Handles different data structures for each weather parameter
+   */
   const getCurrentWeatherValue = () => {
     if (!weatherData) return null;
     
@@ -137,7 +146,10 @@ const WeatherMaps = () => {
     }
   };
 
-  // Enhanced legend information based on map type
+  /**
+   * Provides legend information for current map type
+   * Includes color scales and value ranges
+   */
   const getLegendInfo = () => {
     switch (mapType) {
       case 'PR0':
@@ -217,7 +229,7 @@ const WeatherMaps = () => {
     }
   };
 
-  // Load new map when type or zoom changes
+  /** Manage map loading state */
   useEffect(() => {
     if (weatherData?.coord) {
       setIsLoading(true);
@@ -229,7 +241,8 @@ const WeatherMaps = () => {
   }, [mapType, zoom, weatherData]);
 
   /**
-   * Wrapper component for consistent gradient background
+   * GradientWrapper Component
+   * Provides consistent gradient background based on theme
    */
   const GradientWrapper = ({ children }: { children: React.ReactNode }) => (
     <LinearGradient
