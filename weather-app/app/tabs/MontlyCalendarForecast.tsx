@@ -1,66 +1,61 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import {
-  Text,
-  View,
-  ScrollView,
-  TouchableOpacity,
-  ActivityIndicator,
-  SafeAreaView,
-  StatusBar,
+  Text, View, ScrollView, TouchableOpacity,
+  ActivityIndicator, SafeAreaView, StatusBar,
 } from 'react-native';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
-import { getStyles } from './styles';
-import { useWeather } from './WeatherContext';
-import { WeatherIcon, formatPrecipitation } from './components/WeatherUtils';
-import { useTheme } from './ThemeContext';
-import { useTemperature } from './TemperatureContext';
+import { getStyles } from '../styles/styles';
+import { useWeather } from '../contexts/WeatherContext';
+import { WeatherIcon, formatPrecipitation } from '../components/WeatherUtils';
+import { useTheme } from '../contexts/ThemeContext';
+import { useTemperature } from '../contexts/TemperatureContext';
 import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
+/** Calendar constants */
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-const getTemperatureValue = (forecast: any, type: 'high' | 'low' | 'average') => {
-  // Try different possible data structures
+/**
+ * Extracts temperature value from forecast data based on type
+ * Handles different API response structures and provides fallback estimates
+ */
+const getTemperatureValue = (forecast: any, type: 'high' | 'low' | 'average'): number | null => {
   if (forecast.temp) {
-    if (type === 'high' && forecast.temp.max !== undefined) {
-      return forecast.temp.max;
-    }
-    if (type === 'low' && forecast.temp.min !== undefined) {
-      return forecast.temp.min;
-    }
-    if (type === 'average' && forecast.temp.average !== undefined) {
-      return forecast.temp.average;
-    }
+    if (type === 'high' && forecast.temp.max !== undefined) return forecast.temp.max;
+    if (type === 'low' && forecast.temp.min !== undefined) return forecast.temp.min;
+    if (type === 'average' && forecast.temp.average !== undefined) return forecast.temp.average;
   }
   
-  // Check main object (daily forecast structure)
   if (forecast.main) {
-    if (type === 'high' && forecast.main.temp_max !== undefined) {
-      return forecast.main.temp_max;
-    }
-    if (type === 'low' && forecast.main.temp_min !== undefined) {
-      return forecast.main.temp_min;
-    }
-    if (type === 'average' && forecast.main.temp !== undefined) {
-      return forecast.main.temp;
-    }
+    if (type === 'high' && forecast.main.temp_max !== undefined) return forecast.main.temp_max;
+    if (type === 'low' && forecast.main.temp_min !== undefined) return forecast.main.temp_min;
+    if (type === 'average' && forecast.main.temp !== undefined) return forecast.main.temp;
   }
   
-  // Fallback estimates based on average temperature
   if (forecast.temp?.average !== undefined) {
     const avg = forecast.temp.average;
-    if (type === 'high') return avg + 3; // Estimate high as average + 3°
-    if (type === 'low') return avg - 3;  // Estimate low as average - 3°
+    if (type === 'high') return avg + 3;
+    if (type === 'low') return avg - 3;
     if (type === 'average') return avg;
   }
   
   return null;
 };
 
+/**
+ * Monthly Calendar Forecast Component
+ * Displays an interactive calendar with daily weather forecasts
+ * Features:
+ * - Monthly navigation
+ * - Daily weather overview
+ * - Detailed daily forecast view
+ * - Temperature unit conversion
+ * - Theme support
+ */
 export default function MonthlyCalendarForecast() {
   const { monthlyForecastData, isLoading, errorMsg } = useWeather();
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
@@ -71,26 +66,23 @@ export default function MonthlyCalendarForecast() {
   const { isDarkTheme, toggleTheme } = useTheme();
   const { unit, toggleUnit, formatTemp } = useTemperature();
   const navigation = useNavigation();
-    
-  const styles = getStyles(isDarkTheme); // Dynamic styles
+  
+  const styles = getStyles(isDarkTheme);
 
-  // Create calendar grid for month view
+  /** Generate calendar grid for current month */
   useEffect(() => {
     const firstDayOfMonth = new Date(selectedYear, selectedMonth, 1).getDay();
     const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
     
     const days = [];
-    // Add empty cells for days before the first day of month
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push({ day: null, isEmpty: true });
     }
     
-    // Add actual days of month
     for (let i = 1; i <= daysInMonth; i++) {
       const currentDate = new Date(selectedYear, selectedMonth, i);
       const timestamp = Math.floor(currentDate.getTime() / 1000);
       
-      // Find weather forecast for this day if available
       const forecast = monthlyForecastData.find(f => {
         const forecastDate = new Date(f.dt * 1000);
         return forecastDate.getDate() === i && 

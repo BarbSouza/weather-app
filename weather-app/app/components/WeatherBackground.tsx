@@ -1,108 +1,123 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, StyleSheet, Dimensions } from 'react-native';
 
+/**
+ * Weather condition codes:
+ * 200-599: Rain and thunderstorms
+ * 600-699: Snow
+ * 800: Clear sky
+ * 801-899: Clouds
+ */
+
 interface WeatherBackgroundProps {
+  /** Weather condition code from OpenWeather API */
   weatherId: number;
+  /** Current theme state */
   isDarkTheme: boolean;
+  /** Controls whether animations are enabled */
+  animationsEnabled: boolean;
 }
 
 const { width, height } = Dimensions.get('window');
 
-export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId, isDarkTheme }) => {
+/**
+ * Animated weather background component
+ * Renders dynamic weather effects based on weather condition
+ * Supports rain, snow, and cloud animations with theme awareness
+ */
+export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ 
+  weatherId, 
+  isDarkTheme, 
+  animationsEnabled 
+}) => {
   const raindrops = useRef(Array.from({ length: 15 }, () => new Animated.Value(0))).current;
   const snowflakes = useRef(Array.from({ length: 12 }, () => new Animated.Value(0))).current;
   const clouds = useRef(Array.from({ length: 3 }, () => new Animated.Value(0))).current;
 
-  // Stop all animations
+  /**
+   * Animation control functions
+   */
   const stopAllAnimations = () => {
     raindrops.forEach(drop => drop.stopAnimation());
     snowflakes.forEach(flake => flake.stopAnimation());
     clouds.forEach(cloud => cloud.stopAnimation());
   };
 
-  // Reset all animations
   const resetAllAnimations = () => {
     raindrops.forEach(drop => drop.setValue(0));
     snowflakes.forEach(flake => flake.setValue(0));
     clouds.forEach(cloud => cloud.setValue(0));
   };
 
-  // Rain animation
+  /**
+   * Weather effect animations
+   */
   const startRainAnimation = () => {
-    const animations = raindrops.map((drop, index) => {
-      return Animated.loop(
+    const animations = raindrops.map(drop => 
+      Animated.loop(
         Animated.timing(drop, {
           toValue: 1,
-          duration: 2000 + Math.random() * 1500, // Longer duration
+          duration: 2000 + Math.random() * 1500,
           useNativeDriver: true,
         }),
         { resetBeforeIteration: true }
-      );
-    });
-
+      )
+    );
     Animated.stagger(150, animations).start();
   };
 
-  // Snow animation
   const startSnowAnimation = () => {
-    const animations = snowflakes.map((flake, index) => {
-      return Animated.loop(
+    const animations = snowflakes.map(flake => 
+      Animated.loop(
         Animated.timing(flake, {
           toValue: 1,
-          duration: 4000 + Math.random() * 3000, // Much longer duration
+          duration: 4000 + Math.random() * 3000,
           useNativeDriver: true,
         }),
         { resetBeforeIteration: true }
-      );
-    });
-
+      )
+    );
     Animated.stagger(300, animations).start();
   };
 
-  // Cloud animation
   const startCloudAnimation = () => {
-    const animations = clouds.map((cloud, index) => {
-      return Animated.loop(
+    clouds.map(cloud => 
+      Animated.loop(
         Animated.timing(cloud, {
           toValue: 1,
-          duration: 15000 + index * 3000, // Much longer duration
+          duration: 15000 + Math.random() * 3000,
           useNativeDriver: true,
         })
-      );
-    });
-
-    animations.forEach(animation => animation.start());
+      ).start()
+    );
   };
 
+  /**
+   * Weather effect lifecycle management
+   */
   useEffect(() => {
-    // Stop and reset all animations first
     stopAllAnimations();
     resetAllAnimations();
 
-    // Small delay to ensure animations are properly reset
+    if (!animationsEnabled) return;
+
     const timer = setTimeout(() => {
-      // Rain conditions (thunderstorm, drizzle, rain)
-      if (weatherId >= 200 && weatherId < 600) {
-        startRainAnimation();
-      }
-      // Snow conditions
-      else if (weatherId >= 600 && weatherId < 700) {
-        startSnowAnimation();
-      }
-      // Cloudy conditions (not clear sky)
-      else if (weatherId >= 801 && weatherId < 900) {
-        startCloudAnimation();
-      }
+      if (weatherId >= 200 && weatherId < 600) startRainAnimation();
+      else if (weatherId >= 600 && weatherId < 700) startSnowAnimation();
+      else if (weatherId >= 801 && weatherId < 900) startCloudAnimation();
     }, 100);
 
     return () => {
       clearTimeout(timer);
       stopAllAnimations();
     };
-  }, [weatherId]);
+  }, [weatherId, animationsEnabled]);
 
+  /**
+   * Weather effect rendering functions
+   */
   const renderRaindrops = () => {
-    if (weatherId < 200 || weatherId >= 600) return null;
+    if (!animationsEnabled || weatherId < 200 || weatherId >= 600) return null;
 
     return raindrops.map((drop, index) => (
       <Animated.View
@@ -130,7 +145,7 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId,
   };
 
   const renderSnowflakes = () => {
-    if (weatherId < 600 || weatherId >= 700) return null;
+    if (!animationsEnabled || weatherId < 600 || weatherId >= 700) return null;
 
     return snowflakes.map((flake, index) => (
       <Animated.View
@@ -164,7 +179,7 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId,
   };
 
   const renderClouds = () => {
-    if (weatherId < 801 || weatherId >= 900) return null;
+    if (!animationsEnabled || weatherId < 801 || weatherId >= 900) return null;
 
     return clouds.map((cloud, index) => (
       <Animated.View
@@ -200,6 +215,9 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherId,
   );
 };
 
+/**
+ * Component styles
+ */
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',

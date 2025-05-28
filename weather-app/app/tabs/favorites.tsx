@@ -1,22 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
-  RefreshControl,
-  StyleSheet,
+  View, Text, FlatList, TouchableOpacity, ActivityIndicator,
+  Alert, RefreshControl, StyleSheet,
 } from 'react-native';
 import { MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
-import { FavoritesService } from './FavoritesService';
-import { searchLocation } from './api';
+import { FavoritesService } from '../services/FavoritesService';
+import { searchLocation } from '../services/api';
 import { useFocusEffect } from '@react-navigation/native';
-import { useTemperature } from './TemperatureContext';
+import { useTemperature } from '../contexts/TemperatureContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTheme } from './ThemeContext'; 
+import { useTheme } from '../contexts/ThemeContext';
 
+/**
+ * Weather data structure for favorite cities
+ */
 interface WeatherData {
   city: string;
   temperature: number;
@@ -27,32 +24,41 @@ interface WeatherData {
   feelsLike: number;
 }
 
+/**
+ * Favorites Screen Component
+ * Displays a list of favorite cities with their current weather information
+ * Features:
+ * - Pull to refresh
+ * - Remove favorites
+ * - Auto-refresh on screen focus
+ * - Fallback states for loading and errors
+ */
 const Favorites: React.FC = () => {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [weatherData, setWeatherData] = useState<Record<string, WeatherData>>({});
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { isDarkTheme } = useTheme();
-  
-
   const { unit } = useTemperature();
 
-  // Load favorites from storage
+  /**
+   * Loads favorite cities from persistent storage
+   */
   const loadFavorites = useCallback(async () => {
     try {
       const favoriteCities = await FavoritesService.getFavorites();
-      console.log('Loaded favorites:', favoriteCities);
       setFavorites(favoriteCities);
     } catch (error) {
       console.error('Error loading favorites:', error);
     }
   }, []);
 
-  // Fetch weather for a single city using your existing API
+  /**
+   * Fetches current weather data for a single city
+   * @param city - City name to fetch weather for
+   */
   const fetchCityWeather = async (city: string): Promise<WeatherData | null> => {
     try {
-      console.log(`Fetching weather for: ${city}`);
-      
       const unitParam = unit === 'C' ? 'metric' : 'imperial';
       const data = await searchLocation(city, unitParam);
       
@@ -67,7 +73,6 @@ const Favorites: React.FC = () => {
       };
     } catch (error) {
       console.error(`Error fetching weather for ${city}:`, error);
-      // Return fallback data instead of null
       return {
         city,
         temperature: 0,
@@ -80,7 +85,10 @@ const Favorites: React.FC = () => {
     }
   };
 
-  // Fetch weather for all favorites
+  /**
+   * Fetches weather data for all favorite cities
+   * Implements rate limiting to avoid API throttling
+   */
   const fetchAllWeatherData = useCallback(async () => {
     if (favorites.length === 0) {
       setWeatherData({});
@@ -91,19 +99,13 @@ const Favorites: React.FC = () => {
     
     try {
       const weatherMap: Record<string, WeatherData> = {};
-      
-      // Fetch weather data sequentially to avoid rate limiting
       for (const city of favorites) {
         const result = await fetchCityWeather(city);
         if (result) {
-          // Use the original search term as key, but display the API result name
           weatherMap[city] = result;
         }
-        // Small delay between requests to avoid rate limiting
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-      
-      console.log('Weather map:', weatherMap);
       setWeatherData(weatherMap);
     } catch (error) {
       console.error('Error fetching weather data:', error);
@@ -192,14 +194,19 @@ const Favorites: React.FC = () => {
     }
   }, [fetchAllWeatherData]);
 
-  // Render favorite item
+  /**
+   * Renders an individual favorite city item with weather data
+   */
   const renderFavoriteItem = ({ item }: { item: string }) => {
     const weather = weatherData[item];
     
     return (
-      <View style={styles.favoriteItem}>
+      <View style={[
+      styles.favoriteItem,
+      { backgroundColor: isDarkTheme ? '#1e293b57' : '#ffffff59' }
+    ]}>
         <View style={styles.favoriteLeft}>
-          <Text style={styles.favoriteCityName}>
+         <Text style={[styles.favoriteCityName, { color: isDarkTheme ? 'white' : 'black' }]}>
             {weather ? weather.city : item}
           </Text>
           {weather ? (
@@ -208,31 +215,31 @@ const Favorites: React.FC = () => {
                 <MaterialCommunityIcons
                   name={getWeatherIcon(weather.icon)}
                   size={40}
-                  color={isDarkTheme ? '#F1F5F9' : '#333'}
+                  color={isDarkTheme ? '#71aaac' : '#71aaac'} 
                 />
                 <View style={styles.favoriteTempContainer}>
-                  <Text style={styles.favoriteTemp}>
+                  <Text style={[styles.favoriteTemp, { color: isDarkTheme ? 'white' : 'black' }]}>
                     {weather.temperature}°{unit}
                   </Text>
-                  <Text style={styles.favoriteDescription}>
+                  <Text style={[styles.favoriteDescription, { color: isDarkTheme ? 'white' : 'black' }]}>
                     {weather.description}
                   </Text>
                 </View>
               </View>
               <View style={styles.favoriteDetails}>
-                <Text style={styles.favoriteDetailText}>
+                <Text style={[styles.favoriteDetailText, { color: isDarkTheme ? 'white' : 'black' }]}>
                   Feels like {weather.feelsLike}°{unit}
                 </Text>
-                <Text style={styles.favoriteDetailText}>
+                <Text style={[styles.favoriteDetailText, { color: isDarkTheme ? 'white' : 'black' }]}>
                   Humidity: {weather.humidity}%
                 </Text>
-                <Text style={styles.favoriteDetailText}>
+                <Text style={[styles.favoriteDetailText, { color: isDarkTheme ? 'white' : 'black' }]}>
                   Wind: {weather.windSpeed} {unit === 'C' ? 'm/s' : 'mph'}
                 </Text>
               </View>
             </View>
           ) : (
-            <Text style={styles.favoriteNoData}>
+           <Text style={[styles.favoriteNoData, { color: isDarkTheme ? 'white' : 'black' }]}>
               {loading ? 'Loading weather...' : 'Weather data unavailable'}
             </Text>
           )}
@@ -249,6 +256,9 @@ const Favorites: React.FC = () => {
     );
   };
 
+  /**
+   * Wrapper component for consistent gradient background
+   */
   const GradientWrapper = ({ children }: { children: React.ReactNode }) => (
     <LinearGradient
       colors={isDarkTheme ? ['#277ea5', '#0d0f12'] : ['#7fd7ff', '#fff']}
@@ -313,21 +323,24 @@ const Favorites: React.FC = () => {
   );
 };
 
+/**
+ * Styles for the Favorites component
+ * Supports both light and dark themes
+ */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor removed for gradient
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    //backgroundColor: '#f5f5f5',
+    
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    //color: isDarkTheme ? '#F1F5F9' : '#333',
+    
   },
   emptyStateContainer: {
     flex: 1,
@@ -341,13 +354,12 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 24,
     fontWeight: 'bold',
-    //color: isDarkTheme ? '#F1F5F9' : '#333',
+    
     marginBottom: 8,
     textAlign: 'center',
   },
   emptyStateDescription: {
     fontSize: 16,
-    color: '#666',
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -355,7 +367,6 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   favoriteItem: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -374,7 +385,6 @@ const styles = StyleSheet.create({
   favoriteCityName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 8,
   },
   favoriteWeatherInfo: {
@@ -391,11 +401,9 @@ const styles = StyleSheet.create({
   favoriteTemp: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
   },
   favoriteDescription: {
     fontSize: 14,
-    color: '#666',
     textTransform: 'capitalize',
     marginTop: 2,
   },
@@ -407,11 +415,9 @@ const styles = StyleSheet.create({
   },
   favoriteDetailText: {
     fontSize: 12,
-    color: '#888',
   },
   favoriteNoData: {
     fontSize: 14,
-    color: '#888',
     fontStyle: 'italic',
   },
   favoriteRemoveButton: {

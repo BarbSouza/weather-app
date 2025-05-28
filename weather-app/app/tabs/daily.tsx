@@ -1,34 +1,50 @@
 import React, { useLayoutEffect, useState } from 'react';
 import {
-  Text,
-  View,
-  ActivityIndicator,
-  ScrollView,
-  SafeAreaView,
-  StatusBar,
-  TouchableOpacity,
+  Text, View, ActivityIndicator, ScrollView,
+  SafeAreaView, StatusBar, TouchableOpacity,
 } from 'react-native';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { getStyles } from './styles';
-import { useWeather } from './WeatherContext';
-import { WeatherIcon, formatDate, formatPrecipitation } from './components/WeatherUtils';
-import MonthlyCalendarForecast from './MontlyCalendarForecast'; 
-import { useTheme } from './ThemeContext';
-import { useTemperature } from './TemperatureContext';
-import { useNavigation } from 'expo-router';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { LinearGradient } from 'expo-linear-gradient';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { useNavigation } from 'expo-router';
+import { getStyles } from '../styles/styles';
+import { useWeather } from '../contexts/WeatherContext';
+import { useTheme } from '../contexts/ThemeContext';
+import { useTemperature } from '../contexts/TemperatureContext';
+import { WeatherIcon, formatDate, formatPrecipitation } from '../components/WeatherUtils';
+import MonthlyCalendarForecast from './MontlyCalendarForecast';
 
+/**
+ * Daily Weather Forecast Screen
+ * Displays either a 5-day weather forecast or 30-day climate forecast
+ * Features:
+ * - Toggle between 5-day and 30-day views
+ * - Temperature unit conversion
+ * - Detailed daily weather information
+ * - Precipitation probability
+ */
 export default function Daily() {
-  const { isDarkTheme, toggleTheme } = useTheme();
+  const { isDarkTheme } = useTheme();
   const { unit } = useTemperature();
   const navigation = useNavigation();
-  const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
-  const styles = getStyles(isDarkTheme); // Dynamic styles
-  const { dailyForecastData, monthlyForecastData, isLoading, errorMsg, weatherData } = useWeather();
+  const styles = getStyles(isDarkTheme);
+  const iconColor = isDarkTheme ? '#F1F5F9' : '#333';
+  
+  const {
+    dailyForecastData,
+    monthlyForecastData,
+    isLoading,
+    errorMsg,
+    weatherData
+  } = useWeather();
+  
   const [showMonthly, setShowMonthly] = useState(false);
 
-  // Convert temperature based on unit
+  /**
+   * Converts temperature to selected unit (C/F)
+   * @param temp - Temperature in Celsius
+   * @returns Rounded temperature in selected unit
+   */
   const convertTemp = (temp: number): number => {
     if (unit === 'F') {
       return Math.round((temp * 9/5) + 32);
@@ -36,21 +52,10 @@ export default function Daily() {
     return Math.round(temp);
   };
 
-  // Get temperature unit symbol
-  const getTempUnit = (): string => {
-    return unit;
-  };
-
-  // Format date for monthly forecast (could be different from daily format)
-  const formatMonthlyDate = (timestamp: number): string => {
-    const date = new Date(timestamp * 1000);
-    const options: Intl.DateTimeFormatOptions = { weekday: 'short', month: 'short', day: 'numeric' };
-    return date.toLocaleDateString('en-US', options);
-  };
-
-  const toggleForecastType = () => {
-    setShowMonthly(!showMonthly);
-  };
+  /**
+   * Gets current temperature unit symbol
+   */
+  const getTempUnit = (): string => unit;
 
   return (
     <LinearGradient
@@ -61,15 +66,16 @@ export default function Daily() {
     >
       <SafeAreaView style={{ flex: 1 }}>
         <StatusBar barStyle="light-content" />
-      {/* Location Name Header */}
-      {weatherData && (
-        <View style={styles.locationHeaderContainer}>
-          <Text style={styles.locationHeaderText}>
-            {weatherData.name}, {weatherData.sys.country}
-          </Text>
-        </View>
-      )}
 
+        {weatherData && (
+          <View style={styles.locationHeaderContainer}>
+            <Text style={styles.locationHeaderText}>
+              {weatherData.name}, {weatherData.sys.country}
+            </Text>
+          </View>
+        )}
+
+        {/* Forecast Type Toggle */}
         <View style={styles.toggleContainer}>
           <TouchableOpacity
             style={[

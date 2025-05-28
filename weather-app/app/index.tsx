@@ -1,39 +1,51 @@
 import React, { useLayoutEffect, useState } from 'react';
 import {
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
-  ActivityIndicator,
-  ScrollView,
-  SafeAreaView,
-  StatusBar,
-  Keyboard,
-  FlatList
+  Text, View, TextInput, TouchableOpacity, ActivityIndicator,
+  ScrollView, SafeAreaView, StatusBar, Keyboard, FlatList, Platform
 } from 'react-native';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
-import { getStyles } from './styles';
-import { useWeather } from './WeatherContext';
+import { getStyles } from './styles/styles';
+import { useWeather } from './contexts/WeatherContext';
 import { WeatherIcon, formatHour, formatDate, formatPrecipitation } from './components/WeatherUtils';
-import SearchHistory from './SearchHistory';
+import SearchHistory from './components/SearchHistory';
 import { useNavigation } from 'expo-router';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import { useTheme } from './ThemeContext'; 
+import { useTheme } from './contexts/ThemeContext'; 
 import { LinearGradient } from 'expo-linear-gradient';
 import { TemperatureDisplay } from './components/TemperatureDisplay';
-import { useTemperature } from './TemperatureContext';
+import { useTemperature } from './contexts/TemperatureContext';
 import { WeatherBackground } from './components/WeatherBackground';
+import { ResponsiveLayout, ResponsiveSection } from './components/ResponsiveLayout';
+import { useOrientation } from './components/OrientationHandler';
+import { useAnimations } from './_layout'; // Import the animations context
 
+ /**
+ * Main weather application component that displays current weather,
+ * hourly forecast, and daily forecast information.
+ * 
+ * Features:
+ * - Current weather display
+ * - Location search with suggestions
+ * - Search history
+ * - Hourly and 5-day forecast
+ * - Responsive layout for portrait/landscape
+ * - Dark/light theme support
+ * - Temperature unit toggle
+ * - Animation toggle support
+ */
 export default function Home() {
   const { isDarkTheme, toggleTheme } = useTheme();
   const { unit, toggleUnit, formatTemp } = useTemperature();
+  const { isLandscape, isPortrait } = useOrientation();
+  const { animationsEnabled } = useAnimations(); // Get animation state
   const navigation = useNavigation();
-  const styles = getStyles(isDarkTheme); 
-  const iconColor = isDarkTheme ? '#F1F5F9' : '#333'
+  const styles = getStyles(isDarkTheme);
+  const iconColor = isDarkTheme ? '#F1F5F9' : '#333';
 
-  const { 
-    weatherData, 
-    hourlyForecastData, 
+  // Weather context values and handlers
+  const {
+    weatherData,
+    hourlyForecastData,
     dailyForecastData,
     isLoading, 
     errorMsg, 
@@ -54,8 +66,12 @@ export default function Home() {
     handleSelectSuggestion
   } = useWeather();
 
+  /**
+   * Renders an individual hourly forecast item
+   * @param {Object} param0 - Destructured item object containing forecast data
+   */
   const renderHourlyItem = ({ item }: { item: any }) => (
-    <View style={styles.hourlyItem}>
+    <View style={[styles.hourlyItem, isLandscape && { width: 80 }]}>
       <Text style={styles.hourlyTime}>{formatHour(item.dt)}</Text>
       <WeatherIcon weatherId={item.weather[0].id} size={22} />
       <Text style={styles.hourlyTemp}>{formatTemp(item.temp)}</Text>
@@ -66,9 +82,12 @@ export default function Home() {
     </View>
   );
 
-  
+  /**
+   * Renders an individual daily forecast item
+   * @param {Object} param0 - Destructured item object containing forecast data
+   */
   const renderDailyItem = ({ item }: { item: any }) => (
-    <View style={styles.dailyItem}>
+    <View style={[styles.dailyItem, isLandscape && { width: 120 }]}>
       <Text style={styles.dailyDay}>{formatDate(item.dt)}</Text>
       <WeatherIcon weatherId={item.weather[0].id} size={22} />
       <View style={styles.dailyTempContainer}>
@@ -81,7 +100,10 @@ export default function Home() {
     </View>
   );
 
-  // Format the last updated time
+  /**
+   * Formats the last updated time into a human-readable string
+   * @returns {string} Formatted time string (e.g., "Updated 5 minutes ago")
+   */
   const formatLastUpdated = () => {
     if (!lastUpdated) return '';
     
@@ -98,29 +120,41 @@ export default function Home() {
     return `Updated ${hours} hours ago`;
   };
 
-
   return (
     <LinearGradient 
-        colors={isDarkTheme ? ['#277ea5', '#0d0f12'] : ['#7fd7ff', '#fff']}
-       start={{ x: 0.4, y: 0 }}
-        end={{ x: 0.4, y: 1 }}
+      colors={isDarkTheme ? ['#277ea5', '#0d0f12'] : ['#7fd7ff', '#fff']}
+      start={{ x: 0.4, y: 0 }}
+      end={{ x: 0.4, y: 1 }}
       style={styles.container} 
     >
-      {/* Weather Background Effects */}
+      {/* Background weather effects with animation toggle */}
       {weatherData && (
         <WeatherBackground 
           weatherId={weatherData.weather[0].id} 
           isDarkTheme={isDarkTheme} 
+          animationsEnabled={animationsEnabled} // Pass animation state
         />
       )}
       
-      {/* Other components */}
-      <StatusBar barStyle="light-content" />
-      
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
+      {/* Main content sections */}
+      {/* Search interface */}
+      <View style={[
+        styles.searchContainer, 
+        isLandscape && Platform.OS !== 'web' && { 
+          marginVertical: 5,
+          maxWidth: 1000,
+          alignSelf: 'center'
+        }
+      ]}>
         <TextInput
-          style={styles.searchInput}
+          style={[
+            styles.searchInput,
+            isLandscape && Platform.OS !== 'web' && {
+              marginVertical: -15,
+              height: 25,
+              fontSize: 14
+            }
+          ]}
           placeholder="Search for a city"
           value={searchQuery}
           onChangeText={handleSearchInputChange}
@@ -135,13 +169,20 @@ export default function Home() {
           }}
         />
         <TouchableOpacity 
-          style={styles.searchButton} 
+          style={[
+            styles.searchButton,
+            isLandscape && Platform.OS !== 'web' && {
+              marginVertical: -15,
+              width: 25,
+              height: 25
+            }
+          ]} 
           onPress={handleSearchLocation}
         >
-          <Feather name="search" size={22} color="#fff" />
+          <Feather name="search" size={isLandscape && Platform.OS !== 'web' ? 18 : 22} color="#fff" />
         </TouchableOpacity>
       </View>
-      
+
       {/* Search History/Suggestions Popup */}
       <SearchHistory
         visible={showSearchHistory}
@@ -156,19 +197,35 @@ export default function Home() {
       />
       
       <TouchableOpacity 
-        style={styles.locationButton} 
+        style={[
+          styles.locationButton, 
+          isLandscape && Platform.OS !== 'web' && { 
+            marginVertical: 5,
+            paddingVertical: 6,
+            maxWidth: 300,
+            alignSelf: 'center',
+            height: 28
+          }
+        ]} 
         onPress={handleGetCurrentLocation}
       >
-        <Feather name="map-pin" size={18} color="#fff" />
-        <Text style={styles.locationButtonText}>Current Location</Text>
+        <Feather name="map-pin" size={isLandscape && Platform.OS !== 'web' ? 16 : 18} color="#fff" />
+        <Text style={[
+          styles.locationButtonText,
+          isLandscape && Platform.OS !== 'web' && {
+            fontSize: 13
+          }
+        ]}>Current Location</Text>
       </TouchableOpacity>
 
       {isLoading ? (
+        // Loading state
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#0066cc" />
           <Text style={styles.loadingText}>Loading weather data...</Text>
         </View>
       ) : errorMsg ? (
+        // Error state
         <View style={styles.errorContainer}>
           <MaterialCommunityIcons name="weather-cloudy-alert" size={60} color="#d32f2f" style={styles.emptyStateIcon} />
           <Text style={styles.errorText}>{errorMsg}</Text>
@@ -181,13 +238,13 @@ export default function Home() {
           </TouchableOpacity>
         </View>
       ) : weatherData ? (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollViewContent}
-          onScrollBeginDrag={Keyboard.dismiss}
-        >
-          {/* Current Weather */}
-          <View style={styles.currentWeatherContainer}>
+        // Weather data display
+        <ResponsiveLayout scrollable={true}>
+          {/* Current weather section */}
+          <ResponsiveSection 
+            
+            style={styles.currentWeatherContainer}
+          >
             <Text style={styles.currentDateTime}>
               {new Date().toLocaleDateString('en-US', { 
               weekday: 'long',
@@ -235,46 +292,53 @@ export default function Home() {
                 <Text style={styles.lastUpdatedText}>{formatLastUpdated()}</Text>
               )}
             </View>
-          </View>
+          </ResponsiveSection>
 
-          {/* Hourly Forecast Preview */}
-          <View style={styles.hourlyForecastContainer}>
-            <Text style={styles.forecastTitle}>Hourly Forecast</Text>
-            <FlatList
-              data={hourlyForecastData.slice(0, 8)}
-              renderItem={renderHourlyItem}
-              keyExtractor={(item) => item.dt.toString()}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.hourlyForecastList}
-            />
-          </View>
-
-          {/* Daily Forecast Preview */}
-          <View style={styles.dailyForecastContainer}>
-            <Text style={styles.forecastTitle}>5-Day Forecast</Text>
-            <FlatList
-              data={dailyForecastData.slice(0, 5)}
-              renderItem={renderDailyItem}
-              keyExtractor={(item) => item.dt.toString()}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.dailyForecastList}
-            />
-          </View>
-          
-          {/* Refresh button at the bottom */}
-          <TouchableOpacity 
-            style={styles.refreshContainer}
-            onPress={() => {
-              weatherData && handleSelectHistoryItem(weatherData.name);
-            }}
+          {/* Weather Details Section - Right side in landscape */}
+          <ResponsiveSection 
+            
           >
-            <Feather name="refresh-cw" size={16} color="#0066cc" />
-            <Text style={styles.refreshText}>Refresh Weather</Text>
-          </TouchableOpacity>
-        </ScrollView>
+            {/* Hourly Forecast */}
+            <View style={styles.hourlyForecastContainer}>
+              <Text style={styles.forecastTitle}>Hourly Forecast</Text>
+              <FlatList
+                data={hourlyForecastData.slice(0, isLandscape ? 6 : 8)}
+                renderItem={renderHourlyItem}
+                keyExtractor={(item) => item.dt.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.hourlyForecastList}
+              />
+            </View>
+
+            {/* Daily Forecast */}
+            <View style={styles.dailyForecastContainer}>
+              <Text style={styles.forecastTitle}>5-Day Forecast</Text>
+              <FlatList
+                data={dailyForecastData.slice(0, 5)}
+                renderItem={renderDailyItem}
+                keyExtractor={(item) => item.dt.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.dailyForecastList}
+              />
+            </View>
+            
+            {/* Refresh button */}
+            <TouchableOpacity 
+              style={styles.refreshContainer}
+              onPress={() => {
+                weatherData && handleSelectHistoryItem(weatherData.name);
+              }}
+            >
+              <Feather name="refresh-cw" size={16} color="#0066cc" />
+              <Text style={styles.refreshText}>Refresh Weather</Text>
+            </TouchableOpacity>
+          </ResponsiveSection>
+        </ResponsiveLayout>
       ) : (
+        // Empty state
         <View style={styles.emptyStateContainer}>
           <MaterialCommunityIcons name="weather-cloudy" size={80} color="#888" style={styles.emptyStateIcon} />
           <Text style={styles.emptyStateText}>No Weather Data</Text>
