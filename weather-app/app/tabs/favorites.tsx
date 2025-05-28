@@ -201,9 +201,12 @@ const Favorites: React.FC = () => {
     const weather = weatherData[item];
     
     return (
-      <View style={styles.favoriteItem}>
+      <View style={[
+      styles.favoriteItem,
+      { backgroundColor: isDarkTheme ? '#1e293b57' : '#ffffff59' }
+    ]}>
         <View style={styles.favoriteLeft}>
-          <Text style={styles.favoriteCityName}>
+         <Text style={[styles.favoriteCityName, { color: isDarkTheme ? 'white' : 'black' }]}>
             {weather ? weather.city : item}
           </Text>
           {weather ? (
@@ -212,31 +215,31 @@ const Favorites: React.FC = () => {
                 <MaterialCommunityIcons
                   name={getWeatherIcon(weather.icon)}
                   size={40}
-                  color={isDarkTheme ? '#F1F5F9' : '#333'}
+                  color={isDarkTheme ? '#71aaac' : '#71aaac'} 
                 />
                 <View style={styles.favoriteTempContainer}>
-                  <Text style={styles.favoriteTemp}>
+                  <Text style={[styles.favoriteTemp, { color: isDarkTheme ? 'white' : 'black' }]}>
                     {weather.temperature}°{unit}
                   </Text>
-                  <Text style={styles.favoriteDescription}>
+                  <Text style={[styles.favoriteDescription, { color: isDarkTheme ? 'white' : 'black' }]}>
                     {weather.description}
                   </Text>
                 </View>
               </View>
               <View style={styles.favoriteDetails}>
-                <Text style={styles.favoriteDetailText}>
+                <Text style={[styles.favoriteDetailText, { color: isDarkTheme ? 'white' : 'black' }]}>
                   Feels like {weather.feelsLike}°{unit}
                 </Text>
-                <Text style={styles.favoriteDetailText}>
+                <Text style={[styles.favoriteDetailText, { color: isDarkTheme ? 'white' : 'black' }]}>
                   Humidity: {weather.humidity}%
                 </Text>
-                <Text style={styles.favoriteDetailText}>
+                <Text style={[styles.favoriteDetailText, { color: isDarkTheme ? 'white' : 'black' }]}>
                   Wind: {weather.windSpeed} {unit === 'C' ? 'm/s' : 'mph'}
                 </Text>
               </View>
             </View>
           ) : (
-            <Text style={styles.favoriteNoData}>
+           <Text style={[styles.favoriteNoData, { color: isDarkTheme ? 'white' : 'black' }]}>
               {loading ? 'Loading weather...' : 'Weather data unavailable'}
             </Text>
           )}
@@ -327,7 +330,6 @@ const Favorites: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    
   },
   loadingContainer: {
     flex: 1,
@@ -358,7 +360,6 @@ const styles = StyleSheet.create({
   },
   emptyStateDescription: {
     fontSize: 16,
-    color: '#666',
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -366,7 +367,6 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   favoriteItem: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -385,7 +385,6 @@ const styles = StyleSheet.create({
   favoriteCityName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 8,
   },
   favoriteWeatherInfo: {
@@ -402,11 +401,9 @@ const styles = StyleSheet.create({
   favoriteTemp: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
   },
   favoriteDescription: {
     fontSize: 14,
-    color: '#666',
     textTransform: 'capitalize',
     marginTop: 2,
   },
@@ -418,11 +415,9 @@ const styles = StyleSheet.create({
   },
   favoriteDetailText: {
     fontSize: 12,
-    color: '#888',
   },
   favoriteNoData: {
     fontSize: 14,
-    color: '#888',
     fontStyle: 'italic',
   },
   favoriteRemoveButton: {

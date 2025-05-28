@@ -1,34 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-  ActivityIndicator,
-  SafeAreaView,
+  View, Text, StyleSheet, Image, ScrollView,
+  TouchableOpacity, Dimensions, ActivityIndicator, SafeAreaView,
 } from 'react-native';
 import { WEATHER_API_KEY } from '../services/api';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useWeather } from '../contexts/WeatherContext';
-import { useTemperature } from '../contexts/TemperatureContext'; // Import the temperature context
-import { getStyles } from '../styles/styles';
+import { useTemperature } from '../contexts/TemperatureContext';
+import { useTheme } from '../contexts/ThemeContext';
 
-// Screen dimensions for the map
+/** Screen dimensions configuration */
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const MAP_HEIGHT = 300;
+const MAP_HEIGHT = 280;
 
+/** Map layer configuration interface */
 interface MapLayer {
   id: string;
   name: string;
-  icon: string; // Changed from keyof typeof Feather.glyphMap to string
+  icon: string;
   weatherKey: string;
   unit: string;
 }
 
-// Add interface for weather data structure to handle optional properties
+/** Weather data structure interfaces */
 interface WeatherDataRain {
   '1h'?: number;
   '3h'?: number;
@@ -43,20 +38,29 @@ interface WeatherDataClouds {
   all?: number;
 }
 
+/**
+ * WeatherMaps Component
+ * Displays interactive weather maps with different layers and zoom levels
+ * Features:
+ * - Multiple weather layer types (temperature, precipitation, wind, etc.)
+ * - Adjustable zoom levels
+ * - Current weather value display
+ * - Detailed map legend
+ * - Theme-aware styling
+ */
 const WeatherMaps = () => {
   const { weatherData } = useWeather();
-  const { formatTemp, unit } = useTemperature(); // Use the temperature context
+  const { formatTemp, unit } = useTemperature();
+  const { isDarkTheme } = useTheme();
   const [mapType, setMapType] = useState('TA2');
   const [zoom, setZoom] = useState(4);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDarkTheme] = useState(false);
-  const styles = getStyles(isDarkTheme);
-  
-  // City coordinates from weather data
+
+  /** Location coordinates from weather data */
   const lat = weatherData?.coord?.lat || 0;
   const lon = weatherData?.coord?.lon || 0;
-  
-  // Map layer options with corresponding weather data keys - update temperature unit dynamically
+
+  /** Available map layer configurations */
   const mapLayers: MapLayer[] = [
     { id: 'TA2', name: 'Temperature', icon: 'thermometer', weatherKey: 'temp', unit: `°${unit}` },
     { id: 'PR0', name: 'Precipitation', icon: 'cloud-rain', weatherKey: 'rain', unit: 'mm/h' },
@@ -65,17 +69,19 @@ const WeatherMaps = () => {
     { id: 'APM', name: 'Pressure', icon: 'activity', weatherKey: 'pressure', unit: 'hPa' },
   ];
 
-  // Map zoom options
+  /** Zoom level options */
   const zoomLevels = [
     { level: 2, name: 'Wide' },
     { level: 4, name: 'Regional' },
     { level: 6, name: 'Local' },
     { level: 8, name: 'Close' },
   ];
-  
-  // Generate correct OpenWeatherMap URL using Maps API 2.0
+
+  /**
+   * Generates OpenWeatherMap URL for current map settings
+   * Converts coordinates to tile system
+   */
   const generateMapUrl = () => {
-    // Convert lat/lon to tile coordinates
     const tileX = Math.floor((lon + 180) / 360 * Math.pow(2, zoom));
     const latRad = lat * Math.PI / 180;
     const tileY = Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * Math.pow(2, zoom));
@@ -83,7 +89,10 @@ const WeatherMaps = () => {
     return `http://maps.openweathermap.org/maps/2.0/weather/${mapType}/${zoom}/${tileX}/${tileY}?appid=${WEATHER_API_KEY}`;
   };
 
-  // Get current weather value for selected map type
+  /**
+   * Gets current weather value based on selected map type
+   * Handles different data structures for each weather parameter
+   */
   const getCurrentWeatherValue = () => {
     if (!weatherData) return null;
     
@@ -92,13 +101,12 @@ const WeatherMaps = () => {
     
     switch (mapType) {
       case 'TA2':
-        // Use formatTemp to convert and format temperature according to user preference
-        const tempValue = formatTemp(weatherData.main.temp, 'C', false); // Remove unit from formatTemp since we add it below
+        const tempValue = formatTemp(weatherData.main.temp, 'C', false);
         return {
           value: tempValue,
           label: 'Current Temperature',
           icon: 'thermometer',
-          unit: `${unit}` // Use the current unit from context
+          unit: `${unit}`
         };
       case 'PR0':
         // Safe access to rain data with proper type checking
@@ -138,7 +146,10 @@ const WeatherMaps = () => {
     }
   };
 
-  // Enhanced legend information based on map type - update temperature ranges based on current unit
+  /**
+   * Provides legend information for current map type
+   * Includes color scales and value ranges
+   */
   const getLegendInfo = () => {
     switch (mapType) {
       case 'PR0':
@@ -218,7 +229,7 @@ const WeatherMaps = () => {
     }
   };
 
-  // Load new map when type or zoom changes
+  /** Manage map loading state */
   useEffect(() => {
     if (weatherData?.coord) {
       setIsLoading(true);
@@ -229,17 +240,41 @@ const WeatherMaps = () => {
     }
   }, [mapType, zoom, weatherData]);
 
+  /**
+   * GradientWrapper Component
+   * Provides consistent gradient background based on theme
+   */
+  const GradientWrapper = ({ children }: { children: React.ReactNode }) => (
+    <LinearGradient
+      colors={isDarkTheme ? ['#277ea5', '#0d0f12'] : ['#7fd7ff', '#fff']}
+      start={{ x: 0.4, y: 0 }}
+      end={{ x: 0.4, y: 1 }}
+      style={styles.container}
+    >
+      {children}
+    </LinearGradient>
+  );
+
   if (!weatherData?.coord) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.emptyStateContainer}>
-          <MaterialCommunityIcons name="map-marker-off" size={80} color="#888" />
-          <Text style={styles.emptyStateText}>No Location Selected</Text>
-          <Text style={styles.emptyStateDescription}>
-            Search for a location first to view weather maps.
-          </Text>
-        </View>
-      </SafeAreaView>
+      <GradientWrapper>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.emptyStateContainer}>
+            <MaterialCommunityIcons 
+              name="map-marker-off" 
+              size={80} 
+              color={isDarkTheme ? '#9CA3AF' : '#555'} 
+              style={styles.emptyStateIcon}
+            />
+            <Text style={[styles.emptyStateText, { color: isDarkTheme ? '#FFFFFF' : '#000000' }]}>
+              No Location Selected
+            </Text>
+            <Text style={[styles.emptyStateDescription, { color: isDarkTheme ? '#E5E7EB' : '#4B5563' }]}>
+              Search for a location first to view weather maps.
+            </Text>
+          </View>
+        </SafeAreaView>
+      </GradientWrapper>
     );
   }
 
@@ -248,339 +283,361 @@ const WeatherMaps = () => {
   const currentWeatherValue = getCurrentWeatherValue();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView 
-        style={mapStyles.container}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={mapStyles.scrollContent}
-      >
-        {/* Header */}
-        <View style={mapStyles.headerContainer}>
-          <Text style={mapStyles.headerTitle}>
-            {weatherData.name}, {weatherData.sys.country}
-          </Text>
-          <Text style={mapStyles.locationText}>
-            {lat.toFixed(3)}°N, {lon.toFixed(3)}°W
-          </Text>
-        </View>
-
-        {/* Map Layer Selector */}
-        <View style={mapStyles.selectorContainer}>
-          <Text style={mapStyles.selectorLabel}>Select Weather Layer:</Text>
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={mapStyles.layerButtonsContainer}
-          >
-            {mapLayers.map((layer) => (
-              <TouchableOpacity
-                key={layer.id}
-                style={[
-                  mapStyles.layerButton,
-                  mapType === layer.id && mapStyles.layerButtonActive
-                ]}
-                onPress={() => setMapType(layer.id)}
-              >
-                <Feather 
-                  name={layer.icon as any} // Type assertion to handle icon names
-                  size={18} 
-                  color={mapType === layer.id ? '#fff' : '#0066cc'} 
-                />
-                <Text style={[
-                  mapStyles.layerButtonText,
-                  mapType === layer.id && mapStyles.layerButtonTextActive
-                ]}>
-                  {layer.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* Zoom Selector */}
-        <View style={mapStyles.selectorContainer}>
-          <Text style={mapStyles.selectorLabel}>Map Zoom:</Text>
-          <View style={mapStyles.zoomButtonsContainer}>
-            {zoomLevels.map((zoomOption) => (
-              <TouchableOpacity
-                key={zoomOption.level}
-                style={[
-                  mapStyles.zoomButton,
-                  zoom === zoomOption.level && mapStyles.zoomButtonActive
-                ]}
-                onPress={() => setZoom(zoomOption.level)}
-              >
-                <Text style={[
-                  mapStyles.zoomButtonText,
-                  zoom === zoomOption.level && mapStyles.zoomButtonTextActive
-                ]}>
-                  {zoomOption.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
+    <GradientWrapper>
+      <SafeAreaView style={styles.container}>
+        <ScrollView 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollViewContent}
+        >
+          {/* Header */}
+          <View style={styles.locationHeaderContainer}>
+            <Text style={[styles.locationHeaderText, { color: isDarkTheme ? '#FFFFFF' : '#000000' }]}>
+              {weatherData.name}, {weatherData.sys.country}
+            </Text>
+            <Text style={[styles.coordinatesText, { color: isDarkTheme ? '#D1D5DB' : '#6B7280' }]}>
+              {lat.toFixed(3)}°N, {lon.toFixed(3)}°W
+            </Text>
           </View>
-        </View>
 
-        {/* Current Weather Value for Selected Layer */}
-        {currentWeatherValue && (
-          <View style={mapStyles.currentValueContainer}>
-            <View style={mapStyles.currentValueContent}>
-              <MaterialCommunityIcons 
-                name={currentWeatherValue.icon as any} // Type assertion for MaterialCommunityIcons
-                size={24} 
-                color="#0066cc" 
-              />
-              <View style={mapStyles.currentValueText}>
-                <Text style={mapStyles.currentValueLabel}>
-                  {currentWeatherValue.label}
-                </Text>
-                <Text style={mapStyles.currentValueNumber}>
-                  {currentWeatherValue.value}{currentWeatherValue.unit}
-                </Text>
-              </View>
-            </View>
-          </View>
-        )}
-
-        {/* Map Display */}
-        <View style={mapStyles.mapContainer}>
-          {isLoading ? (
-            <View style={mapStyles.loadingContainer}>
-              <ActivityIndicator size="large" color="#0066cc" />
-              <Text style={mapStyles.loadingText}>Loading {legendInfo.title.toLowerCase()}...</Text>
-            </View>
-          ) : (
-            <View style={mapStyles.mapImageContainer}>
-              <Image 
-                source={{ uri: mapUrl }} 
-                style={mapStyles.mapImage}
-                resizeMode="cover"
-                onError={(error) => {
-                  console.log('Map loading error:', error.nativeEvent.error);
-                }}
-                onLoad={() => {
-                  console.log('Map loaded successfully');
-                }}
-              />
-              
-              {/* Location Marker */}
-              <View style={mapStyles.mapLocationMarker}>
-                <MaterialCommunityIcons name="map-marker" size={30} color="#e91e63" />
-                <View style={mapStyles.locationLabel}>
-                  <Text style={mapStyles.locationLabelText}>
-                    {weatherData.name}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          )}
-        </View>
-
-        {/* Enhanced Map Legend */}
-        {legendInfo.colors.length > 0 && (
-          <View style={mapStyles.legendContainer}>
-            <View style={mapStyles.legendHeader}>
-              <Text style={mapStyles.legendTitle}>{legendInfo.title}</Text>
-              <Text style={mapStyles.legendDescription}>{legendInfo.description}</Text>
-            </View>
-            <View style={mapStyles.legendGrid}>
-              {legendInfo.colors.map((item, index) => (
-                <View key={index} style={mapStyles.legendItem}>
-                  <View 
-                    style={[
-                      mapStyles.legendColorBox, 
-                      { backgroundColor: item.color }
-                    ]} 
+          {/* Map Layer Selector */}
+          <View style={[
+            styles.selectorContainer,
+            { backgroundColor: isDarkTheme ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)' }
+          ]}>
+            <Text style={[styles.selectorTitle, { color: isDarkTheme ? '#FFFFFF' : '#000000' }]}>
+              Weather Layer
+            </Text>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.horizontalScroll}
+            >
+              {mapLayers.map((layer) => (
+                <TouchableOpacity
+                  key={layer.id}
+                  style={[
+                    styles.layerButton,
+                    { 
+                      backgroundColor: mapType === layer.id 
+                        ? (isDarkTheme ? '#2e6a8a' : '#2e6a8a')
+                        : (isDarkTheme ? '#ffffff4d' : '#8abad3')
+                    }
+                  ]}
+                  onPress={() => setMapType(layer.id)}
+                >
+                  <Feather 
+                    name={layer.icon as any}
+                    size={16} 
+                    color={mapType === layer.id 
+                      ? (isDarkTheme ? '#000000' : '#FFFFFF')
+                      : (isDarkTheme ? '#FFFFFF' : '#000000')
+                    }
+                    style={styles.layerIcon}
                   />
-                  <View style={mapStyles.legendTextContainer}>
-                    <Text style={mapStyles.legendLabel}>{item.label}</Text>
-                    <Text style={mapStyles.legendSubtext}>{item.description}</Text>
-                  </View>
-                </View>
+                  <Text style={[
+                    styles.layerButtonText,
+                    { 
+                      color: mapType === layer.id 
+                        ? (isDarkTheme ? '#000000' : '#FFFFFF')
+                        : (isDarkTheme ? '#FFFFFF' : '#000000')
+                    }
+                  ]}>
+                    {layer.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+
+          {/* Zoom Selector */}
+          <View style={[
+            styles.selectorContainer,
+            { backgroundColor: isDarkTheme ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)' }
+          ]}>
+            <Text style={[styles.selectorTitle, { color: isDarkTheme ? '#FFFFFF' : '#000000' }]}>
+              Map Zoom
+            </Text>
+            <View style={styles.zoomContainer}>
+              {zoomLevels.map((zoomOption, index) => (
+                <TouchableOpacity
+                  key={zoomOption.level}
+                  style={[
+                    styles.zoomButton,
+                    { 
+                      backgroundColor: zoom === zoomOption.level 
+                        ? (isDarkTheme ? '#2e6a8a' : '#2e6a8a')
+                        : (isDarkTheme ? '#30586a)' : '#a8e1ff'),
+                      borderColor: isDarkTheme ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'
+                    },
+                    index === 0 && styles.zoomButtonFirst,
+                    index === zoomLevels.length - 1 && styles.zoomButtonLast
+                  ]}
+                  onPress={() => setZoom(zoomOption.level)}
+                >
+                  <Text style={[
+                    styles.zoomButtonText,
+                    { 
+                      color: zoom === zoomOption.level 
+                        ? (isDarkTheme ? '#000000' : '#FFFFFF')
+                        : (isDarkTheme ? '#FFFFFF' : '#000000')
+                    }
+                  ]}>
+                    {zoomOption.name}
+                  </Text>
+                </TouchableOpacity>
               ))}
             </View>
           </View>
-        )}
 
-        {/* Map Information */}
-        <View style={mapStyles.infoContainer}>
-          <Text style={mapStyles.infoTitle}>Map Information</Text>
-          <Text style={mapStyles.infoText}>
-            This weather map shows real-time {legendInfo.title.toLowerCase()} data from OpenWeatherMap. 
-            The colors represent different intensity levels, with the legend above showing the scale. 
-            Your current location is marked with a red pin.
-          </Text>
-          <View style={mapStyles.infoDetails}>
-            <Text style={mapStyles.infoDetailText}>
-              • Data updates every 10 minutes
+          {/* Current Weather Value for Selected Layer */}
+          {currentWeatherValue && (
+            <View style={[
+              styles.currentValueContainer,
+              { backgroundColor: isDarkTheme ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)' }
+            ]}>
+              <View style={styles.currentValueHeader}>
+                <MaterialCommunityIcons 
+                  name={currentWeatherValue.icon as any}
+                  size={20} 
+                  color={isDarkTheme ? '#FFFFFF' : '#000000'}
+                />
+                <Text style={[styles.currentValueLabel, { color: isDarkTheme ? '#FFFFFF' : '#000000' }]}>
+                  {currentWeatherValue.label}
+                </Text>
+              </View>
+              <Text style={[styles.currentValueText, { color: isDarkTheme ? '#FFFFFF' : '#000000' }]}>
+                {currentWeatherValue.value}{currentWeatherValue.unit}
+              </Text>
+            </View>
+          )}
+
+          {/* Map Display */}
+          <View style={[
+            styles.mapContainer,
+            { backgroundColor: isDarkTheme ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)' }
+          ]}>
+            <Text style={[styles.mapTitle, { color: isDarkTheme ? '#FFFFFF' : '#000000' }]}>
+              Weather Map
             </Text>
-            <Text style={mapStyles.infoDetailText}>
-              • Resolution: {zoom <= 4 ? 'Regional' : zoom <= 6 ? 'Local' : 'High detail'}
-            </Text>
-            <Text style={mapStyles.infoDetailText}>
-              • Source: OpenWeatherMap API
-            </Text>
+            
+            {isLoading ? (
+              <View style={[styles.loadingContainer, { height: MAP_HEIGHT }]}>
+                <ActivityIndicator size="large" color={isDarkTheme ? '#60A5FA' : '#2563EB'} />
+                <Text style={[styles.loadingText, { color: isDarkTheme ? '#D1D5DB' : '#6B7280' }]}>
+                  Loading {legendInfo.title.toLowerCase()}...
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.mapImageContainer}>
+                <Image 
+                  source={{ uri: mapUrl }} 
+                  style={styles.mapImage}
+                  resizeMode="cover"
+                  onError={(error) => {
+                    console.log('Map loading error:', error.nativeEvent.error);
+                  }}
+                  onLoad={() => {
+                    console.log('Map loaded successfully');
+                  }}
+                />
+                
+                {/* Location Marker */}
+                <View style={styles.locationMarkerContainer}>
+                  <MaterialCommunityIcons name="map-marker" size={30} color="#e91e63" />
+                  <View style={styles.locationMarkerLabel}>
+                    <Text style={styles.locationMarkerText}>
+                      {weatherData.name}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            )}
           </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+
+          {/* Enhanced Map Legend */}
+          {legendInfo.colors.length > 0 && (
+            <View style={[
+              styles.legendContainer,
+              { backgroundColor: isDarkTheme ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)' }
+            ]}>
+              <Text style={[styles.legendTitle, { color: isDarkTheme ? '#FFFFFF' : '#000000' }]}>
+                {legendInfo.title}
+              </Text>
+              <Text style={[styles.legendDescription, { color: isDarkTheme ? '#E5E7EB' : '#4B5563' }]}>
+                {legendInfo.description}
+              </Text>
+              
+              <View style={styles.legendItems}>
+                {legendInfo.colors.map((item, index) => (
+                  <View key={index} style={styles.legendItem}>
+                    <View style={styles.legendItemLeft}>
+                      <View 
+                        style={[
+                          styles.legendColor,
+                          { 
+                            backgroundColor: item.color,
+                            borderColor: isDarkTheme ? '#6B7280' : '#D1D5DB'
+                          }
+                        ]} 
+                      />
+                      <Text style={[styles.legendLabel, { color: isDarkTheme ? '#FFFFFF' : '#000000' }]}>
+                        {item.label}
+                      </Text>
+                    </View>
+                    <Text style={[styles.legendValue, { color: isDarkTheme ? '#E5E7EB' : '#4B5563' }]}>
+                      {item.description}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    </GradientWrapper>
   );
 };
 
-const mapStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollContent: {
-    paddingBottom: 30,
+  scrollViewContent: {
+    padding: 16,
+    paddingBottom: 32,
   },
-  headerContainer: {
-    marginVertical: 20,
-    paddingHorizontal: 20,
+  locationHeaderContainer: {
     alignItems: 'center',
+    marginBottom: 24,
   },
-  headerTitle: {
+  locationHeaderText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
     textAlign: 'center',
-    marginBottom: 5,
   },
-  locationText: {
-    fontSize: 16,
-    color: '#666',
+  coordinatesText: {
+    fontSize: 14,
+    marginTop: 4,
     textAlign: 'center',
   },
   selectorContainer: {
-    marginBottom: 20,
-    paddingHorizontal: 20,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  selectorLabel: {
+  selectorTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: 'bold',
     marginBottom: 12,
   },
-  layerButtonsContainer: {
-    paddingVertical: 5,
+  horizontalScroll: {
+    paddingVertical: 4,
   },
   layerButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
-    paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 25,
-    marginRight: 12,
-    borderWidth: 2,
-    borderColor: '#e9ecef',
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginHorizontal: 4,
+    minWidth: 100,
   },
-  layerButtonActive: {
-    backgroundColor: '#0066cc',
-    borderColor: '#0066cc',
+  layerIcon: {
+    marginRight: 6,
   },
   layerButtonText: {
-    fontSize: 15,
-    color: '#0066cc',
-    marginLeft: 8,
+    fontSize: 14,
     fontWeight: '500',
   },
-  layerButtonTextActive: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  zoomButtonsContainer: {
+  zoomContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    borderRadius: 8,
+    overflow: 'hidden',
   },
   zoomButton: {
     flex: 1,
+    paddingVertical: 10,
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f8f9fa',
-    paddingVertical: 12,
-    marginHorizontal: 4,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderWidth: 1,
   },
-  zoomButtonActive: {
-    backgroundColor: '#0066cc',
-    borderColor: '#0066cc',
+  zoomButtonFirst: {
+    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 8,
+  },
+  zoomButtonLast: {
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
   },
   zoomButtonText: {
     fontSize: 14,
-    color: '#0066cc',
     fontWeight: '500',
   },
-  zoomButtonTextActive: {
-    color: '#fff',
-    fontWeight: '600',
-  },
   currentValueContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    marginHorizontal: 20,
-    marginBottom: 20,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  currentValueContent: {
+  currentValueHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  currentValueText: {
-    marginLeft: 15,
-    flex: 1,
+    marginBottom: 8,
   },
   currentValueLabel: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 4,
+    marginLeft: 8,
   },
-  currentValueNumber: {
-    fontSize: 28,
+  currentValueText: {
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#0066cc',
+    textAlign: 'center',
   },
   mapContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
-    marginHorizontal: 20,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  mapTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
   },
   loadingContainer: {
-    height: MAP_HEIGHT,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(128,128,128,0.1)',
+    borderRadius: 12,
   },
   loadingText: {
-    marginTop: 15,
+    marginTop: 12,
     fontSize: 16,
-    color: '#555',
   },
   mapImageContainer: {
     height: MAP_HEIGHT,
-    position: 'relative',
-    overflow: 'hidden',
     borderRadius: 12,
+    overflow: 'hidden',
     backgroundColor: '#f0f0f0',
+    position: 'relative',
   },
   mapImage: {
     width: '100%',
     height: '100%',
   },
-  mapLocationMarker: {
+  locationMarkerContainer: {
     position: 'absolute',
     top: '50%',
     left: '50%',
@@ -589,103 +646,86 @@ const mapStyles = StyleSheet.create({
     zIndex: 10,
     alignItems: 'center',
   },
-  locationLabel: {
+  locationMarkerLabel: {
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
     marginTop: 5,
   },
-  locationLabelText: {
+  locationMarkerText: {
     color: '#fff',
     fontSize: 12,
     fontWeight: '500',
   },
   legendContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    marginHorizontal: 20,
-    marginBottom: 20,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  legendHeader: {
-    marginBottom: 15,
+    shadowRadius: 4,
+    elevation: 3,
   },
   legendTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
+    marginBottom: 8,
   },
   legendDescription: {
     fontSize: 14,
-    color: '#666',
+    marginBottom: 16,
     lineHeight: 20,
   },
-  legendGrid: {
+  legendItems: {
     gap: 12,
   },
   legendItem: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8,
   },
-  legendColorBox: {
-    width: 24,
-    height: 24,
-    borderRadius: 8,
+  legendItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  legendColor: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
     marginRight: 12,
     borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  legendTextContainer: {
-    flex: 1,
   },
   legendLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#333',
-    marginBottom: 2,
   },
-  legendSubtext: {
-    fontSize: 12,
-    color: '#666',
+  legendValue: {
+    fontSize: 14,
+    flex: 1,
+    textAlign: 'right',
   },
-  infoContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    marginHorizontal: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
   },
-  infoTitle: {
-    fontSize: 18,
+  emptyStateIcon: {
+    marginBottom: 16,
+  },
+  emptyStateText: {
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
+    marginBottom: 8,
+    textAlign: 'center',
   },
-  infoText: {
-    fontSize: 14,
-    color: '#555',
-    lineHeight: 22,
-    marginBottom: 15,
-  },
-  infoDetails: {
-    marginTop: 5,
-  },
-  infoDetailText: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 6,
+  emptyStateDescription: {
+    fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 24,
   },
 });
 
